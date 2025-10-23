@@ -94,7 +94,7 @@ main{
     text-decoration: none;
 }
 
-.buttons .add-listing-btn:hover{
+.buttons .add-listing-btn a:hover{
     transition: 0.5s ease;
     background-color: #fff;
 }
@@ -320,6 +320,10 @@ main{
     color: #073066;
 }
 
+.bid-cards-list .bid-card .bottom .join-bid-btn:hover a {
+    color: #073066;
+}
+
 .homepage-section .available-swaps{
     display: flex;
     flex-direction: column;
@@ -432,6 +436,10 @@ main{
     background: transparent;
     color: #073066;
     border: 1px solid #073066;
+}
+
+.swap-cards-list .swap-card .button-container button:hover a {
+    color: #073066;
 }
 
 .swap-cards-list .swap-card .button-container .heart-button-swap{
