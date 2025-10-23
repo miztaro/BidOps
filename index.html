@@ -5,19 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bid and Swap</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 </head>
 <body>
     <main>
         <!--Home Page-->
-        <section class="homepage" id="homepage">
+        <section class="homepage-section">
             <div class="home-cover">
-                <img src="" alt="">
-                <div class="home-cover-title">
+                <img src="images/home-cover-img.png" alt="Home Cover Image">
+                <div class="title">
                     <h1>Trade Smart,<br>Study Smarter</h1>
-                    <p>Description here</p>
+                    <p>Discover the ultimate campus marketplace where SLU students bid on textbooks, swap study materials, and find essential academic resources</p>
                 </div>
                 <div class="buttons">
-                    <button class="add-listing-btn">Add Listing</button>
+                    <button class="add-listing-btn"><a href="#">Add Listing</a></button>
                     <button class="browse-items-btn">Browse Items</button>
                 </div>
             </div>
@@ -43,125 +44,251 @@
 
             <div class="available-bids">
                 <div class="available-bids-title">
-                    <h3>Available Bids</h3>
-                    <p>Join the bidding war for amazing academic resources</p>
+                    <div class="left">
+                        <h3>Available Bids</h3>
+                        <p>Join the bidding war for amazing academic resources</p>
+                    </div>
                     <a href="#" class="view-all">View All</a>
                 </div>
 
                 <div class="bid-cards-list">
-                    <div id="bid-card">
-                        <img src="" alt="">
-                        <h6>Calculus Textbook</h6>
-                        <p>Engineering & CS</p>
-                        <p>Starting bid <span class="bid-price">P,1250</span></p>
-                        <div class="bid-time-and-count">
-                            <p class="time">2h 45m left</p>
-                            <p class="count"><span>12</span>bids</p>
+                    <div class="bid-card">
+                        <div class="top">
+                            <img src="images/calculator.jpg" alt="">
+                            <button class="heart-button-bid">
+                                <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo"></iconify-icon>  
+                            </button>
                         </div>
-                        <button class="join-bid-btn">Join Bid</button>
+                        <div class="bottom">
+                            <h6>Calculator</h6>
+                            <p class="category">General Education</p>
+                            <p  class="start-bid">Starting bid <span class="bid-price">P,1250</span></p>
+                            <div class="bid-time-and-count">
+                                <div class="time">
+                                    <p>2h 45m left</p>
+                                </div>
+                                <p class="count"><span>12</span> bids</p>
+                            </div>
+                            <button class="join-bid-btn"><a href="#">Join Bid</a></button>
+                        </div>
                     </div>
 
-                    <div id="bid-card">
-                        <img src="" alt="">
-                        <h6>Calculus Textbook</h6>
-                        <p>Engineering & CS</p>
-                        <p>Starting bid <span class="bid-price">P,1250</span></p>
-                        <div class="bid-time-and-count">
-                            <p class="time">2h 45m left</p>
-                            <p class="count"><span>12</span>bids</p>
+                    <div class="bid-card">
+                        <div class="top">
+                            <img src="images/T-Square.jpg" alt="">
+                            <button class="heart-button-bid">
+                                <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo"></iconify-icon>  
+                            </button>                         
                         </div>
-                        <button class="join-bid-btn">Join Bid</button>
+                        <div class="bottom">
+                            <h6>T-Square</h6>
+                            <p class="category">Architecture</p>
+                            <p class="start-bid">Starting bid <span class="bid-price">P,1250</span></p>
+                            <div class="bid-time-and-count">
+                                <div class="time">
+                                    <p>2h 45m left</p>
+                                </div>
+                                <p class="count"><span>12</span> bids</p>
+                            </div>
+                            <button class="join-bid-btn"><a href="#">Join Bid</a></button>
+                        </div>
                     </div>
 
-                    <div id="bid-card">
-                        <img src="" alt="">
-                        <h6>Calculus Textbook</h6>
-                        <p>Engineering & CS</p>
-                        <p>Starting bid <span class="bid-price">P,1250</span></p>
-                        <div class="bid-time-and-count">
-                            <p class="time">2h 45m left</p>
-                            <p class="count"><span>12</span>bids</p>
+                    <div class="bid-card">
+                        <div class="top">
+                            <img src="images/CalculusTextbook.png" alt="">
+                            <button class="heart-button-bid">
+                                <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo"></iconify-icon>  
+                            </button>                        
                         </div>
-                        <button class="join-bid-btn">Join Bid</button>
+                        <div class="bottom">
+                            <h6>Calculus Textbook</h6>
+                            <p class="category">Engineering & CS</p>
+                            <p class="start-bid">Starting bid <span class="bid-price">P,1250</span></p>
+                            <div class="bid-time-and-count">
+                                <div class="time">
+                                    <p>2h 45m left</p>
+                                </div>
+                                <p class="count"><span>12</span> bids</p>
+                            </div>
+                            <button class="join-bid-btn"><a href="#">Join Bid</a></button>
+                        </div>
                     </div>
 
-                    <div id="bid-card">
-                        <img src="" alt="">
-                        <h6>Calculus Textbook</h6>
-                        <p>Engineering & CS</p>
-                        <p>Starting bid <span class="bid-price">P,1250</span></p>
-                        <div class="bid-time-and-count">
-                            <p class="time">2h 45m left</p>
-                            <p class="count"><span>12</span>bids</p>
+                    <div class="bid-card">
+                        <div class="top">
+                            <img src="images/Camera.jpg" alt="">
+                            <button class="heart-button-bid">
+                                <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo"></iconify-icon>  
+                            </button> 
                         </div>
-                        <button class="join-bid-btn">Join Bid</button>
+                        <div class="bottom">
+                            <h6>Camera</h6>
+                            <p class="category">Media & Communications</p>
+                            <p class="start-bid">Starting bid <span class="bid-price">P,1250</span></p>
+                            <div class="bid-time-and-count">
+                                <div class="time">
+                                    <p>2h 45m left</p>
+                                </div>
+                                <p class="count"><span>12</span> bids</p>
+                            </div>
+                            <button class="join-bid-btn"><a href="#">Join Bid</a></button>
+                        </div>
+                    </div>
+
+                    <div class="bid-card">
+                        <div class="top">
+                            <img src="images/Arduino Kit.jpg" alt="">
+                            <button class="heart-button-bid">
+                                <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo"></iconify-icon>  
+                            </button>                        
+                        </div>
+                        <div class="bottom">
+                            <h6>Arduino Kit</h6>
+                            <p class="category">Engineering & CS</p>
+                            <p class="start-bid">Starting bid <span class="bid-price">P,1250</span></p>
+                            <div class="bid-time-and-count">
+                                <div class="time">
+                                    <p>2h 45m left</p>
+                                </div>
+                                <p class="count"><span>12</span> bids</p>
+                            </div>
+                            <button class="join-bid-btn"><a href="#">Join Bid</a></button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="available-swaps">
                 <div class="available-swaps-title">
-                    <h3>Available Swaps</h3>
-                    <p>Join the swapping hub for amazing academic resources</p>
+                    <div class="left">
+                        <h3>Available Swaps</h3>
+                        <p>Join the swapping hub for amazing academic resources</p>
+                    </div>
                     <a href="#" class="view-all">View All</a>
                 </div>
 
                 <div class="swap-cards-list">
                     <div class="swap-card">
-                        <p class="swap-offer">Swap Offer</p>
-                        <img src="" alt="">
-                        <h6>Calculus Textbook</h6>
-                        <p>Engineering & CS</p>
-                        <p class="posted-items"><span>2</span> days ago</p>
-                        <button class="make-offer-btn">Make an Offer</button>
+                        <div class="top">
+                            <div class="offer-wrap"><p>Swap Offer</p></div>
+                            <p class="posted-items"><span>2</span> days ago</p>
+                        </div>
+                        <div class="img-container"><img src="images/calculator.jpg" alt=""></div>
+                        <div class="bottom">
+                            <h6>Calculator</h6>
+                            <p>General Education</p>
+                        </div>
+                        <div class="button-container">
+                            <button class="make-offer-btn"><a href="#">Make Offer</a></button>
+                            <button class="heart-button-swap">
+                                <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo"></iconify-icon>
+                            </button>                        
+                        </div>
                     </div>
 
                     <div class="swap-card">
-                        <p class="swap-offer">Swap Offer</p>
-                        <img src="" alt="">
-                        <h6>Calculus Textbook</h6>
-                        <p>Engineering & CS</p>
-                        <p class="posted-items"><span>2</span> days ago</p>
-                        <button class="make-offer-btn">Make an Offer</button>
+                        <div class="top">
+                            <div class="offer-wrap"><p>Swap Offer</p></div>
+                            <p class="posted-items"><span>2</span> days ago</p>
+                        </div>
+                        <div class="img-container"><img src="images/T-Square.jpg" alt=""></div>
+                        <div class="bottom">
+                            <h6>T-Square</h6>
+                            <p>Architecture</p>
+                        </div>
+                        <div class="button-container">
+                            <button class="make-offer-btn"><a href="#">Make Offer</a></button>
+                            <button class="heart-button-swap">
+                                <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo"></iconify-icon>
+                            </button>                        
+                        </div>
                     </div>
 
                     <div class="swap-card">
-                        <p class="swap-offer">Swap Offer</p>
-                        <img src="" alt="">
-                        <h6>Calculus Textbook</h6>
-                        <p>Engineering & CS</p>
-                        <p class="posted-items"><span>2</span> days ago</p>
-                        <button class="make-offer-btn">Make an Offer</button>
+                        <div class="top">
+                            <div class="offer-wrap"><p class="swap-offer">Swap Offer</p></div>
+                            <p class="posted-items"><span>2</span> days ago</p>
+                        </div>
+                        <div class="img-container"><img src="images/CalculusTextbook.png" alt=""></div>
+                        <div class="bottom">
+                            <h6>Calculus Textbook</h6>
+                            <p>Engineering & CS</p>
+                        </div>
+                        <div class="button-container">
+                            <button class="make-offer-btn"><a href="#">Make Offer</a></button>
+                            <button class="heart-button-swap">
+                                <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo"></iconify-icon>  
+                            </button>                       
+                        </div>
                     </div>
 
                     <div class="swap-card">
-                        <p class="swap-offer">Swap Offer</p>
-                        <img src="" alt="">
-                        <h6>Calculus Textbook</h6>
-                        <p>Engineering & CS</p>
-                        <p class="posted-items"><span>2</span> days ago</p>
-                        <button class="make-offer-btn">Make an Offer</button>
+                        <div class="top">
+                            <div class="offer-wrap"><p>Swap Offer</p></div>
+                            <p class="posted-items"><span>2</span> days ago</p>
+                        </div>
+                        <div class="img-container"><img src="images/Camera.jpg" alt=""></div>
+                        <div class="bottom">
+                            <h6>Camera</h6>
+                            <p>Media & Communications</p>
+                        </div>
+                        <div class="button-container">
+                            <button class="make-offer-btn"><a href="#">Make Offer</a></button>
+                            <button class="heart-button-swap">
+                                <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo"></iconify-icon>  
+                            </button>                       
+                        </div>
+                    </div>
+
+                    <div class="swap-card">
+                        <div class="top">
+                            <div class="offer-wrap"><p>Swap Offer</p></div>
+                            <p class="posted-items"><span>2</span> days ago</p>
+                        </div>
+                        <div class="img-container"><img src="images/Arduino Kit.jpg" alt=""></div>
+                        <div class="bottom">
+                            <h6>Arduino</h6>
+                            <p>Engineering & CS</p>
+                        </div>
+                        <div class="button-container">
+                            <button class="make-offer-btn"><a href="#">Make Offer</a></button>
+                            <button class="heart-button-swap">
+                                <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo"></iconify-icon>
+                            </button>
+                        </div>
                     </div>
                 </div>
+                
             </div>
 
             <div class="browse-category">
-                <h3>Browse by Category</h3>
-                <p>Join the bid and swap war for amazing resources</p>
-        
+                <div class="top">
+                    <h3>Browse by Category</h3>
+                    <p>Join the bid and swap war for amazing resources</p>
+                </div>
+
                 <div class="category-grid">
-                    <button class="category-card"><span id="category-logo">#</span><h6>General Education</h6><p>243 items</p></button>
-                    <button class="category-card"><span id="category-logo">#</span><h6>Architecture</h6><p>243 items</p></button>
-                    <button class="category-card"><span id="category-logo">#</span><h6>Business Economics</h6><p>243 items</p></button>
-                    <button class="category-card"><span id="category-logo">#</span><h6>Engineering & CS</h6><p>243 items</p></button>
-                    <button class="category-card"><span id="category-logo">#</span><h6>Natural Science</h6><p>243 items</p></button>
-                    <button class="category-card"><span id="category-logo">#</span><h6>Social Science</h6><p>243 items</p></button>
-                    <button class="category-card"><span id="category-logo">#</span><h6>Health & Medicine</h6><p>243 items</p></button>
-                    <button class="category-card"><span id="category-logo">#</span><h6>Education & Teaching</h6><p>243 items</p></button>
-                    <button class="category-card"><span id="category-logo">#</span><h6>Law</h6><p>243 items</p></button>
-                    <button class="category-card"><span id="category-logo">#</span><h6>Media & Communications</h6><p>243 items</p></button>
-                    <button class="category-card"><span id="category-logo">#</span><h6>Arts & Humanities</h6><p>243 items</p></button>
-                    <button class="category-card"><span id="category-logo">#</span><h6>Non-Academic</h6><p>243 items</p></button>
+                    <button class="category-card">
+                        <iconify-icon icon="mdi:book-open-page-variant" id="category-logo"></iconify-icon>
+                        <a  class="category-link" href="#"><h6>General Education</h6></a>
+                        <p>243 items</p>
+                    </button>
+                    <button class="category-card">
+                        <iconify-icon icon="mingcute:building-2-fill" id="category-logo"></iconify-icon>
+                        <a href="#" class="category-link" ><h6>Architecture</h6></a>
+                        <p>243 items</p>
+                    </button>
+                    <button class="category-card"><iconify-icon icon="foundation:torso-business" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Business Economics</h6></a><p>243 items</p></button>
+                    <button class="category-card"><iconify-icon icon="heroicons:cpu-chip-20-solid" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Engineering & CS</h6></a><p>243 items</p></button>
+                    <button class="category-card"><iconify-icon icon="icomoon-free:lab" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Natural Science</h6></a><p>243 items</p></button>
+                    <button class="category-card"><iconify-icon icon="ion:people" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Social Science</h6></a><p>243 items</p></button>
+                    <button class="category-card"><iconify-icon icon="mdi:medicine" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Health & Medicine</h6></a><p>243 items</p></button>
+                    <button class="category-card"><iconify-icon icon="ph:chalkboard-teacher-fill" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Education & Teaching</h6></a><p>243 items</p></button>
+                    <button class="category-card"><iconify-icon icon="octicon:law-16" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Law</h6></a><p>243 items</p></button>
+                    <button class="category-card"><iconify-icon icon="gridicons:camera" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Media & Communications</h6></a><p>243 items</p></button>
+                    <button class="category-card"><iconify-icon icon="fluent:paint-brush-32-filled" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Arts & Humanities</h6></a><p>243 items</p></button>
+                    <button class="category-card"><iconify-icon icon="mdi:toys" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Non-Academic</h6></a><p>243 items</p></button>
                 </div>
             </div>
         </section>
