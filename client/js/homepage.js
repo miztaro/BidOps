@@ -15,6 +15,12 @@ const viewAllBidContainer = document.getElementById("viewAll-bid-cards-list");
 const homeSwapContainer = document.getElementById("home-swap-cards-list");
 const viewAllSwapContainer = document.getElementById("viewAll-swap-cards-list");
 
+const categoryBtn = document.getElementById("viewAll-category-btn");
+const categoryDropDown = document.getElementById("viewAll-category-dropDown");
+const dropDownItems = categoryDropDown.querySelectorAll(".dropDown-item");
+const categoryTitle = document.getElementById("viewAll-category-title");
+const categoryDescription = document.getElementById("viewAll-category-description");
+
 const bids = [
   { id: 1, title: "Calculator", category: "General Education", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/calculator.jpg" },
   { id: 2, title: "T-Square", category: "Architecture", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/T-Square.jpg" },
@@ -160,5 +166,27 @@ swapBtn.addEventListener("click", () => {
     viewAllSwapContainer.style.display = "grid";
 });
 
+categoryBtn.addEventListener("click", () => {
+  event.stopPropagation();
+  categoryDropDown.classList.toggle("active");
+  categoryBtn.classList.toggle("active")
+});
+
+dropDownItems.forEach(item => {
+  item.addEventListener("click", () => {
+    categoryTitle.textContent =item.textContent;
+    categoryDescription.textContent = item.textContent;
+
+    categoryDropDown.classList.remove("active");
+    categoryBtn.classList.remove("active");
+  })
+})
+
+document.addEventListener("click", (event) => {
+  if (!categoryBtn.contains(event.target) && !categoryDropDown.contains(event.target)) {
+    categoryDropDown.classList.remove("active");
+    categoryBtn.classList.remove("active");
+  }
+});
 
 

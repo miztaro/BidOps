@@ -1,24 +1,24 @@
 @font-face {
   font-family: 'Montserrat-Regular';
-  src: url('assets/fonts/Montserrat/static/Montserrat-Regular.ttf') format('truetype');
+  src: url('../assets/fonts/Montserrat/static/Montserrat-Regular.ttf') format('truetype');
   font-weight: 400;
 }
 
 @font-face {
   font-family: 'Montserrat-Medium';
-  src: url('assets/fonts/Montserrat/static/Montserrat-Medium.ttf') format('truetype');
+  src: url('../assets/fonts/Montserrat/static/Montserrat-Medium.ttf') format('truetype');
   font-weight: 500;
 }
 
 @font-face {
   font-family: 'Montserrat-SemiBold';
-  src: url('assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf') format('truetype');
+  src: url('../assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf') format('truetype');
   font-weight: 600;
 }
 
 @font-face {
   font-family: 'Montserrat-Bold';
-  src: url('assets/fonts/Montserrat/static/Montserrat-Bold.ttf') format('truetype');
+  src: url('../assets/fonts/Montserrat/static/Montserrat-Bold.ttf') format('truetype');
   font-weight: 700;
 }
 
@@ -45,7 +45,8 @@ main{
 
 .homepage-section .home-cover{
     width: 100%;
-    height: 40vh;
+    height: 100%;
+    max-height: 40vh;
     position: relative;
     display: inline-block;
 }
@@ -207,6 +208,7 @@ main{
     height: 409px;
     display: flex;
     flex-direction: column;
+    border: 1px solid #073066;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
@@ -555,11 +557,13 @@ main{
 }
 
 
-/*-----------------------View All: Bids--------------------------*/
+/*-----------------------View All: Bids & Swap--------------------------*/
 .viewAll-section{
     box-sizing: border-box;
     background-color:#fff;
     font-family:'Montserrat-Regular',sans-serif;
+    padding-bottom: 140px;
+    padding-top: 140px; /*Remove this when you insert header*/
 }
 
 .viewAll-section .top-nav{
@@ -572,6 +576,7 @@ main{
     background-color: #fff;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     z-index: 2;
+    top: 0%; /*Remove this when you insert header*/
 }
 
 .viewAll-section .top-nav .back-home,
@@ -623,12 +628,12 @@ main{
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 80px;
-    padding: 120px 30px 50px;
+    padding: 0px 150px 0px 150px;
 }
 
 .viewAll-section .bottom-nav{
     bottom: 0%;
-    padding: 40px;
+    padding: 30px;
     border-top: 1px solid #073066;
     background-color: #fff;
     position: fixed;
@@ -638,6 +643,7 @@ main{
     text-align: center;
     gap: 10px;
     width: 100%;
+    z-index: 2;
 }
 
 .viewAll-section .bottom-nav .category-name-des-container .title{
@@ -651,7 +657,16 @@ main{
     color: #8C8A8A;
 }
 
-.viewAll-section .bottom-nav .category-btn{
+.viewAll-section .bottom-nav .category-name-des-container .description span{
+    color: #000000;
+}
+
+.viewAll-section .bottom-nav .category-container{
+    position: relative;
+    display: inline-block;
+}
+
+.viewAll-section .bottom-nav .category-container .category-btn{
     margin-left: 20px;
     padding: 3px 10px;
     display: flex;
@@ -662,6 +677,62 @@ main{
     color: #D9D9D9;
     background-color: #073066;
     font-size: 0.8;
+}
+
+.viewAll-section .bottom-nav .category-container .category-btn:hover{
+    background-color: transparent;
+    color:#073066;
+    border: 1px solid #073066;
+    transition: 0.5s ease;
+}
+
+.viewAll-section .bottom-nav .category-container .dropDown{
+  position: absolute;
+  bottom: 48px;
+  left: 0;
+  width: 250px;
+  background-color: #fff;
+  border:1px solid #073066;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: none;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.viewAll-section .bottom-nav .category-container .dropDown.active{
+    display: flex;
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+.viewAll-section .bottom-nav .category-container .dropDown .dropDown-item{
+    padding: 12px 15px;
+    cursor:pointer;
+    border-bottom: 1px solid #eee;
+    font-size:14px;
+    transition: background 0.2s ease;
+}
+
+.viewAll-section .bottom-nav .category-container .dropDown .dropDown-item:last-child{
+    border-bottom: none;
+}
+
+.viewAll-section .bottom-nav .category-container .dropDown .dropDown-item:hover{
+    background-color: #8C8A8A;
+    font-family:'Montserrat-SemiBold',sans-serif;
+}
+
+.viewAll-section .bottom-nav .category-container .category-btn iconify-icon {
+  transition: transform 0.5s ease;
+}
+
+.viewAll-section .bottom-nav .category-container .category-btn.active iconify-icon {
+  transform: rotate(180deg);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 
