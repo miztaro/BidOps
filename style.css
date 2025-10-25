@@ -36,6 +36,7 @@ main{
     padding: 0;
 }
 
+/*--------------------Home Page------------------------*/
 .homepage-section{
     width:100%;
     box-sizing: border-box;
@@ -94,9 +95,13 @@ main{
     text-decoration: none;
 }
 
-.buttons .add-listing-btn a:hover{
+.buttons .add-listing-btn:hover{
     transition: 0.5s ease;
     background-color: #fff;
+}
+
+.buttons .add-listing-btn:hover a{
+    color: #073066;
 }
 
 .buttons .browse-items-btn{
@@ -180,6 +185,13 @@ main{
     font-family:'Montserrat-Regular',sans-serif;
     color: #073066;
     text-decoration: none;
+    background-color: transparent;
+    border: none;
+}
+
+.available-bids .available-bids-title .view-all:hover,
+.available-swaps .available-swaps-title .view-all:hover{
+    color: #B41B1B;
 }
 
 .available-bids .bid-cards-list,
@@ -190,7 +202,8 @@ main{
 }
 
 .bid-cards-list .bid-card{
-    width: 317px;
+    width: 100%;
+    max-width: 317px;
     height: 409px;
     display: flex;
     flex-direction: column;
@@ -219,19 +232,28 @@ main{
     object-fit: cover;
 }
 
-.bid-cards-list .bid-card .top .heart-button-bid{
-    flex:1;
-    padding:5px;
-    border: 1px solid #073066;
-    color: #073066;
-    background: transparent;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top:2%;
-    right:2%;
+.bid-cards-list .bid-card .top .heart-button-bid {
+  flex: 1;
+  padding: 5px;
+  border: 1px solid #073066;
+  color: #073066;
+  background: transparent;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 2%;
+  right: 2%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.bid-cards-list .bid-card .top .heart-button-bid.active {
+  color: #B41B1B;
+  background-color: #fff;
+  border: none;
+  transform: scale(1.1);
 }
 
 .bid-cards-list .bid-card .top .heart-button-bid:hover{
@@ -332,7 +354,8 @@ main{
 }
 
 .swap-cards-list .swap-card{
-    width: 317px;
+    width: 100%;
+    max-width: 317px;
     height: 409px;
     display: flex;
     flex-direction: column;
@@ -452,12 +475,21 @@ main{
     align-items: center;
     justify-content: center;
     display: flex;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .swap-cards-list .swap-card .button-container .heart-button-swap:hover{
     transition: 0.5s ease;
     background: transparent;
     border: 1px solid #073066;
+}
+
+.swap-cards-list .swap-card .button-container .heart-button-swap.active {
+  color: #B41B1B;
+  background-color: #fff;
+  border: none;
+  transform: scale(1.1);
 }
 
 .homepage-section .browse-category{
@@ -521,6 +553,125 @@ main{
   margin-bottom: 10px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+
+
+/*-----------------------View All: Bids--------------------------*/
+.viewAll-section{
+    box-sizing: border-box;
+    background-color:#fff;
+    font-family:'Montserrat-Regular',sans-serif;
+}
+
+.viewAll-section .top-nav{
+    width: 100%;
+    position: fixed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px;
+    background-color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    z-index: 2;
+}
+
+.viewAll-section .top-nav .back-home,
+.viewAll-section .top-nav .sort-btn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    background-color: transparent;
+    color: #073066;
+    border: none;
+    font-size: 1em;
+}
+
+.viewAll-section .top-nav .back-home:hover,
+.viewAll-section .top-nav .sort-btn:hover{
+    color: #B41B1B;
+}
+
+.viewAll-section .top-nav .swap-bid-container{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap:10px;
+}
+
+.viewAll-section .top-nav .swap-bid-container .bid-btn,
+.viewAll-section .top-nav .swap-bid-container .swap-btn{
+    padding: 10px;
+    background-color: transparent;
+    color: #073066;
+    border: 1px solid #073066;
+    border-radius: 20px;
+    width: 120px;
+    cursor: pointer;
+    transition: 0.5s ease;
+    font-size: 1em;
+    font-family:'Montserrat-SemiBold',sans-serif;
+}
+
+.viewAll-section .top-nav .swap-bid-container .active{
+    background-color: #073066;
+    color: #fff;
+    border: none;
+}
+
+.viewAll-section .bid-cards-list,
+.viewAll-section .swap-cards-list{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 80px;
+    padding: 120px 30px 50px;
+}
+
+.viewAll-section .bottom-nav{
+    bottom: 0%;
+    padding: 40px;
+    border-top: 1px solid #073066;
+    background-color: #fff;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.viewAll-section .bottom-nav .category-name-des-container .title{
+    font-size: 2.8em;
+    color: #073066;
+    font-family:'Montserrat-Bold',sans-serif;
+}
+
+.viewAll-section .bottom-nav .category-name-des-container .description{
+    font-size: 0.8em;
+    color: #8C8A8A;
+}
+
+.viewAll-section .bottom-nav .category-btn{
+    margin-left: 20px;
+    padding: 3px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 20px;
+    color: #D9D9D9;
+    background-color: #073066;
+    font-size: 0.8;
+}
+
+
+
+
+
+
+
+
+
 
 
 
