@@ -16,23 +16,23 @@ const homeSwapContainer = document.getElementById("home-swap-cards-list");
 const viewAllSwapContainer = document.getElementById("viewAll-swap-cards-list");
 
 const bids = [
-  { id: 1, title: "Calculator", category: "General Education", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "images/calculator.jpg" },
-  { id: 2, title: "T-Square", category: "Architecture", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "images/T-Square.jpg" },
-  { id: 3, title: "Calculus Textbook", category: "Engineering & CS", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "images/CalculusTextbook.png" },
-  { id: 4, title: "Camera", category: "Media & Communications", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "images/Camera.jpg" },
-  { id: 5, title: "Arduino Kit", category: "Engineering & CS", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "images/Arduino Kit.jpg" },
-  { id: 6, title: "Arduino Kit", category: "Engineering & CS", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "images/Arduino Kit.jpg" },
-  { id: 7, title: "Arduino Kit", category: "Engineering & CS", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "images/Arduino Kit.jpg" }
+  { id: 1, title: "Calculator", category: "General Education", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/calculator.jpg" },
+  { id: 2, title: "T-Square", category: "Architecture", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/T-Square.jpg" },
+  { id: 3, title: "Calculus Textbook", category: "Engineering & CS", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/CalculusTextbook.png" },
+  { id: 4, title: "Camera", category: "Media & Communications", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/Camera.jpg" },
+  { id: 5, title: "Arduino Kit", category: "Engineering & CS", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/Arduino Kit.jpg" },
+  { id: 6, title: "Arduino Kit", category: "Engineering & CS", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/Arduino Kit.jpg" },
+  { id: 7, title: "Arduino Kit", category: "Engineering & CS", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/Arduino Kit.jpg" }
 ];
 
 const swaps = [
-  { id: 1, title: "Calculator", category: "General Education", image: "images/calculator.jpg" },
-  { id: 2, title: "T-Square", category: "Architecture", image: "images/T-Square.jpg" },
-  { id: 3, title: "Calculus Textbook", category: "Engineering & CS", image: "images/CalculusTextbook.png" },
-  { id: 4, title: "Camera", category: "Media & Communications", image: "images/Camera.jpg" },
-  { id: 5, title: "Arduino", category: "Engineering & CS", image: "images/Arduino Kit.jpg" },
-  { id: 6, title: "Arduino", category: "Engineering & CS", image: "images/Arduino Kit.jpg" },
-  { id: 7, title: "Arduino", category: "Engineering & CS", image: "images/Arduino Kit.jpg" }
+  { id: 1, title: "Calculator", category: "General Education", image: "../assets/images/calculator.jpg" },
+  { id: 2, title: "T-Square", category: "Architecture", image: "../assets/images/T-Square.jpg" },
+  { id: 3, title: "Calculus Textbook", category: "Engineering & CS", image: "../assets/images/CalculusTextbook.png" },
+  { id: 4, title: "Camera", category: "Media & Communications", image: "../assets/images/Camera.jpg" },
+  { id: 5, title: "Arduino", category: "Engineering & CS", image: "../assets/images/Arduino Kit.jpg" },
+  { id: 6, title: "Arduino", category: "Engineering & CS", image: "../assets/images/Arduino Kit.jpg" },
+  { id: 7, title: "Arduino", category: "Engineering & CS", image: "../assets/images/Arduino Kit.jpg" }
 ];
 
 function createBidCard(bid){
