@@ -1,0 +1,44 @@
+/* 
+* will contain the global design settings for the website
+*/
+@font-face {
+  font-family: 'Montserrat-Regular';
+  src: url('assets/fonts/Montserrat/static/Montserrat-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Montserrat-Medium';
+  src: url('assets/fonts/Montserrat/static/Montserrat-Medium.ttf') format('truetype');
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: 'Montserrat-SemiBold';
+  src: url('assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: 'Montserrat-Bold';
+  src: url('assets/fonts/Montserrat/static/Montserrat-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html{
+    scroll-behavior: smooth;
+}
+
+
+/* Desktop Colors */
+
+/* Padding */
+
+
+/* Mobile */
