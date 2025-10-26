@@ -4,6 +4,8 @@ const viewAll = document.getElementById("viewAll-section");
 const bidViewAllBtn = document.getElementById("bid-view-all")
 const swapViewAllBtn = document.getElementById("swap-view-all")
 
+const categoryCards = document.querySelectorAll(".category-card");
+
 const backHomeBtn = document.getElementById("back-home");
 
 const bidBtn = document.querySelector(".bid-btn");
@@ -20,6 +22,7 @@ const categoryDropDown = document.getElementById("viewAll-category-dropDown");
 const dropDownItems = categoryDropDown.querySelectorAll(".dropDown-item");
 const categoryTitle = document.getElementById("viewAll-category-title");
 const categoryDescription = document.getElementById("viewAll-category-description");
+
 
 const bids = [
   { id: 1, title: "Calculator", category: "General Education", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/calculator.jpg" },
@@ -68,7 +71,7 @@ function createBidCard(bid){
   return bidCard;
 }
 
-bids.slice(0,5).forEach(bid => {
+bids.slice(0,4).forEach(bid => {
   homeBidContainer.appendChild(createBidCard(bid));
 });
 
@@ -101,7 +104,7 @@ function createSwapCard(swap) {
   return swapCard;
 }
 
-swaps.slice(0,5).forEach(swap =>{
+swaps.slice(0,4).forEach(swap =>{
   homeSwapContainer.appendChild(createSwapCard(swap));
 });
 
@@ -145,6 +148,57 @@ swapViewAllBtn.addEventListener("click", () => {
   swapBtn.classList.add("active");
 });
 
+categoryCards.forEach(cards => {
+  cards.addEventListener("click", () =>{
+    const selectedCategory = cards.getAttribute("browse-category");
+
+    home.style.display = "none";
+    viewAll.style.display = "block";
+
+    bidBtn.classList.add("active");
+    swapBtn.classList.remove("active");
+    viewAllBidContainer.style.display = "grid";
+    viewAllSwapContainer.style.display = "none"
+
+    categoryTitle.textContent = selectedCategory;
+    categoryDescription.textContent = selectedCategory;
+
+    viewAllBidContainer.innerHTML = "";
+    viewAllSwapContainer.innerHTML = "";
+
+    const filteredBids = bids.filter(bid => bid.category.toLowerCase() === selectedCategory.toLowerCase());
+    const filteredSwaps = swaps.filter(swap => swap.category.toLowerCase() === selectedCategory.toLowerCase());
+
+    if (filteredBids.length > 0) {
+      bidBtn.classList.add("active");
+      swapBtn.classList.remove("active");
+      viewAllBidContainer.style.display = "grid";
+      viewAllSwapContainer.style.display = "none";
+
+      filteredBids.forEach(bid => {
+        viewAllBidContainer.appendChild(createBidCard(bid));
+      });
+    } 
+    else if (filteredSwaps.length > 0) {
+      swapBtn.classList.add("active");
+      bidBtn.classList.remove("active");
+      viewAllSwapContainer.style.display = "grid";
+      viewAllBidContainer.style.display = "none";
+
+      filteredSwaps.forEach(swap => {
+        viewAllSwapContainer.appendChild(createSwapCard(swap));
+      });
+    } 
+    else {
+      bidBtn.classList.remove("active");
+      swapBtn.classList.remove("active");
+      viewAllBidContainer.style.display = "none";
+      viewAllSwapContainer.style.display = "none";
+      categoryDescription.textContent = "No items found for this category.";
+    }
+  });
+});
+
 backHomeBtn.addEventListener("click", () => {
     viewAll.style.display = "none";
     home.style.display = "block";
@@ -156,6 +210,7 @@ bidBtn.addEventListener("click", () => {
 
     viewAllBidContainer.style.display="grid";
     viewAllSwapContainer.style.display="none";
+    applyCurrentCategoryFilter();
 });
 
 swapBtn.addEventListener("click", () => {
@@ -164,6 +219,7 @@ swapBtn.addEventListener("click", () => {
 
     viewAllBidContainer.style.display = "none";
     viewAllSwapContainer.style.display = "grid";
+    applyCurrentCategoryFilter();
 });
 
 categoryBtn.addEventListener("click", () => {
@@ -174,13 +230,17 @@ categoryBtn.addEventListener("click", () => {
 
 dropDownItems.forEach(item => {
   item.addEventListener("click", () => {
-    categoryTitle.textContent =item.textContent;
-    categoryDescription.textContent = item.textContent;
+    const selectedCategory = item.textContent.trim();
+
+    categoryTitle.textContent = selectedCategory;
+    categoryDescription.textContent = selectedCategory;
 
     categoryDropDown.classList.remove("active");
     categoryBtn.classList.remove("active");
-  })
-})
+
+    applyCurrentCategoryFilter();
+  });
+});
 
 document.addEventListener("click", (event) => {
   if (!categoryBtn.contains(event.target) && !categoryDropDown.contains(event.target)) {
@@ -188,4 +248,33 @@ document.addEventListener("click", (event) => {
     categoryBtn.classList.remove("active");
   }
 });
+
+function applyCurrentCategoryFilter() {
+  const selectedCategory = categoryTitle.textContent.trim();
+  const isBidActive = bidBtn.classList.contains("active");
+
+  if (isBidActive) {
+    viewAllBidContainer.innerHTML = "";
+
+    const filteredBids = selectedCategory === "All Programs"
+      ? bids
+      : bids.filter(bid => bid.category.toLowerCase() === selectedCategory.toLowerCase());
+
+    filteredBids.forEach(bid => {
+      viewAllBidContainer.appendChild(createBidCard(bid));
+    });
+
+  } else {
+    viewAllSwapContainer.innerHTML = "";
+
+    const filteredSwaps = selectedCategory === "All Programs"
+      ? swaps
+      : swaps.filter(swap => swap.category.toLowerCase() === selectedCategory.toLowerCase());
+
+    filteredSwaps.forEach(swap => {
+      viewAllSwapContainer.appendChild(createSwapCard(swap));
+    });
+  }
+}
+
 
