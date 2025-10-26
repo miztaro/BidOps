@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Listing</title>
+    <link rel="stylesheet" href="../client/style/add-listing.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Create a Listing</h2>
+        <form action="../server/item/insert_item.php" method="post" enctype="multipart/form-data">
+            <label for="title">Item Title</label>
+            <input type="text" id="title" name="title" placeholder="Enter item title" required>
+
+            <label for="category">Category</label>
+            <input type="text" id="category" name="category" placeholder="Enter item category" required>
+
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" placeholder="Enter item description" required></textarea>
+
+            <label for="image">Upload Image</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+
+            <label for="listingType">Listing Type</label>
+            <select id="listingType" name="listingType" required>
+                <option value="swap">Swap</option>
+                <option value="bid">Bidding</option>
+            </select>
+
+            <div class="buttons">
+                <button type="submit" class="create-btn">Create Listing</button>
+                <button type="reset" class="cancel-btn">Cancel</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
