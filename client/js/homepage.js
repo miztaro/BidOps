@@ -132,9 +132,16 @@ bidViewAllBtn.addEventListener("click", () => {
 
   viewAllBidContainer.style.display = "grid";
   viewAllSwapContainer.style.display = "none";
-
   bidBtn.classList.add("active");
   swapBtn.classList.remove("active");
+
+  categoryTitle.textContent = "All Programs";
+  categoryDescription.textContent = "All Programs"
+  
+  viewAllBidContainer.innerHTML = "";
+  bids.forEach(bid => {
+    viewAllBidContainer.appendChild(createBidCard(bid));
+  });
 });
 
 swapViewAllBtn.addEventListener("click", () => {
@@ -143,9 +150,16 @@ swapViewAllBtn.addEventListener("click", () => {
 
   viewAllBidContainer.style.display = "none";
   viewAllSwapContainer.style.display = "grid";
-
   bidBtn.classList.remove("active");
   swapBtn.classList.add("active");
+
+  categoryTitle.textContent = "All Programs";
+  categoryDescription.textContent = "All Programs"
+
+  viewAllSwapContainer.innerHTML = "";
+  swaps.forEach(swap => {
+    viewAllSwapContainer.appendChild(createSwapCard(swap));
+  });
 });
 
 categoryCards.forEach(cards => {
