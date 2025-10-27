@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bid Details - Swap and Bid</title>
+    <link rel="stylesheet" href="style/join-bid.css">
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <img src="../assets/images/slu-logo.png" alt="SLU Logo" class="logo">
+                <div class="logo-text">
+                    <h1>Swap and Bid</h1>
+                    <p>Campus Marketplace</p>
+                    <span>SAINT LOUIS UNIVERSITY</span>
+                    <small>Baguio City, Philippines</small>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search items, books, equipment...">
+                    <button class="search-btn">
+                        <iconify-icon icon="material-symbols:search"></iconify-icon>
+                    </button>
+                </div>
+                
+                <button class="icon-btn">
+                    <iconify-icon icon="mdi:bell-outline"></iconify-icon>
+                </button>
+                <button class="icon-btn">
+                    <iconify-icon icon="mdi:message-outline"></iconify-icon>
+                </button>
+                <button class="icon-btn profile-btn">
+                    <iconify-icon icon="mdi:account-circle"></iconify-icon>
+                </button>
+                <button class="add-listing-btn">
+                    <iconify-icon icon="mdi:plus"></iconify-icon> Add Listing
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="bid-details-container">
+        <div class="content-wrapper">
+            <!-- Left Section: Image Gallery -->
+            <div class="image-section">
+                <div class="main-image-container">
+                    <img src="../assets/images/CalculusTextbook.png" alt="Calculus Textbook" id="mainImage">
+                    <button class="report-btn" id="reportBtn">
+                        <iconify-icon icon="mdi:dots-vertical"></iconify-icon>
+                    </button>
+                </div>
+                
+                <div class="thumbnail-container">
+                    <img src="../assets/images/calculator.jpg" alt="Thumbnail 1" class="thumbnail active" data-image="../assets/images/calculator.jpg">
+                    <img src="../assets/images/CalculusTextbook.png" alt="Thumbnail 2" class="thumbnail" data-image="../assets/images/CalculusTextbook.png">
+                </div>
+            </div>
+
+            <!-- Right Section: Item Details -->
+            <div class="details-section">
+                <h2 class="item-title">Calculus: Early Transcendentals 8th Edition</h2>
+                <p class="item-description">
+                    Excellent condition textbook for MATH 1510.<br>
+                    All pages intact, minimal highlighting. Perfect for upcoming semester.
+                </p>
+
+                <!-- Seller Info -->
+                <div class="seller-info">
+                    <img src="../assets/images/profile-placeholder.png" alt="Seller" class="seller-avatar">
+                    <div class="seller-details">
+                        <h4>Lebron James</h4>
+                        <p>8080808@slu.edu.ph</p>
+                    </div>
+                    <a href="#" class="view-profile-btn">View Profile</a>
+                </div>
+
+                <!-- Bid Pricing -->
+                <div class="bid-pricing">
+                    <div class="price-item">
+                        <span class="price-label">Starting Bid</span>
+                        <span class="price-value">₱45.00</span>
+                    </div>
+                    <div class="price-item current-bid">
+                        <span class="price-label">Current Highest</span>
+                        <span class="price-value">₱69.50</span>
+                    </div>
+                </div>
+
+                <!-- Countdown Timer -->
+                <div class="countdown-timer">
+                    <span class="timer-label">Auction Ending Soon</span>
+                    <div class="timer-display">
+                        <div class="timer-unit">
+                            <span class="timer-value" id="days">02</span>
+                            <span class="timer-label-small">Days</span>
+                        </div>
+                        <div class="timer-unit">
+                            <span class="timer-value" id="hours">16</span>
+                            <span class="timer-label-small">Hours</span>
+                        </div>
+                        <div class="timer-unit">
+                            <span class="timer-value" id="minutes">32</span>
+                            <span class="timer-label-small">Minutes</span>
+                        </div>
+                        <div class="timer-unit">
+                            <span class="timer-value" id="seconds">18</span>
+                            <span class="timer-label-small">Seconds</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Place Bid Form -->
+                <div class="place-bid-section">
+                    <h3>Place your Bid</h3>
+                    <label for="bidAmount">Bid Amount</label>
+                    <div class="bid-input-group">
+                        <span class="currency-symbol">₱</span>
+                        <input type="number" id="bidAmount" placeholder="70.00" step="0.01" min="70">
+                    </div>
+                    <p class="minimum-bid-text">Minimum bid increment: ₱5.00</p>
+                    <button class="place-bid-btn" id="placeBidBtn">
+                        <iconify-icon icon="mdi:gavel"></iconify-icon> Place Bid
+                    </button>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="favorites-btn">
+                        <iconify-icon icon="mdi:heart"></iconify-icon> Add to Favorites
+                    </button>
+                    <button class="chat-btn">
+                        <iconify-icon icon="mdi:message"></iconify-icon> Chat with Seller
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bidding History -->
+        <div class="bidding-history">
+            <h3>Bidding History</h3>
+            <div class="history-list">
+                <div class="history-item current-high">
+                    <img src="../assets/images/profile-placeholder.png" alt="Bidder" class="bidder-avatar">
+                    <div class="bidder-info">
+                        <h4>Jao Geronimo</h4>
+                        <span class="bid-time">3 minutes ago</span>
+                    </div>
+                    <div class="bid-amount-container">
+                        <span class="bid-amount">₱69.50</span>
+                        <span class="current-high-badge">Current High</span>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <img src="../assets/images/profile-placeholder.png" alt="Bidder" class="bidder-avatar">
+                    <div class="bidder-info">
+                        <h4>Byron Smith</h4>
+                        <span class="bid-time">8 minutes ago</span>
+                    </div>
+                    <div class="bid-amount-container">
+                        <span class="bid-amount">₱65.00</span>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <img src="../assets/images/profile-placeholder.png" alt="Bidder" class="bidder-avatar">
+                    <div class="bidder-info">
+                        <h4>Lander Villaflor</h4>
+                        <span class="bid-time">23 minutes ago</span>
+                    </div>
+                    <div class="bid-amount-container">
+                        <span class="bid-amount">₱63.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-top">
+            <h2>Your Campus, Your Marketplace.</h2>
+            <p>Post your items, make a deal, and connect<br>with SLU students today!</p>
+            <p class="footer-description">A safe, student-powered platform to buy, sell, and trade academic resources and campus essentials.</p>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-left">
+                <img src="../assets/images/slu-logo.png" alt="SLU Logo" class="footer-logo">
+                <div class="footer-text">
+                    <h3>Swap and Bid</h3>
+                    <p>Campus Marketplace</p>
+                    <span>SAINT LOUIS UNIVERSITY</span>
+                    <small>Baguio City, Philippines</small>
+                </div>
+            </div>
+            
+            <div class="footer-center">
+                <p class="footer-tagline">The official trading platform for Saint Louis University. Buy, sell, and swap academic resources safely.</p>
+            </div>
+            
+            <div class="footer-right">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="#"><iconify-icon icon="mdi:facebook"></iconify-icon></a>
+                    <a href="#"><iconify-icon icon="mdi:twitter"></iconify-icon></a>
+                    <a href="#"><iconify-icon icon="mdi:instagram"></iconify-icon></a>
+                </div>
+                <p class="support-email">
+                    <iconify-icon icon="mdi:email"></iconify-icon> support@sluswapbid.edu.ph
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer-copyright">
+            <p>© 2025 SLU Trade - Bid. All rights reserved. | Saint Louis University Initiative</p>
+        </div>
+    </footer>
+
+    <script src="js/join-bid.js"></script>
+</body>
+</html>
