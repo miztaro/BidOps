@@ -49,7 +49,7 @@ function fetchItems() {
                     price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
                     timeLeft: calculateTimeLeft(bid.end_date),
                     bidsCount: bid.bid_count || 0,
-                    image: bid.image_path ? '../server_try/' + bid.image_path : getDefaultImage(bid.category_type)
+                    image: bid.image_path ? `http://localhost:8000/server_try/item/${bid.image_path}` : null
                 }));
             });
             
@@ -61,7 +61,7 @@ function fetchItems() {
                     price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
                     timeLeft: calculateTimeLeft(bid.end_date),
                     bidsCount: bid.bid_count || 0,
-                    image: bid.image_path ? '../server_try/' + bid.image_path : getDefaultImage(bid.category_type)
+                    image: bid.image_path ?  `http://localhost:8000/server_try/item/${bid.image_path}` : null
                 }));
             });
 
@@ -70,7 +70,7 @@ function fetchItems() {
                     id: swap.item_id,
                     title: swap.title,
                     category: swap.category_type,
-                    image: swap.image_path ? '../server_try/' + swap.image_path : getDefaultImage(swap.category_type)
+                    image: swap.image_path ?  `http://localhost:8000/server_try/item/${swap.image_path}` : null
                 }));
             });
             
@@ -79,7 +79,7 @@ function fetchItems() {
                     id: swap.item_id,
                     title: swap.title,
                     category: swap.category_type,
-                    image: swap.image_path ? '../server_try/' + swap.image_path : getDefaultImage(swap.category_type)
+                    image: swap.image_path ?  `http://localhost:8000/server_try/item/${swap.image_path}` : null
                 }));
             });
         })
@@ -101,6 +101,7 @@ function calculateTimeLeft(endDate) {
     return `${diffDays} days left`;
 }
 
+// ion think there should be default image/pag-upload ng image should be required
 function getDefaultImage(category) {
     const categoryImages = {
         'Electronics': '../assets/images/calculator.jpg',
@@ -125,14 +126,15 @@ function createBidCard(bid){
     bidCard.classList.add("bid-card");
     bidCard.setAttribute("id", `bid-card-${bid.id}`);
 
-    //!!IMAGE PATH!!!!!!!!!!!!
-    const imagePath = bid.image_path 
-        ? `http://localhost:8000/server_try/uploads/${bid.image_path}`
-        : getDefaultImage(bid.category_type);
+    const imageContent = bid.image 
+        ? `<img src="${bid.image}" alt="${bid.title}">`
+        : `<div style="background: #073066; height: 100%; display: flex; align-items: center; justify-content: center; color: white;">
+              <iconify-icon icon="mdi:package-variant" width="50" height="50"></iconify-icon>
+           </div>`;
 
     bidCard.innerHTML = `
         <div class="top">
-            <img src="${imagePath}" alt="${bid.title}" onerror="this.src='${getDefaultImage(bid.category_type)}'">
+            ${imageContent}
             <button class="heart-button-bid" id="heart-button-${bid.id}">
                 <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo-${bid.id}"></iconify-icon>
             </button>
@@ -157,17 +159,20 @@ function createSwapCard(swap) {
     swapCard.classList.add("swap-card");
     swapCard.setAttribute("id", `swap-card-${swap.id}`);
 
-    //!!!!!!!!!IMAGE PATH!
-    const imagePath = swap.image_path 
-        ? `http://localhost:8000/server_try/uploads/${swap.image_path}`
-        : getDefaultImage(swap.category_type);
+    const imageContent = swap.image 
+        ? `<img src="${swap.image}" alt="${swap.title}">`
+        : `<div style="background: #073066; height: 100%; display: flex; align-items: center; justify-content: center; color: white;">
+              <iconify-icon icon="mdi:swap-horizontal" width="50" height="50"></iconify-icon>
+           </div>`;
 
     swapCard.innerHTML = `
         <div class="top">
             <div class="offer-wrap"><p>Swap Offer</p></div>
             <p class="posted-items">Recently posted</p>
         </div>
-        <div class="img-container"><img src="${imagePath}" alt="${swap.title}" onerror="this.src='${getDefaultImage(swap.category_type)}'"></div>
+        <div class="img-container">
+            ${imageContent}
+        </div>
         <div class="bottom">
             <h6>${swap.title}</h6>
             <p>${swap.category}</p>

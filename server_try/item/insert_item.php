@@ -39,6 +39,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $image_path = null;
         if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+            // Use uploads folder directly in server_try
             $upload_dir = "uploads/";
             if(!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
@@ -56,7 +57,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             if(move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-                $image_path = $target_file;
+                $image_path = $target_file; // This will be "uploads/filename.jpg"
             } else {
                 throw new Exception("Failed to upload image.");
             }
