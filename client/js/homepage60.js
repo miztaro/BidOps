@@ -1,0 +1,295 @@
+const home = document.getElementById("homepage-section");
+const viewAll = document.getElementById("viewAll-section");
+
+const bidViewAllBtn = document.getElementById("bid-view-all")
+const swapViewAllBtn = document.getElementById("swap-view-all")
+
+const categoryCards = document.querySelectorAll(".category-card");
+
+const backHomeBtn = document.getElementById("back-home");
+
+const bidBtn = document.querySelector(".bid-btn");
+const swapBtn = document.querySelector(".swap-btn");
+
+const homeBidContainer = document.getElementById("home-bid-cards-list");
+const viewAllBidContainer = document.getElementById("viewAll-bid-cards-list");
+
+const homeSwapContainer = document.getElementById("home-swap-cards-list");
+const viewAllSwapContainer = document.getElementById("viewAll-swap-cards-list");
+
+const categoryBtn = document.getElementById("viewAll-category-btn");
+const categoryDropDown = document.getElementById("viewAll-category-dropDown");
+const dropDownItems = categoryDropDown.querySelectorAll(".dropDown-item");
+const categoryTitle = document.getElementById("viewAll-category-title");
+const categoryDescription = document.getElementById("viewAll-category-description");
+
+
+const bids = [
+  { id: 1, title: "Calculator", category: "General Education", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/calculator.jpg" },
+  { id: 2, title: "T-Square", category: "Architecture", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/T-Square.jpg" },
+  { id: 3, title: "Calculus Textbook", category: "Engineering & CS", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/CalculusTextbook.png" },
+  { id: 4, title: "Camera", category: "Media & Communications", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/Camera.jpg" },
+  { id: 5, title: "Arduino Kit", category: "Engineering & CS", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/Arduino Kit.jpg" },
+  { id: 6, title: "Arduino Kit", category: "Engineering & CS", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/Arduino Kit.jpg" },
+  { id: 7, title: "Arduino Kit", category: "Engineering & CS", price: "₱1,250", timeLeft: "2h 45m left", bidsCount: 12, image: "../assets/images/Arduino Kit.jpg" }
+];
+
+const swaps = [
+  { id: 1, title: "Calculator", category: "General Education", image: "../assets/images/calculator.jpg" },
+  { id: 2, title: "T-Square", category: "Architecture", image: "../assets/images/T-Square.jpg" },
+  { id: 3, title: "Calculus Textbook", category: "Engineering & CS", image: "../assets/images/CalculusTextbook.png" },
+  { id: 4, title: "Camera", category: "Media & Communications", image: "../assets/images/Camera.jpg" },
+  { id: 5, title: "Arduino", category: "Engineering & CS", image: "../assets/images/Arduino Kit.jpg" },
+  { id: 6, title: "Arduino", category: "Engineering & CS", image: "../assets/images/Arduino Kit.jpg" },
+  { id: 7, title: "Arduino", category: "Engineering & CS", image: "../assets/images/Arduino Kit.jpg" }
+];
+//tester:
+
+function createBidCard(bid){
+  const bidCard =document.createElement("div");
+  bidCard.classList.add("bid-card");
+  bidCard.setAttribute("id", `bid-card-${bid.id}`);
+
+  bidCard.innerHTML = `
+    <div class="top">
+        <img src="${bid.image}" alt="${bid.title}">
+        <button class="heart-button-bid" id="heart-button-${bid.id}">
+          <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo-${bid.id}"></iconify-icon>
+        </button>
+    </div>
+
+    <div class="bottom">
+      <h6>${bid.title}</h6>
+      <p class="category">${bid.category}</p>
+      <p class="start-bid">Starting bid <span class="bid-price">${bid.price}</span></p>
+      <div class="bid-time-and-count">
+        <div class="time"><p>${bid.timeLeft}</p></div>
+        <p class="count"><span>${bid.bidsCount}</span> bids</p>
+      </div>
+      <button class="join-bid-btn"><a href="#">Join Bid</a></button>
+    </div>
+  `;
+  return bidCard;
+}
+
+bids.slice(0,4).forEach(bid => {
+  homeBidContainer.appendChild(createBidCard(bid));
+});
+
+bids.forEach(bid =>{
+  viewAllBidContainer.appendChild(createBidCard(bid));
+});
+
+function createSwapCard(swap) {
+  const swapCard = document.createElement("div");
+  swapCard.classList.add("swap-card");
+  swapCard.setAttribute("id", `swap-card-${swap.id}`);
+
+  swapCard.innerHTML = `
+    <div class="top">
+      <div class="offer-wrap"><p>Swap Offer</p></div>
+      <p class="posted-items"><span>2</span> days ago</p>
+    </div>
+    <div class="img-container"><img src="${swap.image}" alt="${swap.title}"></div>
+    <div class="bottom">
+      <h6>${swap.title}</h6>
+      <p>${swap.category}</p>
+    </div>
+    <div class="button-container">
+      <button class="make-offer-btn"><a href="#">Make Offer</a></button>
+      <button class="heart-button-swap" id="heart-button-swap-${swap.id}">
+        <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo-swap-${swap.id}"></iconify-icon>
+      </button>
+    </div>
+  `;
+  return swapCard;
+}
+
+swaps.slice(0,4).forEach(swap =>{
+  homeSwapContainer.appendChild(createSwapCard(swap));
+});
+
+swaps.forEach(swap => {
+  viewAllSwapContainer.appendChild(createSwapCard(swap));
+});
+
+const bidHeartButtons = document.querySelectorAll(".heart-button-bid");
+bidHeartButtons.forEach(button => {
+    button.addEventListener("click", () =>{
+        button.classList.toggle("active");
+    });
+});
+
+const swapHeartButtons = document.querySelectorAll(".heart-button-swap");
+swapHeartButtons.forEach(button => {
+    button.addEventListener("click", () =>{
+        button.classList.toggle("active");
+    });
+});
+
+bidViewAllBtn.addEventListener("click", () => {
+  home.style.display = "none";
+  viewAll.style.display = "block";
+
+  viewAllBidContainer.style.display = "grid";
+  viewAllSwapContainer.style.display = "none";
+  bidBtn.classList.add("active");
+  swapBtn.classList.remove("active");
+
+  categoryTitle.textContent = "All Programs";
+  categoryDescription.textContent = "All Programs"
+  
+  viewAllBidContainer.innerHTML = "";
+  bids.forEach(bid => {
+    viewAllBidContainer.appendChild(createBidCard(bid));
+  });
+});
+
+swapViewAllBtn.addEventListener("click", () => {
+  home.style.display = "none";
+  viewAll.style.display = "block";
+
+  viewAllBidContainer.style.display = "none";
+  viewAllSwapContainer.style.display = "grid";
+  bidBtn.classList.remove("active");
+  swapBtn.classList.add("active");
+
+  categoryTitle.textContent = "All Programs";
+  categoryDescription.textContent = "All Programs"
+
+  viewAllSwapContainer.innerHTML = "";
+  swaps.forEach(swap => {
+    viewAllSwapContainer.appendChild(createSwapCard(swap));
+  });
+});
+
+categoryCards.forEach(cards => {
+  cards.addEventListener("click", () =>{
+    const selectedCategory = cards.getAttribute("browse-category");
+
+    home.style.display = "none";
+    viewAll.style.display = "block";
+
+    bidBtn.classList.add("active");
+    swapBtn.classList.remove("active");
+    viewAllBidContainer.style.display = "grid";
+    viewAllSwapContainer.style.display = "none"
+
+    categoryTitle.textContent = selectedCategory;
+    categoryDescription.textContent = selectedCategory;
+
+    viewAllBidContainer.innerHTML = "";
+    viewAllSwapContainer.innerHTML = "";
+
+    const filteredBids = bids.filter(bid => bid.category.toLowerCase() === selectedCategory.toLowerCase());
+    const filteredSwaps = swaps.filter(swap => swap.category.toLowerCase() === selectedCategory.toLowerCase());
+
+    if (filteredBids.length > 0) {
+      bidBtn.classList.add("active");
+      swapBtn.classList.remove("active");
+      viewAllBidContainer.style.display = "grid";
+      viewAllSwapContainer.style.display = "none";
+
+      filteredBids.forEach(bid => {
+        viewAllBidContainer.appendChild(createBidCard(bid));
+      });
+    } 
+    else if (filteredSwaps.length > 0) {
+      swapBtn.classList.add("active");
+      bidBtn.classList.remove("active");
+      viewAllSwapContainer.style.display = "grid";
+      viewAllBidContainer.style.display = "none";
+
+      filteredSwaps.forEach(swap => {
+        viewAllSwapContainer.appendChild(createSwapCard(swap));
+      });
+    } 
+    else {
+      bidBtn.classList.remove("active");
+      swapBtn.classList.remove("active");
+      viewAllBidContainer.style.display = "none";
+      viewAllSwapContainer.style.display = "none";
+      categoryDescription.textContent = "No items found for this category.";
+    }
+  });
+});
+
+backHomeBtn.addEventListener("click", () => {
+    viewAll.style.display = "none";
+    home.style.display = "block";
+});
+
+bidBtn.addEventListener("click", () => {
+    bidBtn.classList.add("active");
+    swapBtn.classList.remove("active");
+
+    viewAllBidContainer.style.display="grid";
+    viewAllSwapContainer.style.display="none";
+    applyCurrentCategoryFilter();
+});
+
+swapBtn.addEventListener("click", () => {
+    bidBtn.classList.remove("active");
+    swapBtn.classList.add("active");
+
+    viewAllBidContainer.style.display = "none";
+    viewAllSwapContainer.style.display = "grid";
+    applyCurrentCategoryFilter();
+});
+
+categoryBtn.addEventListener("click", () => {
+  event.stopPropagation();
+  categoryDropDown.classList.toggle("active");
+  categoryBtn.classList.toggle("active")
+});
+
+dropDownItems.forEach(item => {
+  item.addEventListener("click", () => {
+    const selectedCategory = item.textContent.trim();
+
+    categoryTitle.textContent = selectedCategory;
+    categoryDescription.textContent = selectedCategory;
+
+    categoryDropDown.classList.remove("active");
+    categoryBtn.classList.remove("active");
+
+    applyCurrentCategoryFilter();
+  });
+});
+
+document.addEventListener("click", (event) => {
+  if (!categoryBtn.contains(event.target) && !categoryDropDown.contains(event.target)) {
+    categoryDropDown.classList.remove("active");
+    categoryBtn.classList.remove("active");
+  }
+});
+
+function applyCurrentCategoryFilter() {
+  const selectedCategory = categoryTitle.textContent.trim();
+  const isBidActive = bidBtn.classList.contains("active");
+
+  if (isBidActive) {
+    viewAllBidContainer.innerHTML = "";
+
+    const filteredBids = selectedCategory === "All Programs"
+      ? bids
+      : bids.filter(bid => bid.category.toLowerCase() === selectedCategory.toLowerCase());
+
+    filteredBids.forEach(bid => {
+      viewAllBidContainer.appendChild(createBidCard(bid));
+    });
+
+  } else {
+    viewAllSwapContainer.innerHTML = "";
+
+    const filteredSwaps = selectedCategory === "All Programs"
+      ? swaps
+      : swaps.filter(swap => swap.category.toLowerCase() === selectedCategory.toLowerCase());
+
+    filteredSwaps.forEach(swap => {
+      viewAllSwapContainer.appendChild(createSwapCard(swap));
+    });
+  }
+}
+
+
