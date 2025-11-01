@@ -144,15 +144,20 @@ body{
   height:18px;
   display:inline-block;
 }
+.subtext{
+    font-size: 13px;
+    margin-top: 60px;
+    margin-bottom: 40px;
+}
 
-/* signup text centered small */
-.signup{
+/* login text centered small */
+.login{
   text-align: center;
   font-size: 13px;
   margin-top: 10px;
   color:#222;
 }
-.signup a{
+.login a{
   color: #1f4f7a;
   text-decoration: none;
   font-weight: 600;
@@ -172,7 +177,6 @@ body{
 }
 
 .welcome{
-
   margin-left: 70px;
 }
 /* Welcome content */
