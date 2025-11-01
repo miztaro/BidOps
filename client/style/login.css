@@ -3,7 +3,7 @@
 html,body { height: 100%; }
 body{
   font-family: Arial, Helvetica, sans-serif;
-  background: url("../../assets/images/LoginWhite.png") center/cover no-repeat; /* put bg-white.jpg in assets */
+  background: url("../../assets/images/LoginWhite.png") center/cover no-repeat; 
   display: flex;
   flex-direction: column;
   align-items: center;
