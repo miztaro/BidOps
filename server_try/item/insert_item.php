@@ -28,6 +28,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $description = $_POST['description'] ?? '';
         $listingType = $_POST['listingType'] ?? '';
         $starting_price = $_POST['starting_price'] ?? 0;
+        $end_date = $_POST['end_date'] ?? '';
         
         $seller_id = 'u1'; // using Alice as default seller
 
@@ -37,9 +38,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
         }
 
+        if($listingType == 'bid') {
+            if(empty($end_date)) {
+                http_response_code(400);
+                echo json_encode(array("message" => "End date and time are required for bid listings."));
+                exit();
+            }
+            
+            // converting to date time format sa mysql
+            $end_date_mysql = date('Y-m-d H:i:s', strtotime($end_date));
+            $now = date('Y-m-d H:i:s');
+            
+            if($end_date_mysql <= $now) {
+                http_response_code(400);
+                echo json_encode(array("message" => "End date must be in the future."));
+                exit();
+            }
+        }
+
         $image_path = null;
         if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-            // Use uploads folder directly in server_try
+            // use uploads folder directly in server_try
             $upload_dir = "uploads/";
             if(!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
@@ -57,7 +76,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             if(move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-                $image_path = $target_file; // This will be "uploads/filename.jpg"
+                $image_path = $target_file;
             } else {
                 throw new Exception("Failed to upload image.");
             }
@@ -67,7 +86,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         try {
             $query = "INSERT INTO ITEM (title, description, category_type, item_type, seller_id, status) 
-                      VALUES (:title, :description, :category, :item_type, :seller_id, 'active')";
+                      VALUES (:title, :description, :category, :item_type, :seller_id, 'pending_approval')";
             
             $stmt = $db->prepare($query);
             $stmt->bindParam(":title", $title);
@@ -93,15 +112,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             }
 
- 
             if($listingType == 'bid') {
-                $end_date = date('Y-m-d H:i:s', strtotime('+7 days'));
                 $bidQuery = "INSERT INTO BIDITEM (item_id, starting_price, start_date, end_date) 
                             VALUES (:item_id, :starting_price, NOW(), :end_date)";
                 $bidStmt = $db->prepare($bidQuery);
                 $bidStmt->bindParam(":item_id", $item_id);
                 $bidStmt->bindParam(":starting_price", $starting_price);
-                $bidStmt->bindParam(":end_date", $end_date);
+                $bidStmt->bindParam(":end_date", $end_date_mysql);
                 
                 if(!$bidStmt->execute()) {
                     throw new Exception("Failed to create bid item.");
@@ -120,7 +137,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             http_response_code(201);
             echo json_encode(array(
-                "message" => "Item created successfully.",
+                "message" => "Item created successfully and is pending approval.",
                 "item_id" => $item_id
             ));
 

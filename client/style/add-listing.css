@@ -42,11 +42,32 @@ input, select, textarea {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
+    font-family: Arial, sans-serif;
 }
 
 input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: #007bff;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #999;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    opacity: 1;
+}
+
+select:required:invalid {
+    color: #999;
+}
+
+select option[value=""][disabled] {
+    color: #999;
+}
+
+select option {
+    color: #000;
 }
 
 textarea {
@@ -67,6 +88,7 @@ button {
     cursor: pointer;
     font-size: 14px;
     flex: 1;
+    font-family: Arial, sans-serif;
 }
 
 .create-btn {
@@ -101,6 +123,7 @@ button {
     margin: 10px 0;
     border-radius: 4px;
     font-weight: 500;
+    font-family: Arial, sans-serif;
 }
 
 .message.success {
@@ -114,7 +137,6 @@ button {
     color: #721c24;
     border: 1px solid #f5c6cb;
 }
-
 
 #bidFields {
     margin-top: 15px;
@@ -136,4 +158,22 @@ button {
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
+}
+
+.date-note {
+    display: block;
+    margin-top: -15px;
+    margin-bottom: 15px;
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+    font-family: Arial, sans-serif;
+}
+
+.form-section-spacing {
+    margin-bottom: 20px;
+}
+
+input[type="datetime-local"] {
+    font-family: Arial, sans-serif;
 }
