@@ -1,0 +1,111 @@
+/* Reset default margin/padding */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+}
+
+/* ===== Header ===== */
+.main-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* left side vs right side */
+  background: url("../../assets/images/HeaderBG.png") center/cover no-repeat;
+  border-bottom: 3px solid #FFE100;
+  font-family: "Poppins", sans-serif;
+  height: 133px;
+  padding: 0 28px;
+}
+
+/* ----- Left Logo ----- */
+.header-left {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.slu-header-img {
+  height: 100%;
+  width: auto;
+}
+
+/* ----- Right Section (icons on top, search+button below) ----- */
+.header-right {
+  display: flex;
+  flex-direction: row; /* make 2 rows */
+  align-items: flex-end;  /* align everything to the right side */
+  gap: 10px;              /* space between icon row and search row */
+}
+
+/* Row 1: icons */
+.header-icons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+}
+
+.icon {
+  width: 24px;
+  cursor: pointer;
+}
+
+/* Row 2: search + add listing */
+.header-bottom {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Search Bar */
+.header-search {
+  display: flex;
+  align-items: center;
+  border: 2px solid #153b6d;
+  border-radius: 40px;
+  overflow: hidden;
+  background: white;
+  height: 40px;
+  padding: 0 15px;
+  width: 420px;
+}
+
+.header-search input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+  padding: 0 10px;
+}
+
+.header-search button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.header-search button img {
+  width: 20px;
+}
+
+/* Add Listing Button */
+.add-btn {
+  background: #FFE100;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.add-btn span {
+  font-size: 18px;
+}

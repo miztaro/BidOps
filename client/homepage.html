@@ -8,6 +8,7 @@
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 </head>
 <body>
+    <div id="header"></div>
     <main>
         <!--Home Page-->
         <section class="homepage-section" id="homepage-section">
@@ -22,26 +23,7 @@
                     <button class="browse-items-btn">Browse Items</button>
                 </div>
             </div>
-
-            <div class="analytics">
-                <div class="analytics-item">
-                    <h5 class="stat-number">1,240</h5>
-                    <p>Active Items</p>
-                </div>
-                <div class="analytics-item">
-                    <h5 class="stat-number">890</h5>
-                    <p>SLU Students</p>
-                </div>
-                <div class="analytics-item">
-                    <h5 class="stat-number">₱45,000</h5>
-                    <p>Total Savings</p>
-                </div>
-                <div class="analytics-item">
-                    <h5 class="stat-number">156</h5>
-                    <p>Successful Swaps</p>
-                </div>
-            </div>
-
+            
             <div class="available-bids">
                 <div class="available-bids-title">
                     <div class="left">
@@ -135,5 +117,14 @@
         </section>
     </main>
     <script  src="js/homepage.js"></script>
+    <script>
+    // Load header.html dynamically
+    fetch("header.html")
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("header").innerHTML = data;
+      })
+      .catch(error => console.error("Error loading header:", error));
+  </script>
 </body>
 </html>
