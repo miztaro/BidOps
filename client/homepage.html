@@ -117,14 +117,5 @@
         </section>
     </main>
     <script  src="js/homepage.js"></script>
-    <script>
-    // Load header.html dynamically
-    fetch("header.html")
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById("header").innerHTML = data;
-      })
-      .catch(error => console.error("Error loading header:", error));
-  </script>
 </body>
 </html>

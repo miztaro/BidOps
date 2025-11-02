@@ -23,8 +23,18 @@ const dropDownItems = categoryDropDown.querySelectorAll(".dropDown-item");
 const categoryTitle = document.getElementById("viewAll-category-title");
 const categoryDescription = document.getElementById("viewAll-category-description");
 
+
+
 document.addEventListener('DOMContentLoaded', function() {
-    fetchItems();
+  // Load header.html dynamically
+  fetch("header.html")
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById("header").innerHTML = data;
+    })
+    .catch(error => console.error("Error loading header:", error));
+
+  fetchItems();
 });
 
 function fetchItems() {
@@ -61,7 +71,7 @@ function fetchItems() {
                     price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
                     timeLeft: calculateTimeLeft(bid.end_date),
                     bidsCount: bid.bid_count || 0,
-                    image: bid.image_path ?  `http://localhost:8000/server_try/item/${bid.image_path}` : null
+                    image: bid.image_path ? `http://localhost:8000/server_try/item/${bid.image_path}` : null
                 }));
             });
 
@@ -70,7 +80,7 @@ function fetchItems() {
                     id: swap.item_id,
                     title: swap.title,
                     category: swap.category_type,
-                    image: swap.image_path ?  `http://localhost:8000/server_try/item/${swap.image_path}` : null
+                    image: bid.image_path ? `http://localhost:8000/server_try/item/${bid.image_path}` : null
                 }));
             });
             
@@ -79,7 +89,7 @@ function fetchItems() {
                     id: swap.item_id,
                     title: swap.title,
                     category: swap.category_type,
-                    image: swap.image_path ?  `http://localhost:8000/server_try/item/${swap.image_path}` : null
+                    image: bid.image_path ? `http://localhost:8000/server_try/item/${bid.image_path}` : null
                 }));
             });
         })
@@ -190,6 +200,7 @@ function createSwapCard(swap) {
 bidViewAllBtn.addEventListener("click", () => {
   home.style.display = "none";
   viewAll.style.display = "block";
+  document.getElementById("header").style.display = "none";
 
   viewAllBidContainer.style.display = "grid";
   viewAllSwapContainer.style.display = "none";
@@ -206,6 +217,7 @@ bidViewAllBtn.addEventListener("click", () => {
 swapViewAllBtn.addEventListener("click", () => {
   home.style.display = "none";
   viewAll.style.display = "block";
+  document.getElementById("header").style.display = "none";
 
   viewAllBidContainer.style.display = "none";
   viewAllSwapContainer.style.display = "grid";
@@ -291,6 +303,7 @@ categoryCards.forEach(cards => {
 backHomeBtn.addEventListener("click", () => {
     viewAll.style.display = "none";
     home.style.display = "block";
+    document.getElementById("header").style.display = "block";
 });
 
 bidBtn.addEventListener("click", () => {

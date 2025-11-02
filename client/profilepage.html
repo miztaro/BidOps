@@ -8,13 +8,14 @@
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 </head>
 <body>
+    <div id="header"></div>
     <main class="profile-section">
         <section class="left-nav-menu">
             <button class="back-home" id="back-home"><iconify-icon icon="line-md:arrow-left" width="34" height="34"></iconify-icon>Back Home</button>
 
             <button id="profile-user-info-btn"  class="user-profile-btn">
                 <div class="img-container">
-                    <img src="\BidOps\assets\images\lander.jpg" alt="">
+                    <img src="../assets/images/profilePicture.jpg" alt="">
                 </div>
                 <div class="user-info">
                     <h6>Lander Fugeh</h6>
@@ -45,9 +46,11 @@
                 <div class="analytics"></div>
             </div>
 
-            <div id="profile-user-info-content" class="profile-user-info-content">TODO</div>
+            <div id="profile-user-info-content" class="profile-user-info-content">
+                
+            </div>
 
-            <div id="profile-listings-content" class="listings-content">
+            <div id="profile-listings-content" class="profile-listings-content">
                 <table>
                     <thead>
                         <tr>
@@ -60,7 +63,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="body-row"></tr>
+                        <tr class="listings-body-row" id="listings-body-row"></tr>
                     </tbody>
                 </table>
             </div>
@@ -77,11 +80,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="body-row"></tr>
+                        <tr class="bids-body-row" id="bids-body-row"></tr>
                     </tbody>
                 </table>
             </div>
-            <div id="profile-swaps-content" class="profile-swaps-conent">
+
+            <div id="profile-swaps-content" class="profile-swaps-content">
                 <table>
                     <thead>
                         <tr>
@@ -93,7 +97,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="body-row"></tr>
+                        <tr class="swaps-body-row" id="swaps-body-row"></tr>
                     </tbody>
                 </table>
             </div>
