@@ -37,7 +37,7 @@ try {
               FROM ITEM i
               JOIN USER u ON i.seller_id = u.user_id
               LEFT JOIN ITEMIMAGE ii ON i.item_id = ii.item_id
-              WHERE i.status IN ('active', 'pending_approval')";
+              WHERE i.status IN ('active')";
 
     $params = [];
     if(!empty($category) && $category != 'All Programs') {
