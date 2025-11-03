@@ -9,7 +9,7 @@ function handleFormLogin(event) {
         return;
     }
     
-    fetch('/server_try/auth/login.php', {
+    fetch('../server_try/auth/login.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -17,8 +17,10 @@ function handleFormLogin(event) {
         body: JSON.stringify({
             username: username,
             password: password
-        })
+        }),
+        credentials: 'include' 
     })
+
     .then(response => response.json())
     .then(data => {
         if (data.success) {

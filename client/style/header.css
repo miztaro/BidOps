@@ -1,48 +1,45 @@
-/* Reset default margin/padding */
+/* RESET */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
-html, body {
-  width: 100%;
+body {
+  font-family: "Poppins", sans-serif;
 }
 
-/* ===== Header ===== */
+/* ===== HEADER ===== */
 .main-header {
-  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* left side vs right side */
+  justify-content: space-between;
   background: url("../../assets/images/HeaderBG.png") center/cover no-repeat;
-  border-bottom: 3px solid #FFE100;
-  font-family: "Poppins", sans-serif;
-  height: 133px;
-  padding: 0 28px;
+  border-bottom: 3px solid #ffe100;
+  height: 130px;
+  padding: 0 40px;
 }
 
-/* ----- Left Logo ----- */
+/* ----- LEFT: Logo ----- */
 .header-left {
   display: flex;
   align-items: center;
-  flex-shrink: 0;
 }
 
 .slu-header-img {
-  height: 100%;
+  height: 90px;
   width: auto;
 }
 
-/* ----- Right Section (icons on top, search+button below) ----- */
+/* ----- RIGHT: Two-tier section ----- */
 .header-right {
   display: flex;
-  flex-direction: row; /* make 2 rows */
-  align-items: flex-end;  /* align everything to the right side */
-  gap: 10px;              /* space between icon row and search row */
+  flex-direction: column; /* stack icons (top) and search row (bottom) */
+  align-items: flex-end;
+  gap: 12px;
 }
 
-/* Row 1: icons */
+/* Top row: icons */
 .header-icons {
   display: flex;
   align-items: center;
@@ -50,12 +47,12 @@ html, body {
   gap: 20px;
 }
 
-.icon {
-  width: 24px;
+.header-icons iconify-icon {
   cursor: pointer;
+  color: #000;
 }
 
-/* Row 2: search + add listing */
+/* Bottom row: search bar + add listing */
 .header-bottom {
   display: flex;
   align-items: center;
@@ -66,46 +63,77 @@ html, body {
 .header-search {
   display: flex;
   align-items: center;
+  width: 450px;
+  height: 42px;
   border: 2px solid #153b6d;
   border-radius: 40px;
+  background: #fff;
   overflow: hidden;
-  background: white;
-  height: 40px;
   padding: 0 15px;
-  width: 420px;
 }
 
 .header-search input {
+  flex: 1;
   border: none;
   outline: none;
-  flex: 1;
   font-size: 14px;
-  padding: 0 10px;
+  padding-left: 8px;
 }
 
 .header-search button {
-  background: none;
   border: none;
+  background: none;
   cursor: pointer;
-}
-
-.header-search button img {
-  width: 20px;
+  color: #153b6d;
 }
 
 /* Add Listing Button */
 .add-btn {
-  background: #FFE100;
-  padding: 10px 20px;
-  border-radius: 40px;
-  font-weight: 600;
+  background: #ffe100;
   border: none;
-  cursor: pointer;
+  border-radius: 40px;
+  padding: 10px 22px;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 6px;
+  cursor: pointer;
+  color: #000;
 }
 
 .add-btn span {
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: 700;
 }
+/* ===== ADMIN HEADER ===== */
+.admin-header {
+  display: flex;  
+  align-items: center;
+  justify-content: space-between;
+  background: url("../../assets/images/HeaderBG.png") center/cover no-repeat;
+  border-bottom: 3px solid #ffe100;
+  height: 130px;
+  padding: 0 40px;
+}
+
+/* Admin Links Row */
+.admin-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 25px;
+}
+
+/* Style for admin navigation links */
+.admin-link {
+  font-weight: 700;
+  text-decoration: underline;
+  color: #000;
+  cursor: pointer;
+}
+
+.admin-link:hover {
+  opacity: 0.7;
+}
+
+
