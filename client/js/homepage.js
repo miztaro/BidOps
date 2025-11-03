@@ -23,14 +23,16 @@ const dropDownItems = categoryDropDown.querySelectorAll(".dropDown-item");
 const categoryTitle = document.getElementById("viewAll-category-title");
 const categoryDescription = document.getElementById("viewAll-category-description");
 
-
-
 document.addEventListener('DOMContentLoaded', function() {
-  // Load header.html dynamically
   fetch("header.html")
     .then(response => response.text())
     .then(data => {
       document.getElementById("header").innerHTML = data;
+
+      const profileIcon = document.getElementById("profile-icon");
+      profileIcon.addEventListener("click", () => {
+        window.location.href = "profilepage.html";
+      });
     })
     .catch(error => console.error("Error loading header:", error));
 
@@ -234,6 +236,7 @@ swapViewAllBtn.addEventListener("click", () => {
 categoryCards.forEach(cards => {
   cards.addEventListener("click", () =>{
     const selectedCategory = cards.getAttribute("browse-category");
+    document.getElementById("header").style.display = "none";
 
     home.style.display = "none";
     viewAll.style.display = "block";

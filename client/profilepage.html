@@ -47,7 +47,17 @@
             </div>
 
             <div id="profile-user-info-content" class="profile-user-info-content">
-                
+                <div class="user-container">
+                    <div class="user-img-container">
+                        <img src="" alt="">
+                    </div>
+
+                    <div class="user-info">
+                        <h6>Lander Fugeh</h6>
+                        <div></div>
+                    </div>
+
+                </div>
             </div>
 
             <div id="profile-listings-content" class="profile-listings-content">
@@ -59,7 +69,49 @@
                             <th>Mode</th>
                             <th>Date Listed</th>
                             <th>Status</th>
-                            <th><iconify-icon icon="flowbite:filter-outline" width="24" height="24"></iconify-icon></th>
+                            <th class="listings-filter">
+                                <div class="listings-filter-container">
+                                    <button id="listings-filter-btn" class="listings-filter-btn"><iconify-icon icon="flowbite:filter-outline" width="24" height="24"></iconify-icon></button>
+                                    <div class="listings-filter-dropdown">
+                                        <div class="dropdown-section">
+                                            <h6 class="dropDown-header">Category</h6>
+                                            <div class="sub-dropdown">
+                                                <p class="dropDown-item">All Programs</p>
+                                                <p class="dropDown-item">General Education</p>
+                                                <p class="dropDown-item">Arts & Humanities</p>
+                                                <p class="dropDown-item">Business & Economics</p>
+                                                <p class="dropDown-item">Engineering & CS</p>
+                                                <p class="dropDown-item">Natural Science</p>
+                                                <p class="dropDown-item">Social Sciences</p>
+                                                <p class="dropDown-item">Health & Medicine</p>
+                                                <p class="dropDown-item">Education & Teaching</p>
+                                                <p class="dropDown-item">Law</p>
+                                                <p class="dropDown-item">Media & Communications</p>
+                                                <p class="dropDown-item">Architecture & Design</p>
+                                                <p class="dropDown-item">Non-Academic</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="dropdown-section">
+                                            <h6 class="dropDown-header">Mode</h6>
+                                            <div class="sub-dropdown">
+                                                <p class="dropDown-item">Swap</p>
+                                                <p class="dropDown-item">Bid</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="dropdown-section">
+                                            <h6 class="dropDown-header">Status</h6>
+                                            <div class="sub-dropdown">
+                                                <p class="dropDown-item">Active</p>
+                                                <p class="dropDown-item">Pending</p>
+                                                <p class="dropDown-item">Completed</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="show-all">Show All</p>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,7 +128,32 @@
                             <th>Category</th>
                             <th>Winning Bid</th>
                             <th>Date Won</th>
-                            <th><iconify-icon icon="flowbite:filter-outline" width="24" height="24"></iconify-icon></th>
+                            <th class="bids-filter">
+                                <div class="bids-filter-container">
+                                    <button id="bids-filter-btn" class="bids-filter-btn"><iconify-icon icon="flowbite:filter-outline" width="24" height="24"></iconify-icon></button>
+                                    <div class="bids-filter-dropdown">
+                                        <div class="dropdown-section">
+                                            <h6 class="dropDown-header">Category</h6>
+                                            <div class="sub-dropdown">
+                                                <p class="dropDown-item">All Programs</p>
+                                                <p class="dropDown-item">General Education</p>
+                                                <p class="dropDown-item">Arts & Humanities</p>
+                                                <p class="dropDown-item">Business & Economics</p>
+                                                <p class="dropDown-item">Engineering & CS</p>
+                                                <p class="dropDown-item">Natural Science</p>
+                                                <p class="dropDown-item">Social Sciences</p>
+                                                <p class="dropDown-item">Health & Medicine</p>
+                                                <p class="dropDown-item">Education & Teaching</p>
+                                                <p class="dropDown-item">Law</p>
+                                                <p class="dropDown-item">Media & Communications</p>
+                                                <p class="dropDown-item">Architecture & Design</p>
+                                                <p class="dropDown-item">Non-Academic</p>                                               
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="show-all">Show All</p>
+                            </th>                        
                         </tr>
                     </thead>
                     <tbody>
@@ -93,7 +170,32 @@
                             <th>Category</th>
                             <th>Swapped Item</th>
                             <th>Date Swapped</th>
-                            <th><iconify-icon icon="flowbite:filter-outline" width="24" height="24"></iconify-icon></th>
+                            <th class="swaps-filter">
+                                <div class="swaps-filter-container">
+                                    <button id="swaps-filter-btn" class="swaps-filter-btn"><iconify-icon icon="flowbite:filter-outline" width="24" height="24"></iconify-icon></button>
+                                    <div class="swaps-filter-dropdown">
+                                        <div class="dropdown-section">
+                                            <h6 class="dropDown-header">Category</h6>
+                                            <div class="sub-dropdown">
+                                                <p class="dropDown-item">All Programs</p>
+                                                <p class="dropDown-item">General Education</p>
+                                                <p class="dropDown-item">Arts & Humanities</p>
+                                                <p class="dropDown-item">Business & Economics</p>
+                                                <p class="dropDown-item">Engineering & CS</p>
+                                                <p class="dropDown-item">Natural Science</p>
+                                                <p class="dropDown-item">Social Sciences</p>
+                                                <p class="dropDown-item">Health & Medicine</p>
+                                                <p class="dropDown-item">Education & Teaching</p>
+                                                <p class="dropDown-item">Law</p>
+                                                <p class="dropDown-item">Media & Communications</p>
+                                                <p class="dropDown-item">Architecture & Design</p>
+                                                <p class="dropDown-item">Non-Academic</p>                                               
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="show-all">Show All</p>
+                            </th>                           
                         </tr>
                     </thead>
                     <tbody>

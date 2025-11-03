@@ -1,18 +1,24 @@
 @font-face {
+  font-family: 'Montserrat-Regular';
+  src: url('/assets/fonts/Montserrat/static/Montserrat-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+
+@font-face {
   font-family: 'Montserrat-Medium';
-  src: url('../assets/fonts/Montserrat/static/Montserrat-Medium.ttf') format('truetype');
+  src: url('/assets/fonts/Montserrat/static/Montserrat-Medium.ttf') format('truetype');
   font-weight: 500;
 }
 
 @font-face {
   font-family: 'Montserrat-SemiBold';
-  src: url('../assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf') format('truetype');
+  src: url('/assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf') format('truetype');
   font-weight: 600;
 }
 
 @font-face {
   font-family: 'Montserrat-Bold';
-  src: url('../assets/fonts/Montserrat/static/Montserrat-Bold.ttf') format('truetype');
+  src: url('/assets/fonts/Montserrat/static/Montserrat-Bold.ttf') format('truetype');
   font-weight: 700;
 }
 
@@ -116,6 +122,12 @@ html{scroll-behavior: smooth;}
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     gap: 5px;
     cursor: pointer;
+}
+
+.left-nav-menu .listings-btn.active,
+.left-nav-menu .bids-btn.active,
+.left-nav-menu .swaps-btn.active{
+    background-color: #fff;
 }
 
 .left-nav-menu .listings-btn:hover,
@@ -228,6 +240,15 @@ html{scroll-behavior: smooth;}
     padding-bottom: 10px;
 }
 
+.right-side .profile-listings-content table th.listings-filter,
+.right-side .profile-bids-content table th.bids-filter,
+.right-side .profile-swaps-content table th.swaps-filter{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
 .right-side .profile-listings-content table .listings-body-row,
 .right-side .profile-bids-content table .bids-body-row,
 .right-side .profile-swaps-content table .swaps-body-row{
@@ -272,6 +293,144 @@ html{scroll-behavior: smooth;}
 .right-side .profile-listings-content table .listings-body-row .status.completed{
     background-color: #B41B1B;
 }
+
+.listings-filter-container,
+.bids-filter-container,
+.swaps-filter-container{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.listings-filter-btn,
+.bids-filter-btn,
+.swaps-filter-btn{
+    padding: 3px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 20px;
+    color: #D9D9D9;
+    background-color: #073066;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+}
+
+.listings-filter-btn:hover,
+.bids-filter-btn:hover,
+.swaps-filter-btn:hover{
+    background-color: transparent;
+    color: #073066;
+    border: 1px solid #073066;
+    transition: 0.5s ease;   
+}
+
+.show-all{
+    font-size: 0.8em;
+    font-family: 'Montserrat-Regular', sans-serif;
+    cursor: pointer;
+    transition: 0.5s ease;
+    margin: 0;
+    justify-content: center;
+}
+
+.show-all:hover{
+    color: #B41B1B;
+}
+
+.listings-filter-dropdown,
+.bids-filter-dropdown,
+.swaps-filter-dropdown{
+    position: absolute;
+    bottom: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
+    background-color: #fff;
+    border: 1px solid #073066;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: none;
+    flex-direction: column;
+    z-index: 20;
+    max-height: 280px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+}
+
+.listings-filter-dropdown::-webkit-scrollbar,
+.bids-filter-dropdown::-webkit-scrollbar,
+.swaps-filter-dropdown::-webkit-scrollbar{
+    display: none;
+}
+
+
+.listings-filter-dropdown.active,
+.bids-filter-dropdown.active,
+.swaps-filter-dropdown.active{
+    display: flex;
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+.dropdown-section .dropDown-header{
+    font-size: 1em;
+    font-family: 'Montserrat-Bold', sans-serif;
+    background-color: #fff;
+    padding: 8px 10px;
+    color: #073066;
+    margin: 0;
+    cursor: pointer;
+    border-top: 1px solid #eee;
+}
+
+.dropdown-section .dropDown-header:hover{
+    background-color: #eee;
+}
+
+.dropdown-section .dropDown-header.active{
+    background-color: #073066;
+    color: #fff;
+}
+
+.dropdown-section:first-child .dropDown-header{
+    border-top: none;
+}
+
+.sub-dropdown {
+    display: none;
+    flex-direction: column;
+    background-color: #fff;
+    border-top: 1px solid #eee;
+}
+
+.sub-dropdown .dropDown-item {
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: background 0.2s ease;
+    color: black;
+    font-family: 'Montserrat-Regular',sans-serif;
+}
+
+.sub-dropdown .dropDown-item:hover {
+    background-color: #eee;
+}
+
+.sub-dropdown.show {
+    display: flex;
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 
 .right-side .profile-listings-content table .listings-body-row td,
 .right-side .profile-bids-content table .bids-body-row td,
