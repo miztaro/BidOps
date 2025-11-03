@@ -36,14 +36,6 @@ header("Access-Control-Allow-Credentials: true");
 
 session_start();
 
-//session validation - inactive sessions
-$inactive = 600;
-if (isset($_SESSION['timeout']) && (time() - $_SESSION['timeout'] > $inactive)) {
-    session_destroy();
-    session_start();
-}
-$_SESSION['timeout'] = time();
-
 include_once '../config/database.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -84,18 +76,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($user['is_banned']) {
                 echo json_encode([
                     "success" => false,
-                    "message" => "Your account has been banned. Please contact support."
+                    "message" => "Your account has been banned. Please contact BidOps support."
                 ]);
                 exit();
             }
             
             if ($data->password === $user['password']) {
-                unset($_SESSION['admin_id']);
-
+                session_regenerate_id(true);
+                
                 $_SESSION['role'] = 'user';
                 $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['email'] = $user['email'];
+                $_SESSION['timeout'] = time();
+                
                 $found = true;
 
                 echo json_encode([
@@ -121,11 +115,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $admin = $stmtAdmin->fetch(PDO::FETCH_ASSOC);
                 
                 if ($data->password === $admin['password']) {
-                    unset($_SESSION['user_id']);
+                    session_regenerate_id(true);
                     
                     $_SESSION['role'] = 'admin';
                     $_SESSION['admin_id'] = $admin['admin_id'];
                     $_SESSION['username'] = $admin['username'];
+                    $_SESSION['timeout'] = time();
                     $found = true;
 
                     echo json_encode([

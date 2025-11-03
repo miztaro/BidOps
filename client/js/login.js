@@ -125,31 +125,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
-document.addEventListener('DOMContentLoaded', function() {
-    checkExistingSession();
-    
-    const loginBtn = document.querySelector('.btn.primary');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', handleFormLogin);
-    }
-    
-    const passwordInput = document.getElementById('password');
-    const usernameInput = document.getElementById('username');
-    
-    if (passwordInput) {
-        passwordInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                handleFormLogin(event);
-            }
-        });
-    }
-
-    if (usernameInput) {
-        usernameInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                handleFormLogin(event);
-            }
-        });
-    }
-});
