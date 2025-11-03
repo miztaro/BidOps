@@ -17,8 +17,10 @@ function handleFormLogin(event) {
         body: JSON.stringify({
             username: username,
             password: password
-        })
+        }),
+        credentials: 'include' 
     })
+
     .then(response => response.json())
     .then(data => {
         if (data.success) {

@@ -17,6 +17,7 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization");
 
 include_once '../config/database.php';
+session_start();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $data = json_decode(file_get_contents("php://input"));
@@ -24,41 +25,65 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!empty($data->username) && !empty($data->password)) {
         $database = new Database();
         $db = $database->getConnection();
-        
-        $query = "SELECT * FROM USER WHERE username = :username AND is_deleted = 0";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(":username", $data->username);
-        $stmt->execute();
-        
-        if ($stmt->rowCount() > 0) {
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
+        // Check USER table first
+        $queryUser = "SELECT * FROM USER WHERE username = :username AND is_deleted = 0";
+        $stmtUser = $db->prepare($queryUser);
+        $stmtUser->bindParam(":username", $data->username);
+        $stmtUser->execute();
+
+        // Check ADMIN table if not found in USER
+        $queryAdmin = "SELECT * FROM ADMIN WHERE username = :username";
+        $stmtAdmin = $db->prepare($queryAdmin);
+        $stmtAdmin->bindParam(":username", $data->username);
+        $stmtAdmin->execute();
+
+        $found = false;
+
+        if ($stmtUser->rowCount() > 0) {
+            $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
             if ($data->password === $user['password']) {
-                if ($user['is_banned']) {
-                    echo json_encode([
-                        "success" => false,
-                        "message" => "Your account has been banned! Please contact BidOps support."
-                    ]);
-                } else {
-                    echo json_encode([
-                        "success" => true,
-                        "user" => [
-                            "user_id" => $user['user_id'],
-                            "username" => $user['username'],
-                            "email" => $user['email']
-                        ]
-                    ]);
-                }
-            } else {
+                // Clear any old admin session
+                unset($_SESSION['admin_id']);
+
+                $_SESSION['role'] = 'user';
+                $_SESSION['user_id'] = $user['user_id'];
+                $found = true;
+
                 echo json_encode([
-                    "success" => false,
-                    "message" => "Invalid password!"
+                    "success" => true,
+                    "role" => "user",
+                    "user" => [
+                        "user_id" => $user['user_id'],
+                        "username" => $user['username'],
+                        "email" => $user['email']
+                    ]
                 ]);
             }
-        } else {
+        } elseif ($stmtAdmin->rowCount() > 0) {
+            $admin = $stmtAdmin->fetch(PDO::FETCH_ASSOC);
+            if ($data->password === $admin['password']) {
+
+                unset($_SESSION['user_id']);
+                $_SESSION['role'] = 'admin';
+                $_SESSION['admin_id'] = $admin['admin_id'];
+                $found = true;
+
+                echo json_encode([
+                    "success" => true,
+                    "role" => "admin",
+                    "admin" => [
+                        "admin_id" => $admin['admin_id'],
+                        "username" => $admin['username']
+                    ]
+                ]);
+            }
+        }
+
+        if (!$found) {
             echo json_encode([
                 "success" => false,
-                "message" => "User not found!"
+                "message" => "Invalid username or password!"
             ]);
         }
     } else {
