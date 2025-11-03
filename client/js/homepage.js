@@ -59,7 +59,7 @@ function fetchItems() {
                     title: bid.title,
                     category: bid.category_type,
                     price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
-                    timeLeft: calculateTimeLeft(bid.end_date),
+                    timeLeft: formatEndDate(bid.end_date),
                     bidsCount: bid.bid_count || 0,
                     image: bid.image_path ? `http://localhost:8000/server_try/item/${bid.image_path}` : null
                 }));
@@ -71,7 +71,7 @@ function fetchItems() {
                     title: bid.title,
                     category: bid.category_type,
                     price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
-                    timeLeft: calculateTimeLeft(bid.end_date),
+                    timeLeft: formatEndDate(bid.end_date),
                     bidsCount: bid.bid_count || 0,
                     image: bid.image_path ? `http://localhost:8000/server_try/item/${bid.image_path}` : null
                 }));
@@ -82,7 +82,7 @@ function fetchItems() {
                     id: swap.item_id,
                     title: swap.title,
                     category: swap.category_type,
-                    image: bid.image_path ? `http://localhost:8000/server_try/item/${bid.image_path}` : null
+                    image: swap.image_path ? `http://localhost:8000/server_try/item/${swap.image_path}` : null
                 }));
             });
             
@@ -91,7 +91,7 @@ function fetchItems() {
                     id: swap.item_id,
                     title: swap.title,
                     category: swap.category_type,
-                    image: bid.image_path ? `http://localhost:8000/server_try/item/${bid.image_path}` : null
+                    image: swap.image_path ? `http://localhost:8000/server_try/item/${swap.image_path}` : null
                 }));
             });
         })
@@ -100,37 +100,26 @@ function fetchItems() {
         });
 }
 
-function calculateTimeLeft(endDate) {
-    if (!endDate) return '7 days left';
+function formatEndDate(endDate) {
+    if (!endDate) return 'Ends at: Not specified';
     
     const end = new Date(endDate);
     const now = new Date();
-    const diffTime = end - now;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays <= 0) return 'Ended';
-    if (diffDays === 1) return '1 day left';
-    return `${diffDays} days left`;
-}
-
-// ion think there should be default image/pag-upload ng image should be required
-function getDefaultImage(category) {
-    const categoryImages = {
-        'Electronics': '../assets/images/calculator.jpg',
-        'General Education': '../assets/images/CalculusTextbook.png',
-        'Architecture': '../assets/images/T-Square.jpg',
-        'Media & Communications': '../assets/images/Camera.jpg',
-        'Engineering & CS': '../assets/images/Arduino Kit.jpg',
-        'Sports': '../assets/images/calculator.jpg',
-        'Collectibles': '../assets/images/Camera.jpg',
-        'Accessories': '../assets/images/calculator.jpg',
-        'Gaming': '../assets/images/calculator.jpg',
-        'Home': '../assets/images/calculator.jpg',
-        'Photography': '../assets/images/Camera.jpg',
-        'Toys': '../assets/images/calculator.jpg',
-        'Fashion': '../assets/images/calculator.jpg'
+    if (end <= now) {
+        return 'Ended';
+    }
+    
+    const options = { 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true
     };
-    return categoryImages[category] || '../assets/images/calculator.jpg';
+    
+    const formattedDate = end.toLocaleDateString('en-US', options);
+    return `Ends at ${formattedDate}`;
 }
 
 function createBidCard(bid){
@@ -271,9 +260,9 @@ categoryCards.forEach(cards => {
               title: bid.title,
               category: bid.category_type,
               price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
-              timeLeft: calculateTimeLeft(bid.end_date),
+              timeLeft: formatEndDate(bid.end_date),
               bidsCount: bid.bid_count || 0,
-              image: bid.image_path ? '../server_try/' + bid.image_path : getDefaultImage(bid.category_type)
+              image: bid.image_path ? '../server_try/' + bid.image_path : null
             }));
           });
         } 
@@ -288,7 +277,7 @@ categoryCards.forEach(cards => {
               id: swap.item_id,
               title: swap.title,
               category: swap.category_type,
-              image: swap.image_path ? '../server_try/' + swap.image_path : getDefaultImage(swap.category_type)
+              image: swap.image_path ? '../server_try/' + swap.image_path : null
             }));
           });
         } 
@@ -377,9 +366,9 @@ function applyCurrentCategoryFilter() {
             title: bid.title,
             category: bid.category_type,
             price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
-            timeLeft: calculateTimeLeft(bid.end_date),
+            timeLeft: formatEndDate(bid.end_date),
             bidsCount: bid.bid_count || 0,
-            image: bid.image_path ? '../server_try/' + bid.image_path : getDefaultImage(bid.category_type)
+            image: bid.image_path ? '../server_try/' + bid.image_path : null
           }));
         });
       } else {
@@ -391,7 +380,7 @@ function applyCurrentCategoryFilter() {
             id: swap.item_id,
             title: swap.title,
             category: swap.category_type,
-            image: swap.image_path ? '../server_try/' + swap.image_path : getDefaultImage(swap.category_type)
+            image: swap.image_path ? '../server_try/' + swap.image_path : null
           }));
         });
       }
