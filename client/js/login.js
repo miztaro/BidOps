@@ -9,7 +9,7 @@ function handleFormLogin(event) {
         return;
     }
     
-    fetch('/server_try/auth/login.php', {
+    fetch('../server_try/auth/login.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

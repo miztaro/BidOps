@@ -23,17 +23,6 @@ const dropDownItems = categoryDropDown.querySelectorAll(".dropDown-item");
 const categoryTitle = document.getElementById("viewAll-category-title");
 const categoryDescription = document.getElementById("viewAll-category-description");
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Load header.html dynamically
-  fetch("header.html")
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById("header").innerHTML = data;
-    })
-    .catch(error => console.error("Error loading header:", error));
-
-  fetchItems();
-});
 
 function fetchItems() {
     fetch('http://localhost:8000/server_try/item/get_items.php')
