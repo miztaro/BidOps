@@ -372,6 +372,42 @@ function applyCurrentCategoryFilter() {
     });
     
 }
+function resolveImagePath(fileName) {
+    const basePath = "../server_try/item/";
+    if (!fileName) return null;
+
+    // Remove existing extension (if any)
+    const baseName = fileName.replace(/\.(jpg|jpeg|png)$/i, "");
+
+    // Try multiple extensions
+    const possibleExtensions = [".jpeg", ".jpg", ".png"];
+    const img = new Image();
+
+    // Return the first one that loads successfully
+    return new Promise((resolve) => {
+        let resolved = false;
+
+        possibleExtensions.forEach((ext) => {
+            const testSrc = `${basePath}${baseName}${ext}`;
+            const testImg = new Image();
+            testImg.onload = () => {
+                if (!resolved) {
+                    resolved = true;
+                    resolve(testSrc);
+                }
+            };
+            testImg.onerror = () => {
+                // do nothing, will try next
+            };
+            testImg.src = testSrc;
+        });
+
+        // fallback (in case none work)
+        setTimeout(() => {
+            if (!resolved) resolve(`${basePath}${fileName}`);
+        }, 500);
+    });
+}
 document.addEventListener("DOMContentLoaded", () => {
     fetchItems();
 });

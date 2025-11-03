@@ -8,43 +8,7 @@
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="header-container">
-            <div class="logo-section">
-                <img src="../assets/images/slu-logo.png" alt="SLU Logo" class="logo">
-                <div class="logo-text">
-                    <h1>Swap and Bid</h1>
-                    <p>Campus Marketplace</p>
-                    <span>SAINT LOUIS UNIVERSITY</span>
-                    <small>Baguio City, Philippines</small>
-                </div>
-            </div>
-            
-            <div class="header-actions">
-                <div class="search-bar">
-                    <input type="text" placeholder="Search items, books, equipment...">
-                    <button class="search-btn">
-                        <iconify-icon icon="material-symbols:search"></iconify-icon>
-                    </button>
-                </div>
-                
-                <button class="icon-btn">
-                    <iconify-icon icon="mdi:bell-outline"></iconify-icon>
-                </button>
-                <button class="icon-btn">
-                    <iconify-icon icon="mdi:message-outline"></iconify-icon>
-                </button>
-                <button class="icon-btn profile-btn">
-                    <iconify-icon icon="mdi:account-circle"></iconify-icon>
-                </button>
-                <button class="add-listing-btn">
-                    <iconify-icon icon="mdi:plus"></iconify-icon> Add Listing
-                </button>
-            </div>
-        </div>
-    </header>
-
+    <div id="header"></div>
     <!-- Main Content -->
     <main class="bid-details-container">
         <div class="content-wrapper">
@@ -153,7 +117,32 @@
             <p>© 2025 SLU Trade - Bid. All rights reserved. | Saint Louis University Initiative</p>
         </div>
     </footer>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Determine user role securely (from PHP session)
+        fetch("../server_try/auth/getRole.php")
+        .then(response => response.json())
+        .then(data => {
+          const role = data.role; 
+          let headerFile = "";
 
+          if (role === "admin") {
+            headerFile = "admin_header.html";
+            } else {
+        headerFile = "user_header.html";
+        }
+
+      // Load the correct header file
+        fetch(headerFile)
+            .then(response => response.text())
+            .then(header => {
+            document.getElementById("header").innerHTML = header;
+        })
+        .catch(error => console.error("Error loading header:", error));
+    })
+    .catch(error => console.error("Error determining role:", error));
+    });
+    </script>
     <script src="js/view-swap.js"></script>
 </body>
 </html>

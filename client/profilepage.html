@@ -222,6 +222,32 @@
             </div>
         </section>
     </main>
+        <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Determine user role securely (from PHP session)
+        fetch("../server_try/auth/getRole.php")
+        .then(response => response.json())
+        .then(data => {
+          const role = data.role; 
+          let headerFile = "";
+
+          if (role === "admin") {
+            headerFile = "admin_header.html";
+            } else {
+        headerFile = "user_header.html";
+        }
+
+      // Load the correct header file
+        fetch(headerFile)
+            .then(response => response.text())
+            .then(header => {
+            document.getElementById("header").innerHTML = header;
+        })
+        .catch(error => console.error("Error loading header:", error));
+    })
+    .catch(error => console.error("Error determining role:", error));
+    });
+    </script>
     <script src="js/profilepage.js"></script>
 </body>
 </html>
