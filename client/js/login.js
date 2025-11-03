@@ -36,14 +36,17 @@ function handleFormLogin(event) {
             if (data.role === 'user') {
                 localStorage.setItem('user', JSON.stringify(data.user));
                 localStorage.setItem('role', 'user');
+                
+                alert(data.message || 'Login successful!');
+                window.location.href = 'homepage.html';
+                
             } else if (data.role === 'admin') {
                 localStorage.setItem('admin', JSON.stringify(data.admin));
                 localStorage.setItem('role', 'admin');
+                
+                alert(data.message || 'Admin login successful!');
+                window.location.href = '../admin/manage-listing.html';
             }
-            
-            alert(data.message || 'Login successful!');
-            
-            window.location.href = 'homepage.html';
         } else {
             alert(data.message || 'Login failed, please try again!');
         }
@@ -60,21 +63,68 @@ function handleFormLogin(event) {
 
 function checkExistingSession() {
     const role = localStorage.getItem('role');
-    if (role) {
-        fetch('http://localhost:8000/server_try/auth/getRole.php', {
-            credentials: 'include'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.role === 'user' || data.role === 'admin') {
-                window.location.href = 'homepage.html';
+    
+    fetch('http://localhost:8000/server_try/auth/getRole.php', {
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.role === 'admin') {
+            localStorage.setItem('role', 'admin');
+            localStorage.setItem('admin', JSON.stringify({
+                admin_id: data.admin_id,
+                username: data.username
+            }));
+            window.location.href = '../admin/manage-listing.html';
+        } else if (data.role === 'user') {
+            localStorage.setItem('role', 'user');
+            localStorage.setItem('user', JSON.stringify({
+                user_id: data.user_id,
+                username: data.username,
+                email: data.email
+            }));
+            window.location.href = 'homepage.html';
+        } else {
+            localStorage.removeItem('role');
+            localStorage.removeItem('user');
+            localStorage.removeItem('admin');
+        }
+    })
+    .catch(error => {
+        console.log('Session verification failed:', error);
+        localStorage.removeItem('role');
+        localStorage.removeItem('user');
+        localStorage.removeItem('admin');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    checkExistingSession();
+    
+    const loginBtn = document.querySelector('.btn.primary');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', handleFormLogin);
+    }
+    
+    const passwordInput = document.getElementById('password');
+    const usernameInput = document.getElementById('username');
+    
+    if (passwordInput) {
+        passwordInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                handleFormLogin(event);
             }
-        })
-        .catch(error => {
-            console.log('No active session');
         });
     }
-}
+
+    if (usernameInput) {
+        usernameInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                handleFormLogin(event);
+            }
+        });
+    }
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     checkExistingSession();

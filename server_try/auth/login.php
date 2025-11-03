@@ -36,6 +36,14 @@ header("Access-Control-Allow-Credentials: true");
 
 session_start();
 
+//session validation - inactive sessions
+$inactive = 600;
+if (isset($_SESSION['timeout']) && (time() - $_SESSION['timeout'] > $inactive)) {
+    session_destroy();
+    session_start();
+}
+$_SESSION['timeout'] = time();
+
 include_once '../config/database.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -103,7 +111,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        // If not found in USER, check ADMIN table
         if (!$found) {
             $queryAdmin = "SELECT admin_id, username, password FROM ADMIN WHERE username = :username";
             $stmtAdmin = $db->prepare($queryAdmin);
@@ -114,7 +121,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $admin = $stmtAdmin->fetch(PDO::FETCH_ASSOC);
                 
                 if ($data->password === $admin['password']) {
-                    // Clear any old user session
                     unset($_SESSION['user_id']);
                     
                     $_SESSION['role'] = 'admin';
