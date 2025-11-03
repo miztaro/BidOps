@@ -248,53 +248,70 @@ document.addEventListener('DOMContentLoaded', function() {
     btn.onclick = () => showContent(sectionId);
   });
 
- // ---------------- RENDERING & FILTERING OF ITEMS ----------------
+  // ---------------- RENDERING & FILTERING OF ITEMS ----------------
   let currentFilters = {
-    Category: null,
+   Category: null,
     Mode: null,
     Status: null,
   };
 
-  //Rendering of items to display
-  function renderItems(itemsArray){
+  let sectionFilters = {
+    listings: { Category: null, Mode: null, Status: null },
+    bids: { Category: null, Mode: null, Status: null },
+    swaps: { Category: null, Mode: null, Status: null },
+  };
+
+  // Rendering of items to display (only renders for the target section)
+  function renderItems(itemsArray, section) {
     const listingBody = document.querySelector(".profile-listings-content tbody");
-    const bidsBody = document.querySelector(".profile-bids-content tbody")
-    const swapsBody = document.querySelector(".profile-swaps-content tbody")
+    const bidsBody = document.querySelector(".profile-bids-content tbody");
+    const swapsBody = document.querySelector(".profile-swaps-content tbody");
 
-    listingBody.innerHTML = "";
-    bidsBody.innerHTML = ""; 
-    swapsBody.innerHTML = "";
+    if (section === "listings") listingBody.innerHTML = "";
+    if (section === "bids") bidsBody.innerHTML = "";
+    if (section === "swaps") swapsBody.innerHTML = "";
 
-    itemsArray.forEach(items =>{
-      const listingRow = createListingRow(items);
-      const bidsRow = createWinningBidRow(items)
-      const swapsRow = createSwappedRow(items)
-
-      listingBody.appendChild(listingRow);
-      bidsBody.appendChild(bidsRow);
-      swapsBody.appendChild(swapsRow);
-
+    itemsArray.forEach(item => {
+      if (section === "listings") {
+        const row = createListingRow(item);
+        listingBody.appendChild(row);
+      } else if (section === "bids") {
+        const row = createWinningBidRow(item);
+        bidsBody.appendChild(row);
+      } else if (section === "swaps") {
+        const row = createSwappedRow(item);
+        swapsBody.appendChild(row);
+      }
     });
   }
 
-  //Apply Filter
-  function applyFilter(type, value){
-    if(type === "Category" && value === "All Programs"){
+  // Apply Filter (now section-specific)
+  function applyFilter(type, value, section) {
+    const currentFilters = sectionFilters[section];
+
+    if (type === "Category" && value === "All Programs") {
       currentFilters[type] = null;
-    }else {
+    } else {
       currentFilters[type] = value;
     }
 
-    const filtered = listings.filter(listing =>{
-      return(
-        (!currentFilters.Category || listing.category === currentFilters.Category) &&
-        (!currentFilters.Mode || listing.mode === currentFilters.Mode) &&
-        (!currentFilters.Status || listing.status === currentFilters.Status)       
+    let data = [];
+    if (section === "listings") data = listings;
+    else if (section === "swaps") data = swappedItems;
+    else if (section === "bids") data = winningBids;
+
+    const filtered = data.filter(item => {
+      return (
+        (!currentFilters.Category || item.category === currentFilters.Category) &&
+        (!currentFilters.Mode || item.mode === currentFilters.Mode) &&
+        (!currentFilters.Status || item.status === currentFilters.Status)
       );
     });
 
-    renderItems(filtered);
+    renderItems(filtered, section);
   }
+
+  // ---------------- DROPDOWN HANDLING ----------------
 
   // LISTINGS
   const listingsFilterBtn = document.getElementById("listings-filter-btn");
@@ -349,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Handle clicks outside of all dropdowns
+  // Handle clicks outside of dropdowns
   document.addEventListener("click", (event) => {
     const isClickInsideDropdown = Array.from(allFilterDropdowns).some(dropdown =>
       dropdown.contains(event.target)
@@ -371,9 +388,14 @@ document.addEventListener('DOMContentLoaded', function() {
     item.addEventListener("click", (event) => {
       event.stopPropagation();
       const selectedText = item.textContent.trim();
-      const filterType = item.closest(".dropdown-section").querySelector(".dropDown-header").textContent.trim();
+      const filterType = item.closest(".dropdown-section")
+      .querySelector(".dropDown-header").textContent.trim();
 
-      applyFilter(filterType, selectedText);
+      let section = "listings";
+      if (item.closest(".bids-filter-dropdown")) section = "bids";
+      else if (item.closest(".swaps-filter-dropdown")) section = "swaps";
+
+      applyFilter(filterType, selectedText, section);
 
       allFilterDropdowns.forEach(dropdown => dropdown.classList.remove("active"));
       allFilterBtns.forEach(btn => btn.classList.remove("active"));
@@ -386,13 +408,21 @@ document.addEventListener('DOMContentLoaded', function() {
   showAllBtns.forEach(btn => {
     btn.addEventListener("click", (event) => {
       event.stopPropagation();
-      currentFilters = { Category: null, Mode: null, Status: null };
 
       allFilterDropdowns.forEach(dropdown => dropdown.classList.remove("active"));
       allFilterBtns.forEach(btn => btn.classList.remove("active"));
       document.querySelectorAll(".sub-dropdown").forEach(sd => sd.classList.remove("show"));
 
-      renderItems(listings);
+      if (btn.closest(".listings-filter")) {
+        sectionFilters.listings = { Category: null, Mode: null, Status: null };
+        renderItems(listings, "listings");
+      } else if (btn.closest(".bids-filter")) {
+        sectionFilters.bids = { Category: null, Mode: null, Status: null };
+        renderItems(winningBids, "bids");
+      } else if (btn.closest(".swaps-filter")) {
+        sectionFilters.swaps = { Category: null, Mode: null, Status: null };
+        renderItems(swappedItems, "swaps");
+      }
     });
   });
 });
