@@ -17,9 +17,16 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 include_once '../config/database.php';
+session_start();
 
 $database = new Database();
 $db = $database->getConnection();
+
+if(!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(array("message" => "Please log in to create a listing."));
+    exit();
+}
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
@@ -30,7 +37,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $starting_price = $_POST['starting_price'] ?? 0;
         $end_date = $_POST['end_date'] ?? '';
         
-        $seller_id = 'u1'; // using Alice as default seller
+        //$seller_id = 'u1'; // using Alice as default seller
+        $seller_id = $_SESSION['user_id']; //use current user
 
         if(empty($title) || empty($category) || empty($description) || empty($listingType)) {
             http_response_code(400);

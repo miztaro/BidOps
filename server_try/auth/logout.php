@@ -13,26 +13,24 @@ if (in_array($origin, $allowed_origins)) {
 }
 
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET, OPTIONS");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 header("Access-Control-Allow-Credentials: true");
 
 session_start();
 
-if (isset($_SESSION['admin_id'])) {
-    echo json_encode([
-        'role' => 'admin',
-        'username' => $_SESSION['username'] ?? '',
-        'admin_id' => $_SESSION['admin_id']
-    ]);
-} elseif (isset($_SESSION['user_id'])) {
-    echo json_encode([
-        'role' => 'user', 
-        'username' => $_SESSION['username'] ?? '',
-        'user_id' => $_SESSION['user_id'],
-        'email' => $_SESSION['email'] ?? ''
-    ]);
-} else {
-    echo json_encode(['role' => 'guest']);
+session_destroy();
+
+if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), '', time() - 42000,
+        $params["path"], $params["domain"],
+        $params["secure"], $params["httponly"]
+    );
 }
+
+echo json_encode([
+    "success" => true,
+    "message" => "Logged out successfully"
+]);
 ?>

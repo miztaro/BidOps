@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-  fetch("header.html")  
+  fetch("user_header.html")  
   .then(response => response.text())
   .then(data => {
     document.getElementById("header").innerHTML = data;
 
-    const profileIcon = document.getElementById("profile-icon");
+    const profileIcon = document.getElementById("user-header-profile-icon");
     if(profileIcon) {
       profileIcon.addEventListener("click", () => {
         window.location.href = "profilepage.html";
@@ -18,26 +18,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updateItemCounts();
   })
-
-  .catch(error => console.error("Error loading header:", error));
-
+  .catch(error => console.error("Error loading header:", error));  
   const contents = document.querySelectorAll(
     "#profile-user-info-content, #profile-listings-content, #profile-bids-content, #profile-swaps-content"
   );
 
-  function updateItemCounts(){
-    const listingsCount = document.querySelector("#profile-listings-btn p");
-    const bidsCount = document.querySelector("#profile-bids-btn p");
-    const swapsCount = document.querySelector("#profile-swaps-btn p");
+  // ---------------- TODO: USER PROFILE DATA & FUNCTIONS ----------------
 
-    listingsCount.textContent = `${listings.length} Items`;
-    bidsCount.textContent = `${winningBids.length} Items`;
-    swapsCount.textContent = `${swappedItems.length} items`;
-  }
 
   // ---------------- LISTINGS DATA & FUNCTIONS ----------------
 
-  //Change/Remove when manipulating backend database
+  //NOTE: THIS IS STATIC DATA , Change/Remove when manipulating backend database
   const listings = [
     {id: 1,item: "Law Book",category: "Law",mode: "Swap",dateListed: "09 / 16 / 2025",status: "Active"},
     {id: 2,item: "Architecture Book",category: "Architecture & Design",mode: "Bid",dateListed: "09 / 16 / 2025",status: "Pending"},
@@ -100,12 +91,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ---------------- WINNING BIDS DATA & FUNCTIONS ----------------
 
-  //Change/Remove when manipulating backend database
+  //NOTE: THIS IS STATIC DATA , Change/Remove when manipulating backend database
   const winningBids = [
     {id: 1,item: "Law Book",category: "Law",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
     {id: 2,item: "Law Book",category: "Law",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
     {id: 3,item: "Law Book",category: "Law",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
-    {id: 4,item: "Law Book",category: "Law",winningBid: "P100" ,dateWon: "09 / 16 / 2025"}
+    {id: 4,item: "Law Book",category: "Law",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
   ];
 
   function createWinningBidRow(bid) {
@@ -153,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ---------------- SWAPPED ITEMS DATA & FUNCTIONS ----------------
 
-  //Change/Remove when manipulating backend database
+  //NOTE: THIS IS STATIC DATA , Change/Remove when manipulating backend database
   const swappedItems= [
     {id: 1,item: "Law Book",category: "Law",swappedItem: "Calculator" ,dateSwapped: "09 / 16 / 2025"},
     {id: 2,item: "Law Book",category: "Law",swappedItem: "Calculator" ,dateSwapped: "09 / 16 / 2025"},
@@ -204,28 +195,47 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // ---------------- TITLE & SECTION HANDLING ----------------
+
+  
   function updateTitleForSection(sectionId) {
-   const titleContainer = document.querySelector(".title-container h3");
-   const currentAnalytics = document.querySelector(".title-container .analytics");
+    const titleContainer = document.querySelector(".title-container");
+    const titleHeading = document.querySelector(".title-container h3");
+    const currentAnalytics = document.querySelector(".title-container .analytics");
+
+    if(sectionId === "profile-user-info-content"){
+      titleContainer.style.display="none";
+      return;
+    }
+
+    titleContainer.style.display= "flex";
 
     if (sectionId === "profile-bids-content") {
-      titleContainer.textContent = "My Winning Bids";
+      titleHeading.textContent = "My Winning Bids";
       const bidsAnalytics = createBidsAnalytics(winningBids);
       currentAnalytics.replaceWith(bidsAnalytics);
     } 
     else if (sectionId === "profile-swaps-content") {
-      titleContainer.textContent = "My Swaps";
+      titleHeading.textContent = "My Swaps";
       const swapsAnalytics = createSwapsAnalytics(swappedItems);
       currentAnalytics.replaceWith(swapsAnalytics);
     } 
     else if (sectionId === "profile-listings-content") {
-      titleContainer.textContent = "My Listings";
+      titleHeading.textContent = "My Listings";
       const listingAnalytics = createListingAnalytics(listings);
       currentAnalytics.replaceWith(listingAnalytics);
     }
   }
 
-  // Map section IDs to their buttons
+  function updateItemCounts(){
+    const listingsCount = document.querySelector("#profile-listings-btn p");
+    const bidsCount = document.querySelector("#profile-bids-btn p");
+    const swapsCount = document.querySelector("#profile-swaps-btn p");
+
+    listingsCount.textContent = `${listings.length} Items`;
+    bidsCount.textContent = `${winningBids.length} Items`;
+    swapsCount.textContent = `${swappedItems.length} items`;
+  }
+
   const buttons = {
     "profile-user-info-content": document.getElementById("profile-user-info-btn"),
     "profile-listings-content": document.getElementById("profile-listings-btn"),
@@ -235,7 +245,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function showContent(id) { 
 
-    contents.forEach(c => c.style.display = c.id === id ? "block" : "none");
+    contents.forEach(c => {
+      if(c.id === id){
+        c.style.display = (id === "profile-user-info-content") ? "flex" : "block";
+      }else{
+        c.style.display = "none";
+      }
+    });
+
     updateTitleForSection(id);
 
     Object.values(buttons).forEach(btn => btn.classList.remove("active"));
@@ -249,11 +266,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // ---------------- RENDERING & FILTERING OF ITEMS ----------------
-  let currentFilters = {
-   Category: null,
-    Mode: null,
-    Status: null,
-  };
 
   let sectionFilters = {
     listings: { Category: null, Mode: null, Status: null },

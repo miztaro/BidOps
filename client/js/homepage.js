@@ -164,7 +164,7 @@ function createSwapCard(swap) {
             <p>${swap.category}</p>
         </div>
         <div class="button-container">
-            <button class="make-offer-btn"><a href="#">Make Offer</a></button>
+            <button class="make-offer-btn"><a href="view-swap.html?item_id=${swap.id}">Make Offer</a></button>
             <button class="heart-button-swap" id="heart-button-swap-${swap.id}">
                 <iconify-icon icon="tabler:heart" width="25" height="25" id="favorite-logo-swap-${swap.id}"></iconify-icon>
             </button>
