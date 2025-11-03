@@ -23,7 +23,6 @@ const dropDownItems = categoryDropDown.querySelectorAll(".dropDown-item");
 const categoryTitle = document.getElementById("viewAll-category-title");
 const categoryDescription = document.getElementById("viewAll-category-description");
 
-
 function fetchItems() {
     fetch('http://localhost:8000/server_try/item/get_items.php')
         .then(response => response.json())
@@ -210,6 +209,7 @@ swapViewAllBtn.addEventListener("click", () => {
 categoryCards.forEach(cards => {
   cards.addEventListener("click", () =>{
     const selectedCategory = cards.getAttribute("browse-category");
+    document.getElementById("header").style.display = "none";
 
     home.style.display = "none";
     viewAll.style.display = "block";
