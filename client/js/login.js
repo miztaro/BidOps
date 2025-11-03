@@ -1,7 +1,7 @@
 function handleFormLogin(event) {
     event.preventDefault();
     
-    const username = document.getElementById('username').value;
+    const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
     
     if (!username || !password) {
@@ -9,7 +9,12 @@ function handleFormLogin(event) {
         return;
     }
     
-    fetch('../server_try/auth/login.php', {
+    const loginBtn = document.querySelector('.btn.primary');
+    const originalText = loginBtn.textContent;
+    loginBtn.textContent = 'Logging in...';
+    loginBtn.disabled = true;
+    
+    fetch('http://localhost:8000/server_try/auth/login.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -18,13 +23,26 @@ function handleFormLogin(event) {
             username: username,
             password: password
         }),
-        credentials: 'include' 
+        credentials: 'include'
     })
-
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            localStorage.setItem('user', JSON.stringify(data.user));
+            if (data.role === 'user') {
+                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('role', 'user');
+            } else if (data.role === 'admin') {
+                localStorage.setItem('admin', JSON.stringify(data.admin));
+                localStorage.setItem('role', 'admin');
+            }
+            
+            alert(data.message || 'Login successful!');
+            
             window.location.href = 'homepage.html';
         } else {
             alert(data.message || 'Login failed, please try again!');
@@ -32,17 +50,43 @@ function handleFormLogin(event) {
     })
     .catch(error => {
         console.error('Login error:', error);
-        alert('Login failed. Please try again!');
+        alert('Login failed. Please check your connection and try again!');
+    })
+    .finally(() => {
+        loginBtn.textContent = originalText;
+        loginBtn.disabled = false;
     });
 }
 
+function checkExistingSession() {
+    const role = localStorage.getItem('role');
+    if (role) {
+        fetch('http://localhost:8000/server_try/auth/getRole.php', {
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.role === 'user' || data.role === 'admin') {
+                window.location.href = 'homepage.html';
+            }
+        })
+        .catch(error => {
+            console.log('No active session');
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    checkExistingSession();
+    
     const loginBtn = document.querySelector('.btn.primary');
     if (loginBtn) {
         loginBtn.addEventListener('click', handleFormLogin);
     }
     
     const passwordInput = document.getElementById('password');
+    const usernameInput = document.getElementById('username');
+    
     if (passwordInput) {
         passwordInput.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
@@ -51,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const usernameInput = document.getElementById('username');
     if (usernameInput) {
         usernameInput.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {

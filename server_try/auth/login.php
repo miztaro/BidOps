@@ -4,50 +4,90 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    header("Access-Control-Allow-Origin: http://localhost:8000");
+    $allowed_origins = ['http://localhost:8000', 'http://127.0.0.1:5500', 'http://127.0.0.1:8000'];
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    
+    if (in_array($origin, $allowed_origins)) {
+        header("Access-Control-Allow-Origin: $origin");
+    } else {
+        header("Access-Control-Allow-Origin: http://localhost:8000");
+    }
+    
     header("Access-Control-Allow-Methods: POST, OPTIONS");
     header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+    header("Access-Control-Allow-Credentials: true");
     http_response_code(200);
     exit();
 }
 
-header("Access-Control-Allow-Origin: http://localhost:8000");
+$allowed_origins = ['http://localhost:8000', 'http://127.0.0.1:5500', 'http://127.0.0.1:8000'];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (in_array($origin, $allowed_origins)) {
+    header("Access-Control-Allow-Origin: $origin");
+} else {
+    header("Access-Control-Allow-Origin: http://localhost:8000");
+}
+
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+header("Access-Control-Allow-Credentials: true");
 
-include_once '../config/database.php';
 session_start();
 
+include_once '../config/database.php';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $data = json_decode(file_get_contents("php://input"));
-    
-    if (!empty($data->username) && !empty($data->password)) {
+    try {
+        $input = file_get_contents("php://input");
+        
+        if (empty($input)) {
+            throw new Exception("No data received");
+        }
+        
+        $data = json_decode($input);
+        
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception("Invalid JSON format");
+        }
+        
+        if (empty($data->username) || empty($data->password)) {
+            echo json_encode([
+                "success" => false,
+                "message" => "Username and password are required!"
+            ]);
+            exit();
+        }
+
         $database = new Database();
         $db = $database->getConnection();
 
-        // Check USER table first
-        $queryUser = "SELECT * FROM USER WHERE username = :username AND is_deleted = 0";
+        $queryUser = "SELECT user_id, username, email, password, is_banned FROM USER WHERE username = :username AND is_deleted = 0";
         $stmtUser = $db->prepare($queryUser);
         $stmtUser->bindParam(":username", $data->username);
         $stmtUser->execute();
-
-        // Check ADMIN table if not found in USER
-        $queryAdmin = "SELECT * FROM ADMIN WHERE username = :username";
-        $stmtAdmin = $db->prepare($queryAdmin);
-        $stmtAdmin->bindParam(":username", $data->username);
-        $stmtAdmin->execute();
 
         $found = false;
 
         if ($stmtUser->rowCount() > 0) {
             $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+            
+            if ($user['is_banned']) {
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Your account has been banned. Please contact support."
+                ]);
+                exit();
+            }
+            
             if ($data->password === $user['password']) {
-                // Clear any old admin session
                 unset($_SESSION['admin_id']);
 
                 $_SESSION['role'] = 'user';
                 $_SESSION['user_id'] = $user['user_id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['email'] = $user['email'];
                 $found = true;
 
                 echo json_encode([
@@ -57,26 +97,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         "user_id" => $user['user_id'],
                         "username" => $user['username'],
                         "email" => $user['email']
-                    ]
+                    ],
+                    "message" => "Login successful!"
                 ]);
             }
-        } elseif ($stmtAdmin->rowCount() > 0) {
-            $admin = $stmtAdmin->fetch(PDO::FETCH_ASSOC);
-            if ($data->password === $admin['password']) {
+        }
 
-                unset($_SESSION['user_id']);
-                $_SESSION['role'] = 'admin';
-                $_SESSION['admin_id'] = $admin['admin_id'];
-                $found = true;
+        // If not found in USER, check ADMIN table
+        if (!$found) {
+            $queryAdmin = "SELECT admin_id, username, password FROM ADMIN WHERE username = :username";
+            $stmtAdmin = $db->prepare($queryAdmin);
+            $stmtAdmin->bindParam(":username", $data->username);
+            $stmtAdmin->execute();
 
-                echo json_encode([
-                    "success" => true,
-                    "role" => "admin",
-                    "admin" => [
-                        "admin_id" => $admin['admin_id'],
-                        "username" => $admin['username']
-                    ]
-                ]);
+            if ($stmtAdmin->rowCount() > 0) {
+                $admin = $stmtAdmin->fetch(PDO::FETCH_ASSOC);
+                
+                if ($data->password === $admin['password']) {
+                    // Clear any old user session
+                    unset($_SESSION['user_id']);
+                    
+                    $_SESSION['role'] = 'admin';
+                    $_SESSION['admin_id'] = $admin['admin_id'];
+                    $_SESSION['username'] = $admin['username'];
+                    $found = true;
+
+                    echo json_encode([
+                        "success" => true,
+                        "role" => "admin",
+                        "admin" => [
+                            "admin_id" => $admin['admin_id'],
+                            "username" => $admin['username']
+                        ],
+                        "message" => "Admin login successful!"
+                    ]);
+                }
             }
         }
 
@@ -86,11 +141,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 "message" => "Invalid username or password!"
             ]);
         }
-    } else {
+
+    } catch (Exception $e) {
+        http_response_code(500);
         echo json_encode([
             "success" => false,
-            "message" => "Username and password are required!"
+            "message" => "Server error: " . $e->getMessage()
         ]);
     }
+} else {
+    http_response_code(405);
+    echo json_encode([
+        "success" => false,
+        "message" => "Method not allowed."
+    ]);
 }
 ?>
