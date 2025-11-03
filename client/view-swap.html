@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swap Item Details - Swap and Bid</title>
+    <link rel="stylesheet" href="style/join-bid.css">
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <img src="../assets/images/slu-logo.png" alt="SLU Logo" class="logo">
+                <div class="logo-text">
+                    <h1>Swap and Bid</h1>
+                    <p>Campus Marketplace</p>
+                    <span>SAINT LOUIS UNIVERSITY</span>
+                    <small>Baguio City, Philippines</small>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search items, books, equipment...">
+                    <button class="search-btn">
+                        <iconify-icon icon="material-symbols:search"></iconify-icon>
+                    </button>
+                </div>
+                
+                <button class="icon-btn">
+                    <iconify-icon icon="mdi:bell-outline"></iconify-icon>
+                </button>
+                <button class="icon-btn">
+                    <iconify-icon icon="mdi:message-outline"></iconify-icon>
+                </button>
+                <button class="icon-btn profile-btn">
+                    <iconify-icon icon="mdi:account-circle"></iconify-icon>
+                </button>
+                <button class="add-listing-btn">
+                    <iconify-icon icon="mdi:plus"></iconify-icon> Add Listing
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="bid-details-container">
+        <div class="content-wrapper">
+            <!-- Left Section: Image Gallery -->
+            <div class="image-section">
+                <div class="main-image-container">
+                    <img src="../assets/images/CalculusTextbook.png" alt="Swap Item" id="mainImage">
+                    <button class="report-btn" id="reportBtn">
+                        <iconify-icon icon="mdi:dots-vertical"></iconify-icon>
+                    </button>
+                </div>
+                
+                <div class="thumbnail-container">
+                    <!-- Thumbnails will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Right Section: Item Details -->
+            <div class="details-section">
+                <h2 class="item-title">Loading...</h2>
+                <p class="item-description">Loading item details...</p>
+
+                <!-- Seller Info -->
+                <div class="seller-info">
+                    <img src="../assets/images/profile-placeholder.png" alt="Seller" class="seller-avatar">
+                    <div class="seller-details">
+                        <h4>Loading...</h4>
+                        <p>email@slu.edu.ph</p>
+                    </div>
+                    <a href="#" class="view-profile-btn">View Profile</a>
+                </div>
+
+                <!-- Swap Information -->
+                <div class="swap-info-box">
+                    <div class="swap-badge">
+                        <iconify-icon icon="mdi:swap-horizontal"></iconify-icon>
+                        <span>Available for Swap</span>
+                    </div>
+                    <p class="swap-description">
+                        This item is available for swapping with other items. 
+                        Click below to make your swap offer!
+                    </p>
+                </div>
+
+                <!-- Place Swap Offer Section -->
+                <div class="place-bid-section">
+                    <h3>Place your swap offer</h3>
+                    <p style="margin-bottom: 15px; color: #555;">
+                        You'll be able to propose items you want to swap with this item.
+                    </p>
+                    <button class="place-bid-btn" id="placeSwapBtn">
+                        <iconify-icon icon="mdi:swap-horizontal"></iconify-icon> Place swap offer
+                    </button>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="favorites-btn">
+                        <iconify-icon icon="mdi:heart"></iconify-icon> Add to Favorites
+                    </button>
+                    <button class="chat-btn">
+                        <iconify-icon icon="mdi:message"></iconify-icon> Chat with Seller
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-top">
+            <h2>Your Campus, Your Marketplace.</h2>
+            <p>Post your items, make a deal, and connect<br>with SLU students today!</p>
+            <p class="footer-description">A safe, student-powered platform to buy, sell, and trade academic resources and campus essentials.</p>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-left">
+                <img src="../assets/images/slu-logo.png" alt="SLU Logo" class="footer-logo">
+                <div class="footer-text">
+                    <h3>Swap and Bid</h3>
+                    <p>Campus Marketplace</p>
+                    <span>SAINT LOUIS UNIVERSITY</span>
+                    <small>Baguio City, Philippines</small>
+                </div>
+            </div>
+            
+            <div class="footer-center">
+                <p class="footer-tagline">The official trading platform for Saint Louis University. Buy, sell, and swap academic resources safely.</p>
+            </div>
+            
+            <div class="footer-right">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="#"><iconify-icon icon="mdi:facebook"></iconify-icon></a>
+                    <a href="#"><iconify-icon icon="mdi:twitter"></iconify-icon></a>
+                    <a href="#"><iconify-icon icon="mdi:instagram"></iconify-icon></a>
+                </div>
+                <p class="support-email">
+                    <iconify-icon icon="mdi:email"></iconify-icon> support@sluswapbid.edu.ph
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer-copyright">
+            <p>© 2025 SLU Trade - Bid. All rights reserved. | Saint Louis University Initiative</p>
+        </div>
+    </footer>
+
+    <script src="js/view-swap.js"></script>
+</body>
+</html>
