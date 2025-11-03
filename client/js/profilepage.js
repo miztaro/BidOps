@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
   .then(data => {
     document.getElementById("header").innerHTML = data;
 
-    const profileIcon = document.getElementById("profile-icon");
+    const profileIcon = document.getElementById("user-header-profile-icon");
     if(profileIcon) {
       profileIcon.addEventListener("click", () => {
         window.location.href = "profilepage.html";
