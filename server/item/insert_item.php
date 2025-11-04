@@ -66,7 +66,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $image_path = null;
         if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-            // use uploads folder directly in server_try
+            // use uploads folder directly in server
             $upload_dir = "uploads/";
             if(!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0777, true);

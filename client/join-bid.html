@@ -9,6 +9,14 @@
 </head>
 <body>
     <div id="header"></div>
+
+    <div class="top-nav">
+        <button class="back-home" id="backToPrevious">
+            <iconify-icon icon="line-md:arrow-left" width="24" height="24"></iconify-icon>
+            Back
+        </button>
+    </div>
+
     <!-- Main Content -->
     <main class="bid-details-container">
         <div class="content-wrapper">
@@ -190,7 +198,7 @@
     <script>
     document.addEventListener("DOMContentLoaded", function() {
         // Determine user role securely (from PHP session)
-        fetch("../server_try/auth/getRole.php")
+        fetch("../server/auth/get_role.php")
         .then(response => response.json())
         .then(data => {
           const role = data.role; 
@@ -199,7 +207,7 @@
           if (role === "admin") {
             headerFile = "admin_header.html";
             } else {
-        headerFile = "user_header.html";
+        headerFile = "header.html";
         }
 
       // Load the correct header file

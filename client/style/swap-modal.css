@@ -1,0 +1,287 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+}
+
+.swap-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.swap-modal {
+    background: #fff;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.5rem;
+    text-align: center;
+    flex: 1;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+.modal-content {
+    padding: 30px;
+}
+
+.target-item-section h4,
+.new-item-form h4 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.target-item-card {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 30px;
+    background: #f8f9fa;
+}
+
+.target-item-card img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.target-item-info h5 {
+    margin: 0 0 8px 0;
+    color: #333;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.target-item-info p {
+    margin: 0 0 8px 0;
+    color: #555;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.category {
+    background: #073066;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #999;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    opacity: 1;
+}
+
+.form-group select:required:invalid {
+    color: #999;
+}
+
+.form-group select option[value=""][disabled] {
+    color: #999;
+}
+
+.form-group select option {
+    color: #000;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-group small {
+    color: #666;
+    font-size: 12px;
+    display: block;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.swap-message {
+    margin: 25px 0;
+}
+
+.swap-message label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.swap-message textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 80px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.swap-message textarea::placeholder {
+    color: #999;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.cancel-btn,
+.submit-swap-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    flex: 1;
+    font-family: Arial, sans-serif;
+}
+
+.cancel-btn {
+    background: #f44336;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background: #f26c63;
+}
+
+.submit-swap-btn {
+    background: #073066;
+    color: white;
+}
+
+.submit-swap-btn:hover {
+    background: #052a5a;
+}
+
+.submit-swap-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.message {
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 4px;
+    font-weight: 500;
+    font-family: Arial, sans-serif;
+}
+
+.message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.form-section-spacing {
+    margin-bottom: 20px;
+}
+
+.form-group input[type="file"] {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+}
+
+.form-group input[type="file"]:focus {
+    border-color: #007bff;
+}

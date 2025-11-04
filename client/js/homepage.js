@@ -232,7 +232,7 @@ categoryCards.forEach(card => {
   const categoryName = card.getAttribute("browse-category");
   const countElem = card.querySelector("p"); 
 
-  fetch(`../server_try/item/get_items.php?category=${categoryName}`)
+  fetch(`../server/item/get_items.php?category=${categoryName}`)
     .then(response => response.json())
     .then(data => {
       const items = data.items || [];
@@ -255,7 +255,7 @@ categoryCards.forEach(card => {
     viewAllBidContainer.innerHTML = "";
     viewAllSwapContainer.innerHTML = "";
 
-    fetch(`../server_try/item/get_items.php?category=${categoryName}`)
+    fetch(`../server/item/get_items.php?category=${categoryName}`)
       .then(response => response.json())
       .then(data => {
         const items = data.items || [];
@@ -361,8 +361,8 @@ function applyCurrentCategoryFilter() {
   const isBidActive = bidBtn.classList.contains("active");
 
   const url = selectedCategory === "All Categories" 
-    ? '../server_try/item/get_items.php'
-    : `../server_try/item/get_items.php?category=${selectedCategory}`;
+    ? '../server/item/get_items.php'
+    : `../server/item/get_items.php?category=${selectedCategory}`;
 
   fetch(url)
     .then(response => response.json())

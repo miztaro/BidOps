@@ -1,5 +1,5 @@
 <?php
-// server_try/item/place_bid.php
+// server/item/place_bid.php
 session_start();
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');

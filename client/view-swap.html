@@ -5,10 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Swap Item Details - Swap and Bid</title>
     <link rel="stylesheet" href="style/join-bid.css">
+    <link rel="stylesheet" href="style/swap-modal.css">
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 </head>
 <body>
     <div id="header"></div>
+
+    <div class="top-nav">
+        <button class="back-home" id="backToPrevious">
+            <iconify-icon icon="line-md:arrow-left" width="24" height="24"></iconify-icon>
+            Back
+        </button>
+    </div>
+    
     <!-- Main Content -->
     <main class="bid-details-container">
         <div class="content-wrapper">
@@ -117,31 +126,32 @@
             <p>© 2025 SLU Trade - Bid. All rights reserved. | Saint Louis University Initiative</p>
         </div>
     </footer>
+
+    <div id="swapModalContainer"></div>
+
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Determine user role securely (from PHP session)
-        fetch("../server_try/auth/getRole.php")
-        .then(response => response.json())
-        .then(data => {
-          const role = data.role; 
-          let headerFile = "";
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch("../server/auth/get_role.php")
+            .then(response => response.json())
+            .then(data => {
+                const role = data.role; 
+                let headerFile = "";
 
-          if (role === "admin") {
-            headerFile = "admin_header.html";
-            } else {
-        headerFile = "user_header.html";
-        }
+                if (role === "admin") {
+                    headerFile = "admin_header.html";
+                } else {
+                    headerFile = "header.html";
+                }
 
-      // Load the correct header file
-        fetch(headerFile)
-            .then(response => response.text())
-            .then(header => {
-            document.getElementById("header").innerHTML = header;
-        })
-        .catch(error => console.error("Error loading header:", error));
-    })
-    .catch(error => console.error("Error determining role:", error));
-    });
+                fetch(headerFile)
+                    .then(response => response.text())
+                    .then(header => {
+                        document.getElementById("header").innerHTML = header;
+                    })
+                    .catch(error => console.error("Error loading header:", error));
+            })
+            .catch(error => console.error("Error determining role:", error));
+        });
     </script>
     <script src="js/view-swap.js"></script>
 </body>

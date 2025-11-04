@@ -1,10 +1,17 @@
-// client/js/header.js
 (function () {
   function initHeaderNav() {
     const addListingBtn = document.querySelector(".add-btn") || document.querySelector(".add-listing-btn");
     const profileIcon = document.getElementById("user-header-profile-icon");
     const notifIcon = document.querySelector('iconify-icon[icon="material-symbols:notifications-outline"]');
     const messageIcon = document.querySelector('iconify-icon[icon="ri:message-3-line"]');
+    const headerLogo = document.getElementById("header-logo");
+
+    if (headerLogo) {
+      headerLogo.style.cursor = "pointer";
+      headerLogo.addEventListener("click", () => {
+        window.location.href = "homepage.html";
+      });
+    }
 
     if (addListingBtn) {
       addListingBtn.addEventListener("click", (e) => {

@@ -1,0 +1,67 @@
+<!-- this shows up when user offers a swap -->
+<div class="swap-modal-overlay" id="swapModalOverlay">
+    <div class="swap-modal">
+        <div class="modal-header">
+            <h3>Make a Swap Offer</h3>
+            <button class="close-modal" id="closeModal">&times;</button>
+        </div>
+        
+        <div class="modal-content">
+            <div class="target-item-section">
+                <h4>You're swapping for:</h4>
+                <div class="target-item-card">
+                    <img id="targetItemImage" src="" alt="Target Item">
+                    <div class="target-item-info">
+                        <h5 id="targetItemTitle"></h5>
+                        <p id="targetItemDescription"></p>
+                        <span class="category" id="targetItemCategory"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="new-item-form" id="newItemForm">
+                <h4>Enter Your Item Details</h4>
+                <form id="newItemFormElement">
+                    <div class="form-group">
+                        <label for="itemName">Item Name *</label>
+                        <input type="text" id="itemName" name="itemName" required placeholder="Enter item name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemDescription">Item Description *</label>
+                        <textarea id="itemDescription" name="itemDescription" required placeholder="Describe your item..." rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemCategory">Category *</label>
+                        <select id="itemCategory" name="itemCategory" required>
+                            <option value="">Select category</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Books">Books</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Fashion">Fashion</option>
+                            <option value="Home">Home</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemImage">Upload Image *</label>
+                        <input type="file" id="itemImage" name="itemImage" accept="image/*" required>
+                        <small>Supported formats: JPG, PNG(Max 5MB)</small>
+                    </div>
+                    
+                    <div class="swap-message">
+                        <label for="swapMessage">Message to Seller (Optional):</label>
+                        <textarea id="swapMessage" placeholder="Add a message explaining your swap offer..." rows="3"></textarea>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-btn" id="cancelSwap">Cancel</button>
+                        <button type="submit" class="submit-swap-btn">Submit Swap Offer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

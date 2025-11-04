@@ -2,6 +2,7 @@
 
 // Get item_id from URL
 const urlParams = new URLSearchParams(window.location.search);
+const backToPreviousBtn = document.getElementById('backToPrevious');
 const itemId = urlParams.get('item_id');
 
 let itemData = null;
@@ -16,8 +17,32 @@ window.addEventListener('load', () => {
         return;
     }
     
+    loadHeader();
     loadItemDetails();
 });
+
+function setupBackButton() {
+    if (backToPreviousBtn) {
+        backToPreviousBtn.addEventListener('click', () => {
+            window.history.back();
+        });
+    }
+}
+
+function loadHeader() {
+    fetch("header.html")
+        .then(response => response.text())
+        .then(header => {
+            document.getElementById("header").innerHTML = header;
+            const script = document.createElement("script");
+            
+            script.src = "js/header.js";
+            script.defer = true;
+            document.body.appendChild(script);
+            setupBackButton();
+        })
+        .catch(error => console.error("Error loading header:", error));
+}
 
 // Load item details from backend
 function loadItemDetails() {
