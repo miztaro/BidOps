@@ -1,4 +1,4 @@
-console.log("Homepage script loaded ✅");
+console.log("Homepage script loaded ");
 
 const home = document.getElementById("homepage-section");
 const viewAll = document.getElementById("viewAll-section");
@@ -23,10 +23,12 @@ const dropDownItems = categoryDropDown.querySelectorAll(".dropDown-item");
 const categoryTitle = document.getElementById("viewAll-category-title");
 const categoryDescription = document.getElementById("viewAll-category-description");
 
-// ✅ Correct backend path when inside /client
+// -------------------------
+// Fetch Items from Server
+// -------------------------
 function fetchItems(category = "") {
-    let url = category 
-        ? `../server_try/item/get_items.php?category=${category}`
+    const url = category
+        ? `../server_try/item/get_items.php?category=${encodeURIComponent(category)}`
         : `../server_try/item/get_items.php`;
 
     fetch(url)
@@ -36,43 +38,35 @@ function fetchItems(category = "") {
             const bids = items.filter(i => i.item_type === "bid");
             const swaps = items.filter(i => i.item_type === "swap");
 
+            // Clear containers
             homeBidContainer.innerHTML = "";
             viewAllBidContainer.innerHTML = "";
             homeSwapContainer.innerHTML = "";
             viewAllSwapContainer.innerHTML = "";
 
-            bids.slice(0,4).forEach(item => {
-                homeBidContainer.appendChild(createBidCard(formatBidItem(item)));
-            });
+            // Show limited items on homepage
+            bids.slice(0, 4).forEach(item => homeBidContainer.appendChild(createBidCard(formatBidItem(item))));
+            swaps.slice(0, 4).forEach(item => homeSwapContainer.appendChild(createSwapCard(formatSwapItem(item))));
 
-            swaps.slice(0,4).forEach(item => {
-                homeSwapContainer.appendChild(createSwapCard(formatSwapItem(item)));
-            });
-
-            bids.forEach(item => {
-                viewAllBidContainer.appendChild(createBidCard(formatBidItem(item)));
-            });
-
-            swaps.forEach(item => {
-                viewAllSwapContainer.appendChild(createSwapCard(formatSwapItem(item)));
-            });
+            // Populate "View All" section
+            bids.forEach(item => viewAllBidContainer.appendChild(createBidCard(formatBidItem(item))));
+            swaps.forEach(item => viewAllSwapContainer.appendChild(createSwapCard(formatSwapItem(item))));
         })
-        .catch(err => console.error("❌ Error:", err));
+        .catch(err => console.error("❌ Error fetching items:", err));
 }
 
+// -------------------------
+// Format Items
+// -------------------------
 function formatBidItem(bid) {
     return {
         id: bid.item_id,
         title: bid.title,
         category: bid.category_type,
-        price: `₱${parseFloat(bid.starting_price || 0).toFixed(2)}`,
+        starting_bid: parseFloat(bid.starting_price || 0).toFixed(2),
         timeLeft: formatEndDate(bid.end_date),
         bidsCount: bid.bid_count || 0,
-
-        // ✅ Correct uploaded image path
-        image: bid.image_path 
-            ? `../server_try/item/uploads/${bid.image_path.split('/').pop()}`
-            : null
+        image: bid.image_path ? `../server_try/item/uploads/${bid.image_path.split('/').pop()}` : '../assets/images/placeholder.png'
     };
 }
 
@@ -81,35 +75,19 @@ function formatSwapItem(swap) {
         id: swap.item_id,
         title: swap.title,
         category: swap.category_type,
-
-        // ✅ Correct swap image path
-        image: swap.image_path 
-            ? `../server_try/item/uploads/${swap.image_path.split('/').pop()}`
-            : null
+        image: swap.image_path ? `../server_try/item/uploads/${swap.image_path.split('/').pop()}` : '../assets/images/placeholder.png'
     };
 }
 
-function formatEndDate(endDate) {
-    if (!endDate) return "Ends: N/A";
-    const end = new Date(endDate);
-    return end <= new Date()
-        ? "Ended"
-        : `Ends ${end.toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true
-        })}`;
-}
-
+// -------------------------
+// Card Templates
+// -------------------------
 function createBidCard(bid) {
     const div = document.createElement("div");
     div.classList.add("bid-card");
     div.innerHTML = `
         <div class="top">
-            ${bid.image ? `<img src="${bid.image}" alt="${bid.title}">`
-                        : emptyItemIcon("mdi:package-variant")}
+            <img src="${bid.image}" alt="${bid.title}">
             <button class="heart-button-bid">
                 <iconify-icon icon="tabler:heart" width="25"></iconify-icon>
             </button>
@@ -117,7 +95,7 @@ function createBidCard(bid) {
         <div class="bottom">
             <h6>${bid.title}</h6>
             <p class="category">${bid.category}</p>
-            <p class="start-bid">Starting bid <span class="bid-price">${bid.price}</span></p>
+            <p class="start-bid">Starting bid <span class="bid-price">₱${bid.starting_bid}</span></p>
             <div class="bid-time-and-count">
                 <div class="time"><p>${bid.timeLeft}</p></div>
                 <p class="count"><span>${bid.bidsCount}</span> bids</p>
@@ -136,8 +114,7 @@ function createSwapCard(swap) {
     div.innerHTML = `
         <div class="top"><p>Swap Offer</p></div>
         <div class="img-container">
-            ${swap.image ? `<img src="${swap.image}" alt="${swap.title}">`
-                         : emptyItemIcon("mdi:swap-horizontal")}
+            <img src="${swap.image}" alt="${swap.title}">
         </div>
         <div class="bottom">
             <h6>${swap.title}</h6>
@@ -150,14 +127,26 @@ function createSwapCard(swap) {
     return div;
 }
 
-function emptyItemIcon(icon) {
-    return `
-        <div style="background:#073066;height:100%;display:flex;align-items:center;justify-content:center;color:white;">
-            <iconify-icon icon="${icon}" width="50"></iconify-icon>
-        </div>
-    `;
+// -------------------------
+// Utilities
+// -------------------------
+function formatEndDate(endDate) {
+    if (!endDate) return "Ends: N/A";
+    const end = new Date(endDate);
+    return end <= new Date()
+        ? "Ended"
+        : `Ends ${end.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        })}`;
 }
 
+// -------------------------
+// Navigation & Filters
+// -------------------------
 bidViewAllBtn.addEventListener("click", () => {
     home.style.display = "none";
     viewAll.style.display = "block";
@@ -176,83 +165,6 @@ swapViewAllBtn.addEventListener("click", () => {
     bidBtn.classList.remove("active");
     swapBtn.classList.add("active");
     fetchItems();
-});
-
-categoryCards.forEach(card => {
-  const categoryName = card.getAttribute("browse-category");
-  const countElem = card.querySelector("p"); 
-
-  fetch(`../server_try/item/get_items.php?category=${categoryName}`)
-    .then(response => response.json())
-    .then(data => {
-      const items = data.items || [];
-      countElem.textContent = `${items.length} ${items.length <= 1  ? 'item' : 'items'}` ;
-    });
-
-  card.addEventListener("click", () => {
-    document.getElementById("header").style.display = "none";
-    home.style.display = "none";
-    viewAll.style.display = "block";
-
-    bidBtn.classList.add("active");
-    swapBtn.classList.remove("active");
-    viewAllBidContainer.style.display = "grid";
-    viewAllSwapContainer.style.display = "none";
-
-    categoryTitle.textContent = categoryName;
-    categoryDescription.textContent = categoryName;
-
-    viewAllBidContainer.innerHTML = "";
-    viewAllSwapContainer.innerHTML = "";
-
-    fetch(`../server_try/item/get_items.php?category=${categoryName}`)
-      .then(response => response.json())
-      .then(data => {
-        const items = data.items || [];
-        const filteredBids = items.filter(item => item.item_type === 'bid');
-        const filteredSwaps = items.filter(item => item.item_type === 'swap');
-
-        if (filteredBids.length > 0) {
-          bidBtn.classList.add("active");
-          swapBtn.classList.remove("active");
-          viewAllBidContainer.style.display = "grid";
-          viewAllSwapContainer.style.display = "none";
-
-          filteredBids.forEach(bid => {
-            viewAllBidContainer.appendChild(createBidCard({
-              id: bid.item_id,
-              title: bid.title,
-              category: bid.category_type,
-              price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
-              timeLeft: formatEndDate(bid.end_date),
-              bidsCount: bid.bid_count || 0,
-              image: bid.image_path ? '../server_try/item/' + bid.image_path : null
-            }));
-          });
-        } 
-        else if (filteredSwaps.length > 0) {
-          swapBtn.classList.add("active");
-          bidBtn.classList.remove("active");
-          viewAllSwapContainer.style.display = "grid";
-
-          filteredSwaps.forEach(swap => {
-            viewAllSwapContainer.appendChild(createSwapCard({
-              id: swap.item_id,
-              title: swap.title,
-              category: swap.category_type,
-              image: swap.image_path ? '../server_try/item/' + swap.image_path : null
-            }));
-          });
-        } 
-        else {
-          bidBtn.classList.remove("active");
-          swapBtn.classList.remove("active");
-          viewAllBidContainer.style.display = "none";
-          viewAllSwapContainer.style.display = "none";
-          categoryDescription.textContent = "No items found for this category.";
-        }
-      });
-  });
 });
 
 backHomeBtn.addEventListener("click", () => {
@@ -274,106 +186,77 @@ swapBtn.addEventListener("click", () => {
     viewAllBidContainer.style.display = "none";
 });
 
-categoryBtn.addEventListener("click", () => {
-    categoryDropDown.classList.toggle("active");
-});
-
-dropDownItems.forEach(item => {
-    item.addEventListener("click", () => {
-        const cat = item.textContent.trim();
-        categoryTitle.textContent = cat;
-        categoryDescription.textContent = cat;
-        fetchItems(cat === "All Programs" ? "" : cat);
-        categoryDropDown.classList.remove("active");
-    });
-});
-
-document.addEventListener("click", e => {
-    if (!categoryBtn.contains(e.target) && !categoryDropDown.contains(e.target)) {
-        categoryDropDown.classList.remove("active");
-    }
-});
-
-function applyCurrentCategoryFilter() {
-  const selectedCategory = categoryTitle.textContent.trim();
-  const isBidActive = bidBtn.classList.contains("active");
-
-  const url = selectedCategory === "All Categories" 
-    ? '../server_try/item/get_items.php'
-    : `../server_try/item/get_items.php?category=${selectedCategory}`;
-
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      const items = data.items || [];
-      
-      if (isBidActive) {
-        viewAllBidContainer.innerHTML = "";
-        const filteredBids = items.filter(item => item.item_type === 'bid');
-        
-        filteredBids.forEach(bid => {
-          viewAllBidContainer.appendChild(createBidCard({
-            id: bid.item_id,
-            title: bid.title,
-            category: bid.category_type,
-            price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
-            timeLeft: formatEndDate(bid.end_date),
-            bidsCount: bid.bid_count || 0,
-            image: bid.image_path ? '../server_try/item/' + bid.image_path : null
-          }));
-        });
-      } else {
-        viewAllSwapContainer.innerHTML = "";
-        const filteredSwaps = items.filter(item => item.item_type === 'swap');
-        
-        filteredSwaps.forEach(swap => {
-          viewAllSwapContainer.appendChild(createSwapCard({
-            id: swap.item_id,
-            title: swap.title,
-            category: swap.category_type,
-            image: swap.image_path ? '../server_try/item/' + swap.image_path : null
-          }));
-        });
-      }
-    });
-    
-}
-function resolveImagePath(fileName) {
-    const basePath = "../server_try/item/";
-    if (!fileName) return null;
-
-    // Remove existing extension (if any)
-    const baseName = fileName.replace(/\.(jpg|jpeg|png)$/i, "");
-
-    // Try multiple extensions
-    const possibleExtensions = [".jpeg", ".jpg", ".png"];
-    const img = new Image();
-
-    // Return the first one that loads successfully
-    return new Promise((resolve) => {
-        let resolved = false;
-
-        possibleExtensions.forEach((ext) => {
-            const testSrc = `${basePath}${baseName}${ext}`;
-            const testImg = new Image();
-            testImg.onload = () => {
-                if (!resolved) {
-                    resolved = true;
-                    resolve(testSrc);
-                }
-            };
-            testImg.onerror = () => {
-                // do nothing, will try next
-            };
-            testImg.src = testSrc;
-        });
-
-        // fallback (in case none work)
-        setTimeout(() => {
-            if (!resolved) resolve(`${basePath}${fileName}`);
-        }, 500);
-    });
-}
+// -------------------------
+// Search Integration
+// -------------------------
 document.addEventListener("DOMContentLoaded", () => {
     fetchItems();
+
+    const searchInput = document.querySelector('input[placeholder*="Search"]');
+    const searchButton = document.querySelector('.search-button') || searchInput?.nextElementSibling;
+
+    searchInput?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') performSearch(searchInput.value);
+    });
+
+    searchButton?.addEventListener('click', () => performSearch(searchInput.value));
 });
+
+async function performSearch(query) {
+    if (!query.trim()) return;
+
+    console.log("Searching for:", query);
+
+    try {
+        const response = await fetch(`../server_try/search.php?q=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        displaySearchResults(data, query);
+    } catch (error) {
+        console.error("Search error:", error);
+    }
+}
+
+function displaySearchResults(results, query) {
+    home.style.display = "none";
+    viewAll.style.display = "block";
+
+    viewAllBidContainer.innerHTML = "";
+    viewAllSwapContainer.innerHTML = "";
+
+    document.getElementById('viewAll-category-title').textContent = `Search Results for "${query}"`;
+    categoryDescription.textContent = "";
+
+    let hasResults = false;
+
+    if (results.bids?.length > 0) {
+        hasResults = true;
+        results.bids.forEach(item => {
+            viewAllBidContainer.appendChild(createBidCard({
+                id: item.id,
+                title: item.title,
+                category: item.category,
+                starting_bid: item.starting_bid,
+                timeLeft: formatEndDate(item.end_date),
+                bidsCount: item.bid_count,
+                image: item.image
+            }));
+        });
+    }
+
+    if (results.swaps?.length > 0) {
+        hasResults = true;
+        results.swaps.forEach(item => {
+            viewAllSwapContainer.appendChild(createSwapCard({
+                id: item.id,
+                title: item.title,
+                category: item.category,
+                image: item.image
+            }));
+        });
+    }
+
+    if (!hasResults) {
+        viewAllBidContainer.innerHTML = `<p style="grid-column:1/-1;text-align:center;padding:30px;font-size:18px;">No results found for "<b>${query}</b>"</p>`;
+        viewAllSwapContainer.innerHTML = "";
+    }
+}
