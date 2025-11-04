@@ -1,5 +1,6 @@
 const urlParams = new URLSearchParams(window.location.search);
 const backToPreviousBtn = document.getElementById('backToPrevious');
+const placeBidBtn = document.getElementById('placeBidBtn');
 const itemId = urlParams.get('item_id');
 
 let itemData = null;
@@ -14,8 +15,43 @@ window.addEventListener('load', () => {
     }
     
     loadHeader();
+    disableAllButtons();
     loadItemDetails();
 });
+
+function disableAllButtons() {
+    if (placeBidBtn) {
+        placeBidBtn.disabled = true;
+        placeBidBtn.style.opacity = '0.6';
+        placeBidBtn.style.cursor = 'not-allowed';
+        placeBidBtn.title = 'Bidding feature is currently disabled';
+        placeBidBtn.innerHTML = '<iconify-icon icon="mdi:gavel"></iconify-icon> Place Bid';
+        
+        placeBidBtn.replaceWith(placeBidBtn.cloneNode(true));
+    }
+    
+    const favoritesBtn = document.querySelector('.favorites-btn');
+    if (favoritesBtn) {
+        favoritesBtn.disabled = true;
+        favoritesBtn.style.opacity = '0.6';
+        favoritesBtn.style.cursor = 'not-allowed';
+        favoritesBtn.title = 'Favorites feature is currently disabled';
+        favoritesBtn.innerHTML = '<iconify-icon icon="mdi:heart"></iconify-icon> Add to Favorites';
+        
+        favoritesBtn.replaceWith(favoritesBtn.cloneNode(true));
+    }
+    
+    const chatBtn = document.querySelector('.chat-btn');
+    if (chatBtn) {
+        chatBtn.disabled = true;
+        chatBtn.style.opacity = '0.6';
+        chatBtn.style.cursor = 'not-allowed';
+        chatBtn.title = 'Chat feature is currently disabled';
+        chatBtn.innerHTML = '<iconify-icon icon="mdi:message"></iconify-icon> Chat Seller';
+        
+        chatBtn.replaceWith(chatBtn.cloneNode(true));
+    }
+}
 
 function setupBackButton() {
     if (backToPreviousBtn) {
@@ -249,14 +285,6 @@ function startCountdown(endDate) {
             updateTimerLabel('Auction Ended');
             
             loadItemDetails();
-            
-            const placeBidBtn = document.getElementById('placeBidBtn');
-            if (placeBidBtn) {
-                placeBidBtn.disabled = true;
-                placeBidBtn.innerHTML = 'Auction Ended';
-                placeBidBtn.style.backgroundColor = '#8C8A8A';
-                placeBidBtn.style.cursor = 'not-allowed';
-            }
             return;
         }
 
@@ -293,31 +321,27 @@ function updateTimerLabel(text) {
     }
 }
 
-const placeBidBtn = document.getElementById('placeBidBtn');
-const bidAmountInput = document.getElementById('bidAmount');
 
-if (placeBidBtn && bidAmountInput) {
-    placeBidBtn.addEventListener('click', () => {
-        const bidAmount = parseFloat(bidAmountInput.value);
-        const minimumBid = currentHighestBid + minimumIncrement;
+// placeBidBtn.addEventListener('click', () => {
+//     const bidAmount = parseFloat(bidAmountInput.value);
+//     const minimumBid = currentHighestBid + minimumIncrement;
 
-        if (!bidAmount || isNaN(bidAmount)) {
-            alert('Please enter a valid bid amount.');
-            return;
-        }
+//     if (!bidAmount || isNaN(bidAmount)) {
+//         alert('Please enter a valid bid amount.');
+//         return;
+//     }
 
-        if (bidAmount < minimumBid) {
-            alert(`Your bid must be at least ₱${minimumBid.toFixed(2)} (Current highest bid + ₱${minimumIncrement.toFixed(2)} increment)`);
-            return;
-        }
+//     if (bidAmount < minimumBid) {
+//         alert(`Your bid must be at least ₱${minimumBid.toFixed(2)} (Current highest bid + ₱${minimumIncrement.toFixed(2)} increment)`);
+//         return;
+//     }
 
-        const confirmBid = confirm(`Are you sure you want to place a bid of ₱${bidAmount.toFixed(2)}?`);
-        
-        if (confirmBid) {
-            submitBid(bidAmount);
-        }
-    });
-}
+//     const confirmBid = confirm(`Are you sure you want to place a bid of ₱${bidAmount.toFixed(2)}?`);
+    
+//     if (confirmBid) {
+//         submitBid(bidAmount);
+//     }
+// });
 
 function submitBid(bidAmount) {
     const placeBidBtn = document.getElementById('placeBidBtn');
@@ -378,34 +402,27 @@ function submitBid(bidAmount) {
     });
 }
 
-const favoritesBtn = document.querySelector('.favorites-btn');
-let isFavorite = false;
 
-if (favoritesBtn) {
-    favoritesBtn.addEventListener('click', () => {
-        isFavorite = !isFavorite;
-        
-        if (isFavorite) {
-            favoritesBtn.style.backgroundColor = '#B41B1B';
-            favoritesBtn.style.color = '#fff';
-            favoritesBtn.innerHTML = '<iconify-icon icon="mdi:heart"></iconify-icon> Added to Favorites';
-        } else {
-            favoritesBtn.style.backgroundColor = '#FFE100';
-            favoritesBtn.style.color = '#073066';
-            favoritesBtn.innerHTML = '<iconify-icon icon="mdi:heart"></iconify-icon> Add to Favorites';
-        }
-    });
-}
+// favoritesBtn.addEventListener('click', () => {
+//     isFavorite = !isFavorite;
+    
+//     if (isFavorite) {
+//         favoritesBtn.style.backgroundColor = '#B41B1B';
+//         favoritesBtn.style.color = '#fff';
+//         favoritesBtn.innerHTML = '<iconify-icon icon="mdi:heart"></iconify-icon> Added to Favorites';
+//     } else {
+//         favoritesBtn.style.backgroundColor = '#FFE100';
+//         favoritesBtn.style.color = '#073066';
+//         favoritesBtn.innerHTML = '<iconify-icon icon="mdi:heart"></iconify-icon> Add to Favorites';
+//     }
+// });
 
-const chatBtn = document.querySelector('.chat-btn');
 
-if (chatBtn) {
-    chatBtn.addEventListener('click', () => {
-        if (!itemData) return;
-        
-        window.location.href = `chat.html?seller_id=${itemData.seller_id}&item_id=${itemId}`;
-    });
-}
+// chatBtn.addEventListener('click', () => {
+//     if (!itemData) return;
+    
+//     window.location.href = `chat.html?seller_id=${itemData.seller_id}&item_id=${itemId}`;
+// });
 
 const reportBtn = document.getElementById('reportBtn');
 
@@ -439,6 +456,8 @@ if (reportBtn) {
         }
     });
 }
+
+const bidAmountInput = document.getElementById('bidAmount');
 
 if (bidAmountInput) {
     bidAmountInput.addEventListener('blur', () => {

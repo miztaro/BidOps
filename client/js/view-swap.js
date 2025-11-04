@@ -1,5 +1,6 @@
 const urlParams = new URLSearchParams(window.location.search);
 const backToPreviousBtn = document.getElementById('backToPrevious');
+const placeSwapBtn = document.getElementById('placeSwapBtn');
 const itemId = urlParams.get('item_id');
 let swapItemData = null;
 
@@ -11,8 +12,49 @@ window.addEventListener('load', () => {
     }
     
     loadHeader();
+    disableAllButtons();
     loadSwapItemDetails();
 });
+
+function disableAllButtons() {
+    // Disable Place Swap Offer button
+    if (placeSwapBtn) {
+        placeSwapBtn.disabled = true;
+        placeSwapBtn.style.opacity = '0.6';
+        placeSwapBtn.style.cursor = 'not-allowed';
+        placeSwapBtn.title = 'Swap feature is currently disabled';
+        placeSwapBtn.innerHTML = '<iconify-icon icon="mdi:swap-horizontal"></iconify-icon> Place Swap Offer';
+        
+        // Remove the click event listener
+        placeSwapBtn.replaceWith(placeSwapBtn.cloneNode(true));
+    }
+    
+    // Disable Add to Favorites button
+    const favoritesBtn = document.querySelector('.favorites-btn');
+    if (favoritesBtn) {
+        favoritesBtn.disabled = true;
+        favoritesBtn.style.opacity = '0.6';
+        favoritesBtn.style.cursor = 'not-allowed';
+        favoritesBtn.title = 'Favorites feature is currently disabled';
+        favoritesBtn.innerHTML = '<iconify-icon icon="mdi:heart"></iconify-icon> Add to Favorites';
+        
+        // Remove the click event listener
+        favoritesBtn.replaceWith(favoritesBtn.cloneNode(true));
+    }
+    
+    // Disable Chat with Seller button
+    const chatBtn = document.querySelector('.chat-btn');
+    if (chatBtn) {
+        chatBtn.disabled = true;
+        chatBtn.style.opacity = '0.6';
+        chatBtn.style.cursor = 'not-allowed';
+        chatBtn.title = 'Chat feature is currently disabled';
+        chatBtn.innerHTML = '<iconify-icon icon="mdi:message"></iconify-icon> Chat Seller';
+        
+        // Remove the click event listener
+        chatBtn.replaceWith(chatBtn.cloneNode(true));
+    }
+}
 
 function setupBackButton() {
     if (backToPreviousBtn) {
@@ -140,10 +182,10 @@ function setupImageGallery(images) {
     });
 }
 
-const placeSwapBtn = document.getElementById('placeSwapBtn');
-placeSwapBtn.addEventListener('click', () => {
-    openSwapOfferModal();
-});
+
+// placeSwapBtn.addEventListener('click', () => {
+//     openSwapOfferModal();
+// });
 
 function openSwapOfferModal() {
     fetch('swap-modal.html')
