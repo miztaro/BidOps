@@ -207,26 +207,34 @@ swapViewAllBtn.addEventListener("click", () => {
   fetchItems();
 });
 
-categoryCards.forEach(cards => {
-  cards.addEventListener("click", () =>{
-    const selectedCategory = cards.getAttribute("browse-category");
-    document.getElementById("header").style.display = "none";
+categoryCards.forEach(card => {
+  const categoryName = card.getAttribute("browse-category");
+  const countElem = card.querySelector("p"); 
 
+  fetch(`../server_try/item/get_items.php?category=${categoryName}`)
+    .then(response => response.json())
+    .then(data => {
+      const items = data.items || [];
+      countElem.textContent = `${items.length} ${items.length <= 1  ? 'item' : 'items'}` ;
+    });
+
+  card.addEventListener("click", () => {
+    document.getElementById("header").style.display = "none";
     home.style.display = "none";
     viewAll.style.display = "block";
 
     bidBtn.classList.add("active");
     swapBtn.classList.remove("active");
     viewAllBidContainer.style.display = "grid";
-    viewAllSwapContainer.style.display = "none"
+    viewAllSwapContainer.style.display = "none";
 
-    categoryTitle.textContent = selectedCategory;
-    categoryDescription.textContent = selectedCategory;
+    categoryTitle.textContent = categoryName;
+    categoryDescription.textContent = categoryName;
 
     viewAllBidContainer.innerHTML = "";
     viewAllSwapContainer.innerHTML = "";
 
-    fetch(`../server/item/get_items.php?category=${selectedCategory}`)
+    fetch(`../server_try/item/get_items.php?category=${categoryName}`)
       .then(response => response.json())
       .then(data => {
         const items = data.items || [];
@@ -255,7 +263,6 @@ categoryCards.forEach(cards => {
           swapBtn.classList.add("active");
           bidBtn.classList.remove("active");
           viewAllSwapContainer.style.display = "grid";
-          viewAllSwapContainer.style.display = "none";
 
           filteredSwaps.forEach(swap => {
             viewAllSwapContainer.appendChild(createSwapCard({
@@ -332,9 +339,9 @@ function applyCurrentCategoryFilter() {
   const selectedCategory = categoryTitle.textContent.trim();
   const isBidActive = bidBtn.classList.contains("active");
 
-  const url = selectedCategory === "All Programs" 
-    ? '../server/item/get_items.php'
-    : `../server/item/get_items.php?category=${selectedCategory}`;
+  const url = selectedCategory === "All Categories" 
+    ? '../server_try/item/get_items.php'
+    : `../server_try/item/get_items.php?category=${selectedCategory}`;
 
   fetch(url)
     .then(response => response.json())
