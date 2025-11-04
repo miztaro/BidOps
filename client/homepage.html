@@ -113,7 +113,7 @@
     <script>
     document.addEventListener("DOMContentLoaded", function() {
         // Determine user role securely (from PHP session)
-        fetch("../server_try/auth/getRole.php")
+        fetch("../server/auth/getRole.php")
         .then(response => response.json())
         .then(data => {
           const role = data.role; 
