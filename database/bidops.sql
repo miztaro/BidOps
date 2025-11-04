@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS bidops DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE bidops;
 -- MySQL dump 10.13  Distrib 9.1.0, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: bidops
