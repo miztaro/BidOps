@@ -24,6 +24,27 @@ const dropDownItems = categoryDropDown.querySelectorAll(".dropDown-item");
 const categoryTitle = document.getElementById("viewAll-category-title");
 const categoryDescription = document.getElementById("viewAll-category-description");
 
+document.addEventListener("DOMContentLoaded", function() {
+    fetch("header.html")
+        .then(response => response.text())
+        .then(header => {
+        document.getElementById("header").innerHTML = header;
+        const script = document.createElement("script");
+        const profileIcon = document.getElementById("user-header-profile-icon");
+
+        if(profileIcon) {
+            profileIcon.addEventListener("click", () => {
+                window.location.href = "profilepage.html";
+            });
+        }
+        
+        script.src = "js/header.js";
+        script.defer = true;
+        document.body.appendChild(script);
+    })
+.catch(error => console.error("Error determining role:", error));
+});
+
 function fetchItems() {
     fetch('../server/item/get_items.php')
         .then(response => response.json())

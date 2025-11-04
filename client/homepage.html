@@ -110,44 +110,7 @@
             </div>
         </section>
     </main>
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Determine user role securely (from PHP session)
-        fetch("../server/auth/getRole.php")
-        .then(response => response.json())
-        .then(data => {
-          const role = data.role; 
-          let headerFile = "";
-
-          if (role === "admin") {
-            headerFile = "admin_header.html";
-            } else {
-        headerFile = "user_header.html";
-        }
-
-      // Load the correct header file
-        fetch(headerFile)
-            .then(response => response.text())
-            .then(header => {
-            document.getElementById("header").innerHTML = header;
-            const script = document.createElement("script");
-            const profileIcon = document.getElementById("user-header-profile-icon");
-
-            if(profileIcon) {
-                profileIcon.addEventListener("click", () => {
-                    window.location.href = "profilepage.html";
-                });
-            }
-            
-            script.src = "js/header.js";
-            script.defer = true;
-            document.body.appendChild(script);
-        })
-        .catch(error => console.error("Error loading header:", error));
-    })
-    .catch(error => console.error("Error determining role:", error));
-    });
-    </script>
+    
     <script src="js/homepage.js" defer></script>
 
 </body>
