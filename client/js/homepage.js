@@ -24,6 +24,67 @@ const dropDownItems = categoryDropDown.querySelectorAll(".dropDown-item");
 const categoryTitle = document.getElementById("viewAll-category-title");
 const categoryDescription = document.getElementById("viewAll-category-description");
 
+const sortBtn = document.querySelector(".sort-btn");
+const sortDropdown = document.getElementById("sort-dropdown");
+
+sortBtn.addEventListener("click", (event) => {
+  event.stopPropagation();
+  const isVisible = sortDropdown.style.display === "block";
+  sortDropdown.style.display = isVisible ? "none" : "block";
+
+  const isBidVisible =
+    window.getComputedStyle(viewAllBidContainer).display !== "none";
+
+  const options = sortDropdown.querySelectorAll(".sort-option");
+  options.forEach((opt) => {
+    const sortKey = opt.dataset.sort;
+    if (isBidVisible && (sortKey === "asc" || sortKey === "desc")) {
+      opt.style.display = "block";
+    } else if (!isBidVisible && (sortKey === "az" || sortKey === "za")) {
+      opt.style.display = "block";
+    } else {
+      opt.style.display = "none";
+    }
+  });
+});
+
+document.addEventListener("click", () => {
+  sortDropdown.style.display = "none";
+});
+
+sortDropdown.addEventListener("click", (event) => {
+  const option = event.target.closest(".sort-option");
+  if (!option) return;
+
+  const sortType = option.dataset.sort;
+  const isBidVisible =
+    window.getComputedStyle(viewAllBidContainer).display !== "none";
+  const container = isBidVisible ? viewAllBidContainer : viewAllSwapContainer;
+  const cards = Array.from(
+    container.querySelectorAll(isBidVisible ? ".bid-card" : ".swap-card")
+  );
+
+  if (isBidVisible && (sortType === "asc" || sortType === "desc")) {
+    cards.sort((a, b) => {
+      const priceA = parseFloat(a.dataset.price) || 0;
+      const priceB = parseFloat(b.dataset.price) || 0;
+      return sortType === "asc" ? priceA - priceB : priceB - priceA;
+    });
+  } else if (!isBidVisible && (sortType === "az" || sortType === "za")) {
+    cards.sort((a, b) => {
+      const titleA = a.querySelector("h6").textContent.toLowerCase();
+      const titleB = b.querySelector("h6").textContent.toLowerCase();
+      return sortType === "az"
+        ? titleA.localeCompare(titleB)
+        : titleB.localeCompare(titleA);
+    });
+  }
+
+  container.innerHTML = "";
+  cards.forEach((card) => container.appendChild(card));
+  sortDropdown.style.display = "none";
+});
+
 document.addEventListener("DOMContentLoaded", function() {
     fetch("header.html")
         .then(response => response.text())
@@ -60,45 +121,57 @@ function fetchItems() {
             viewAllSwapContainer.innerHTML = '';
 
             bids.slice(0, 4).forEach(bid => {
-                homeBidContainer.appendChild(createBidCard({
+                const priceValue = parseFloat(bid.starting_price || 0); 
+                const bidData = {
                     id: bid.item_id,
                     title: bid.title,
                     category: bid.category_type,
-                    price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
+                    price: priceValue,
+                    formattedPrice: `₱${priceValue.toFixed(2)}`, 
+                    dateListed: bid.created_date,
                     timeLeft: formatEndDate(bid.end_date),
                     bidsCount: bid.bid_count || 0,
                     image: bid.image_path ? `../server/item/${bid.image_path}` : null
-                }));
+                };
+                homeBidContainer.appendChild(createBidCard(bidData));
             });
-            
+
             bids.forEach(bid => {
-                viewAllBidContainer.appendChild(createBidCard({
+                const priceValue = parseFloat(bid.starting_price || 0);
+                const bidData = {
                     id: bid.item_id,
                     title: bid.title,
                     category: bid.category_type,
-                    price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
+                    price: priceValue,
+                    formattedPrice: `₱${priceValue.toFixed(2)}`,
+                    dateListed: bid.created_date,
                     timeLeft: formatEndDate(bid.end_date),
                     bidsCount: bid.bid_count || 0,
                     image: bid.image_path ? `../server/item/${bid.image_path}` : null
-                }));
+                };
+                viewAllBidContainer.appendChild(createBidCard(bidData));
             });
 
             swaps.slice(0, 4).forEach(swap => {
-                homeSwapContainer.appendChild(createSwapCard({
+                const swapData = {
                     id: swap.item_id,
                     title: swap.title,
                     category: swap.category_type,
+                    dateListed: swap.created_date,
                     image: swap.image_path ? `../server/item/${swap.image_path}` : null
-                }));
+                };
+                homeSwapContainer.appendChild(createSwapCard(swapData));
             });
-            
+
             swaps.forEach(swap => {
-                viewAllSwapContainer.appendChild(createSwapCard({
+                const swapData = {
                     id: swap.item_id,
                     title: swap.title,
                     category: swap.category_type,
+                    dateListed: swap.created_date,
                     image: swap.image_path ? `../server/item/${swap.image_path}` : null
-                }));
+                };
+                viewAllSwapContainer.appendChild(createSwapCard(swapData));
             });
         })
         .catch(error => {
@@ -133,6 +206,9 @@ function createBidCard(bid){
     bidCard.classList.add("bid-card");
     bidCard.setAttribute("id", `bid-card-${bid.id}`);
 
+    bidCard.dataset.price = bid.price;
+    bidCard.dataset.date = bid.dateListed;
+
     const imageContent = bid.image 
         ? `<img src="${bid.image}" alt="${bid.title}">`
         : `<div style="background: #073066; height: 100%; display: flex; align-items: center; justify-content: center; color: white;">
@@ -150,7 +226,7 @@ function createBidCard(bid){
         <div class="bottom">
             <h6>${bid.title}</h6>
             <p class="category">${bid.category}</p>
-            <p class="start-bid">Starting bid <span class="bid-price">${bid.price}</span></p>
+            <p class="start-bid">Starting bid <span class="bid-price">${bid.formattedPrice}</span></p>
             <div class="bid-time-and-count">
                 <div class="time"><p>${bid.timeLeft}</p></div>
                 <p class="count"><span>${bid.bidsCount}</span> bids</p>
@@ -165,6 +241,8 @@ function createSwapCard(swap) {
     const swapCard = document.createElement("div");
     swapCard.classList.add("swap-card");
     swapCard.setAttribute("id", `swap-card-${swap.id}`);
+
+    swapCard.dataset.title = swap.title.toLowerCase();
 
     const imageContent = swap.image 
         ? `<img src="${swap.image}" alt="${swap.title}">`
@@ -204,8 +282,8 @@ bidViewAllBtn.addEventListener("click", () => {
   bidBtn.classList.add("active");
   swapBtn.classList.remove("active");
 
-  categoryTitle.textContent = "All Programs";
-  categoryDescription.textContent = "All Programs"
+  categoryTitle.textContent = "All Categories";
+  categoryDescription.textContent = "All Categories"
   
   viewAllBidContainer.innerHTML = "";
   fetchItems();
@@ -221,8 +299,8 @@ swapViewAllBtn.addEventListener("click", () => {
   bidBtn.classList.remove("active");
   swapBtn.classList.add("active");
 
-  categoryTitle.textContent = "All Programs";
-  categoryDescription.textContent = "All Programs"
+  categoryTitle.textContent = "All Categories";
+  categoryDescription.textContent = "All Categories"
 
   viewAllSwapContainer.innerHTML = "";
   fetchItems();

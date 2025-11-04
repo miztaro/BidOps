@@ -550,9 +550,12 @@ main{padding: 0;}
     z-index: 2;
     top: 0%; /*Remove this when you insert header*/
 }
+.viewAll-section .top-nav .sort-container{
+    position: relative;
+}
 
 .viewAll-section .top-nav .back-home,
-.viewAll-section .top-nav .sort-btn{
+.viewAll-section .top-nav .sort-container .sort-btn {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -561,7 +564,42 @@ main{padding: 0;}
     color: #073066;
     border: none;
     font-size: 1em;
+    position: relative;
+    transition: all 0.5s ease;
 }
+
+.viewAll-section .top-nav .sort-container .sort-dropdown{
+    position: absolute;
+    top: 100%;
+    right: 0%;
+    margin-top: 8px;
+    background-color: #000000;
+    border: 1px solid #073066;
+    pointer-events: auto;
+    z-index: 10;
+    min-width: 200px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.viewAll-section .top-nav .sort-container .sort-dropdown .sort-option{
+    color: #000000;
+    padding: 10px 15px;
+    font-size: 0.8em;
+    cursor: pointer;
+    background-color: #fff;
+    border-top:1px solid #8C8A8A;
+}
+
+.viewAll-section .top-nav .sort-container .sort-dropdown .sort-option:first-child{
+    border-top: none;
+}
+
+.viewAll-section .top-nav .sort-container .sort-dropdown .sort-option:hover{
+    background-color: #073066;
+    color: #fff;
+}
+
 
 .viewAll-section .top-nav .back-home:hover,
 .viewAll-section .top-nav .sort-btn:hover{
@@ -707,6 +745,8 @@ main{padding: 0;}
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+
 
 
 

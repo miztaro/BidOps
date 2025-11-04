@@ -80,7 +80,18 @@
                     <button class="bid-btn">Bid</button>
                     <button class="swap-btn">Swap</button>
                 </div>
-                <button class="sort-btn"><iconify-icon icon="material-symbols:sort-rounded" width="24" height="24"></iconify-icon>Sort</button>
+                <div class="sort-container">
+                <button class="sort-btn">
+                    <iconify-icon class="sort-icon" icon="material-symbols:sort-rounded" width="24" height="24"></iconify-icon>
+                        Sort
+                </button>
+                <div class="sort-dropdown" id="sort-dropdown" style="display: none;">
+                    <div class="sort-option" data-sort="asc">Lowest Start Price</div>
+                    <div class="sort-option" data-sort="desc">Highest Start Price</div>
+                    <div class="sort-option" data-sort="az">Title: A-Z</div>
+                    <div class="sort-option" data-sort="za">Title: Z-A</div>
+                </div>
+                </div>
             </div>
 
             <div class="bid-cards-list" id="viewAll-bid-cards-list"></div>
