@@ -179,16 +179,80 @@ swapViewAllBtn.addEventListener("click", () => {
 });
 
 categoryCards.forEach(card => {
-    card.addEventListener("click", () => {
-        const cat = card.getAttribute("browse-category");
-        home.style.display = "none";
-        viewAll.style.display = "block";
-        categoryTitle.textContent = cat;
-        categoryDescription.textContent = cat;
-        fetchItems(cat);
-        bidBtn.classList.add("active");
-        swapBtn.classList.remove("active");
+  const categoryName = card.getAttribute("browse-category");
+  const countElem = card.querySelector("p"); 
+
+  fetch(`../server_try/item/get_items.php?category=${categoryName}`)
+    .then(response => response.json())
+    .then(data => {
+      const items = data.items || [];
+      countElem.textContent = `${items.length} ${items.length <= 1  ? 'item' : 'items'}` ;
     });
+
+  card.addEventListener("click", () => {
+    document.getElementById("header").style.display = "none";
+    home.style.display = "none";
+    viewAll.style.display = "block";
+
+    bidBtn.classList.add("active");
+    swapBtn.classList.remove("active");
+    viewAllBidContainer.style.display = "grid";
+    viewAllSwapContainer.style.display = "none";
+
+    categoryTitle.textContent = categoryName;
+    categoryDescription.textContent = categoryName;
+
+    viewAllBidContainer.innerHTML = "";
+    viewAllSwapContainer.innerHTML = "";
+
+    fetch(`../server_try/item/get_items.php?category=${categoryName}`)
+      .then(response => response.json())
+      .then(data => {
+        const items = data.items || [];
+        const filteredBids = items.filter(item => item.item_type === 'bid');
+        const filteredSwaps = items.filter(item => item.item_type === 'swap');
+
+        if (filteredBids.length > 0) {
+          bidBtn.classList.add("active");
+          swapBtn.classList.remove("active");
+          viewAllBidContainer.style.display = "grid";
+          viewAllSwapContainer.style.display = "none";
+
+          filteredBids.forEach(bid => {
+            viewAllBidContainer.appendChild(createBidCard({
+              id: bid.item_id,
+              title: bid.title,
+              category: bid.category_type,
+              price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
+              timeLeft: formatEndDate(bid.end_date),
+              bidsCount: bid.bid_count || 0,
+              image: bid.image_path ? '../server_try/item/' + bid.image_path : null
+            }));
+          });
+        } 
+        else if (filteredSwaps.length > 0) {
+          swapBtn.classList.add("active");
+          bidBtn.classList.remove("active");
+          viewAllSwapContainer.style.display = "grid";
+
+          filteredSwaps.forEach(swap => {
+            viewAllSwapContainer.appendChild(createSwapCard({
+              id: swap.item_id,
+              title: swap.title,
+              category: swap.category_type,
+              image: swap.image_path ? '../server_try/item/' + swap.image_path : null
+            }));
+          });
+        } 
+        else {
+          bidBtn.classList.remove("active");
+          swapBtn.classList.remove("active");
+          viewAllBidContainer.style.display = "none";
+          viewAllSwapContainer.style.display = "none";
+          categoryDescription.textContent = "No items found for this category.";
+        }
+      });
+  });
 });
 
 backHomeBtn.addEventListener("click", () => {
@@ -230,4 +294,86 @@ document.addEventListener("click", e => {
     }
 });
 
-document.addEventListener("DOMContentLoaded", () => fetchItems());
+function applyCurrentCategoryFilter() {
+  const selectedCategory = categoryTitle.textContent.trim();
+  const isBidActive = bidBtn.classList.contains("active");
+
+  const url = selectedCategory === "All Categories" 
+    ? '../server_try/item/get_items.php'
+    : `../server_try/item/get_items.php?category=${selectedCategory}`;
+
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const items = data.items || [];
+      
+      if (isBidActive) {
+        viewAllBidContainer.innerHTML = "";
+        const filteredBids = items.filter(item => item.item_type === 'bid');
+        
+        filteredBids.forEach(bid => {
+          viewAllBidContainer.appendChild(createBidCard({
+            id: bid.item_id,
+            title: bid.title,
+            category: bid.category_type,
+            price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
+            timeLeft: formatEndDate(bid.end_date),
+            bidsCount: bid.bid_count || 0,
+            image: bid.image_path ? '../server_try/item/' + bid.image_path : null
+          }));
+        });
+      } else {
+        viewAllSwapContainer.innerHTML = "";
+        const filteredSwaps = items.filter(item => item.item_type === 'swap');
+        
+        filteredSwaps.forEach(swap => {
+          viewAllSwapContainer.appendChild(createSwapCard({
+            id: swap.item_id,
+            title: swap.title,
+            category: swap.category_type,
+            image: swap.image_path ? '../server_try/item/' + swap.image_path : null
+          }));
+        });
+      }
+    });
+    
+}
+function resolveImagePath(fileName) {
+    const basePath = "../server_try/item/";
+    if (!fileName) return null;
+
+    // Remove existing extension (if any)
+    const baseName = fileName.replace(/\.(jpg|jpeg|png)$/i, "");
+
+    // Try multiple extensions
+    const possibleExtensions = [".jpeg", ".jpg", ".png"];
+    const img = new Image();
+
+    // Return the first one that loads successfully
+    return new Promise((resolve) => {
+        let resolved = false;
+
+        possibleExtensions.forEach((ext) => {
+            const testSrc = `${basePath}${baseName}${ext}`;
+            const testImg = new Image();
+            testImg.onload = () => {
+                if (!resolved) {
+                    resolved = true;
+                    resolve(testSrc);
+                }
+            };
+            testImg.onerror = () => {
+                // do nothing, will try next
+            };
+            testImg.src = testSrc;
+        });
+
+        // fallback (in case none work)
+        setTimeout(() => {
+            if (!resolved) resolve(`${basePath}${fileName}`);
+        }, 500);
+    });
+}
+document.addEventListener("DOMContentLoaded", () => {
+    fetchItems();
+});

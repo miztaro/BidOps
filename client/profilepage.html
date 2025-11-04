@@ -93,19 +93,16 @@
                                         <div class="dropdown-section">
                                             <h6 class="dropDown-header">Programs</h6>
                                             <div class="sub-dropdown">
-                                                <p class="dropDown-item">All Programs</p>
-                                                <p class="dropDown-item">General Education</p>
-                                                <p class="dropDown-item">Arts & Humanities</p>
-                                                <p class="dropDown-item">Business & Economics</p>
-                                                <p class="dropDown-item">Engineering & CS</p>
-                                                <p class="dropDown-item">Natural Science</p>
-                                                <p class="dropDown-item">Social Sciences</p>
-                                                <p class="dropDown-item">Health & Medicine</p>
-                                                <p class="dropDown-item">Education & Teaching</p>
-                                                <p class="dropDown-item">Law</p>
-                                                <p class="dropDown-item">Media & Communications</p>
-                                                <p class="dropDown-item">Architecture & Design</p>
-                                                <p class="dropDown-item">Non-Academic</p>
+                                                <p class="dropDown-item">All Categories</p>
+                                                <p class="dropDown-item">Accessories</p>
+                                                <p class="dropDown-item">Collectibles</p>
+                                                <p class="dropDown-item">Electronics</p>
+                                                <p class="dropDown-item">Fashion</p>
+                                                <p class="dropDown-item">Gaming</p>
+                                                <p class="dropDown-item">Home</p>
+                                                <p class="dropDown-item">Photography</p>
+                                                <p class="dropDown-item">Sports</p>
+                                                <p class="dropDown-item">Toys</p>
                                             </div>
                                         </div>
 
@@ -152,19 +149,16 @@
                                         <div class="dropdown-section">
                                             <h6 class="dropDown-header">Programs</h6>
                                             <div class="sub-dropdown">
-                                                <p class="dropDown-item">All Programs</p>
-                                                <p class="dropDown-item">General Education</p>
-                                                <p class="dropDown-item">Arts & Humanities</p>
-                                                <p class="dropDown-item">Business & Economics</p>
-                                                <p class="dropDown-item">Engineering & CS</p>
-                                                <p class="dropDown-item">Natural Science</p>
-                                                <p class="dropDown-item">Social Sciences</p>
-                                                <p class="dropDown-item">Health & Medicine</p>
-                                                <p class="dropDown-item">Education & Teaching</p>
-                                                <p class="dropDown-item">Law</p>
-                                                <p class="dropDown-item">Media & Communications</p>
-                                                <p class="dropDown-item">Architecture & Design</p>
-                                                <p class="dropDown-item">Non-Academic</p>                                               
+                                                <p class="dropDown-item">All Categories</p>
+                                                <p class="dropDown-item">Accessories</p>
+                                                <p class="dropDown-item">Collectibles</p>
+                                                <p class="dropDown-item">Electronics</p>
+                                                <p class="dropDown-item">Fashion</p>
+                                                <p class="dropDown-item">Gaming</p>
+                                                <p class="dropDown-item">Home</p>
+                                                <p class="dropDown-item">Photography</p>
+                                                <p class="dropDown-item">Sports</p>
+                                                <p class="dropDown-item">Toys</p>                                            
                                             </div>
                                         </div>
                                     </div>
@@ -192,21 +186,18 @@
                                     <button id="swaps-filter-btn" class="swaps-filter-btn"><iconify-icon icon="flowbite:filter-outline" width="24" height="24"></iconify-icon></button>
                                     <div class="swaps-filter-dropdown">
                                         <div class="dropdown-section">
-                                            <h6 class="dropDown-header">Programs</h6>
+                                            <h6 class="dropDown-header">Categories</h6>
                                             <div class="sub-dropdown">
-                                                <p class="dropDown-item">All Programs</p>
-                                                <p class="dropDown-item">General Education</p>
-                                                <p class="dropDown-item">Arts & Humanities</p>
-                                                <p class="dropDown-item">Business & Economics</p>
-                                                <p class="dropDown-item">Engineering & CS</p>
-                                                <p class="dropDown-item">Natural Science</p>
-                                                <p class="dropDown-item">Social Sciences</p>
-                                                <p class="dropDown-item">Health & Medicine</p>
-                                                <p class="dropDown-item">Education & Teaching</p>
-                                                <p class="dropDown-item">Law</p>
-                                                <p class="dropDown-item">Media & Communications</p>
-                                                <p class="dropDown-item">Architecture & Design</p>
-                                                <p class="dropDown-item">Non-Academic</p>                                               
+                                                <p class="dropDown-item">All Categories</p>
+                                                <p class="dropDown-item">Accessories</p>
+                                                <p class="dropDown-item">Collectibles</p>
+                                                <p class="dropDown-item">Electronics</p>
+                                                <p class="dropDown-item">Fashion</p>
+                                                <p class="dropDown-item">Gaming</p>
+                                                <p class="dropDown-item">Home</p>
+                                                <p class="dropDown-item">Photography</p>
+                                                <p class="dropDown-item">Sports</p>
+                                                <p class="dropDown-item">Toys</p>                                              
                                             </div>
                                         </div>
                                     </div>
@@ -222,32 +213,6 @@
             </div>
         </section>
     </main>
-        <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Determine user role securely (from PHP session)
-        fetch("../server_try/auth/getRole.php")
-        .then(response => response.json())
-        .then(data => {
-          const role = data.role; 
-          let headerFile = "";
-
-          if (role === "admin") {
-            headerFile = "admin_header.html";
-            } else {
-        headerFile = "user_header.html";
-        }
-
-      // Load the correct header file
-        fetch(headerFile)
-            .then(response => response.text())
-            .then(header => {
-            document.getElementById("header").innerHTML = header;
-        })
-        .catch(error => console.error("Error loading header:", error));
-    })
-    .catch(error => console.error("Error determining role:", error));
-    });
-    </script>
     <script src="js/profilepage.js"></script>
 </body>
 </html>

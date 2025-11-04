@@ -4,6 +4,12 @@ document.addEventListener('DOMContentLoaded', function() {
   .then(data => {
     document.getElementById("header").innerHTML = data;
 
+    if (role === "admin") {
+      headerFile = "admin_header.html";
+    } else {
+      headerFile = "user_header.html";
+    }
+
     const profileIcon = document.getElementById("user-header-profile-icon");
     if(profileIcon) {
       profileIcon.addEventListener("click", () => {
@@ -15,10 +21,9 @@ document.addEventListener('DOMContentLoaded', function() {
     backHomeBtn.addEventListener("click", () => {
       window.location.href = "homepage.html";
     });
-
-    updateItemCounts();
   })
   .catch(error => console.error("Error loading header:", error));  
+
   const contents = document.querySelectorAll(
     "#profile-user-info-content, #profile-listings-content, #profile-bids-content, #profile-swaps-content"
   );
@@ -30,9 +35,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   //NOTE: THIS IS STATIC DATA , Change/Remove when manipulating backend database
   const listings = [
-    {id: 1,item: "Law Book",category: "Law",mode: "Swap",dateListed: "09 / 16 / 2025",status: "Active"},
-    {id: 2,item: "Architecture Book",category: "Architecture & Design",mode: "Bid",dateListed: "09 / 16 / 2025",status: "Pending"},
-    {id: 3,item: "Calculator",category:"General Education",mode: "Bid",dateListed: "09 / 16 / 2025",status: "Completed"}
+    {id: 1,item: "Gaming Laptop",category: "Electronics",mode: "Swap",dateListed: "09 / 16 / 2025",status: "Active"},
+    {id: 2,item: "DSLR Lens",category: "Photography",mode: "Bid",dateListed: "09 / 16 / 2025",status: "Pending"},
+    {id: 3,item: "Board Game",category: "Toys",mode: "Bid",dateListed: "09 / 16 / 2025",status: "Completed"}
   ];
 
   function createListingRow(listing){
@@ -88,15 +93,16 @@ document.addEventListener('DOMContentLoaded', function() {
     listingBody.appendChild(listingRow);
   });
 
+  document.querySelector("#profile-listings-btn p").textContent = `${listings.length} Items`;
 
   // ---------------- WINNING BIDS DATA & FUNCTIONS ----------------
 
   //NOTE: THIS IS STATIC DATA , Change/Remove when manipulating backend database
   const winningBids = [
-    {id: 1,item: "Law Book",category: "Law",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
-    {id: 2,item: "Law Book",category: "Law",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
-    {id: 3,item: "Law Book",category: "Law",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
-    {id: 4,item: "Law Book",category: "Law",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
+    {id: 1,item: "Gaming Laptop",category: "Electronics",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
+    {id: 2,item: "DSLR Lens",category: "Photography",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
+    {id: 3,item: "Board Game",category: "Toys",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
+    {id: 4,item: "ps5 cONTROLLER",category: "Gaming",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
   ];
 
   function createWinningBidRow(bid) {
@@ -142,13 +148,15 @@ document.addEventListener('DOMContentLoaded', function() {
     bidsBody.appendChild(bidsRow);
   });
 
+  document.querySelector("#profile-bids-btn p").textContent = `${winningBids.length} Items`;
+
   // ---------------- SWAPPED ITEMS DATA & FUNCTIONS ----------------
 
   //NOTE: THIS IS STATIC DATA , Change/Remove when manipulating backend database
   const swappedItems= [
-    {id: 1,item: "Law Book",category: "Law",swappedItem: "Calculator" ,dateSwapped: "09 / 16 / 2025"},
-    {id: 2,item: "Law Book",category: "Law",swappedItem: "Calculator" ,dateSwapped: "09 / 16 / 2025"},
-    {id: 3,item: "Law Book",category: "Law",swappedItem: "Calculator" ,dateSwapped: "09 / 16 / 2025"},
+    {id: 1,item: "Gaming Laptop",category: "Electronics",swappedItem: "Calculator" ,dateSwapped: "09 / 16 / 2025"},
+    {id: 2,item: "DSLR Lens",category: "Photography",swappedItem: "Mechanical KB" ,dateSwapped: "09 / 16 / 2025"},
+    {id: 3,item: "Board Game",category: "Toys",swappedItem: "Monitor" ,dateSwapped: "09 / 16 / 2025"},
   ];
 
   function createSwappedRow(swap){
@@ -194,8 +202,9 @@ document.addEventListener('DOMContentLoaded', function() {
     swapsBody.appendChild(swapsRow);
   });
 
-  // ---------------- TITLE & SECTION HANDLING ----------------
+  document.querySelector("#profile-swaps-btn p").textContent = `${swappedItems.length} Items`;
 
+  // ---------------- TITLE & SECTION HANDLING ----------------
   
   function updateTitleForSection(sectionId) {
     const titleContainer = document.querySelector(".title-container");
@@ -224,16 +233,6 @@ document.addEventListener('DOMContentLoaded', function() {
       const listingAnalytics = createListingAnalytics(listings);
       currentAnalytics.replaceWith(listingAnalytics);
     }
-  }
-
-  function updateItemCounts(){
-    const listingsCount = document.querySelector("#profile-listings-btn p");
-    const bidsCount = document.querySelector("#profile-bids-btn p");
-    const swapsCount = document.querySelector("#profile-swaps-btn p");
-
-    listingsCount.textContent = `${listings.length} Items`;
-    bidsCount.textContent = `${winningBids.length} Items`;
-    swapsCount.textContent = `${swappedItems.length} items`;
   }
 
   const buttons = {
@@ -301,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function applyFilter(type, value, section) {
     const currentFilters = sectionFilters[section];
 
-    if (type === "Category" && value === "All Programs") {
+    if (type === "Category" && value === "All Categories") {
       currentFilters[type] = null;
     } else {
       currentFilters[type] = value;
