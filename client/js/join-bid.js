@@ -21,7 +21,7 @@ window.addEventListener('load', () => {
 
 // Load item details from backend
 function loadItemDetails() {
-    fetch(`http://localhost:8000/server_try/item/get_item_details.php?item_id=${itemId}`)
+    fetch(`http://localhost:8000/server/item/get_item_details.php?item_id=${itemId}`)
         .then(response => response.json())
         .then(data => {
             if (!data.success) {
@@ -89,16 +89,16 @@ function setupImageGallery(images) {
     const thumbnailContainer = document.querySelector('.thumbnail-container');
     
     // Set main image
-    mainImage.src = `http://localhost:8000/server_try/item/${images[0].image_path}`;
+    mainImage.src = `http://localhost:8000/server/item/${images[0].image_path}`;
     
     // Clear and populate thumbnails
     thumbnailContainer.innerHTML = '';
     images.forEach((img, index) => {
         const thumbnail = document.createElement('img');
-        thumbnail.src = `http://localhost:8000/server_try/item/${img.image_path}`;
+        thumbnail.src = `http://localhost:8000/server/item/${img.image_path}`;
         thumbnail.alt = `Thumbnail ${index + 1}`;
         thumbnail.className = 'thumbnail' + (index === 0 ? ' active' : '');
-        thumbnail.dataset.image = `http://localhost:8000/server_try/item/${img.image_path}`;
+        thumbnail.dataset.image = `http://localhost:8000/server/item/${img.image_path}`;
         
         thumbnail.addEventListener('click', () => {
             document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
@@ -216,7 +216,7 @@ function submitBid(bidAmount) {
     placeBidBtn.disabled = true;
     placeBidBtn.textContent = 'Placing bid...';
     
-    fetch('http://localhost:8000/server_try/item/place_bid.php', {
+    fetch('http://localhost:8000/server/item/place_bid.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -276,7 +276,7 @@ favoritesBtn.addEventListener('click', () => {
         favoritesBtn.innerHTML = '<iconify-icon icon="mdi:heart"></iconify-icon> Added to Favorites';
         
         // TODO: Send to backend to save favorite
-        // fetch('http://localhost:8000/server_try/user/add_favorite.php', ...)
+        // fetch('http://localhost:8000/server/user/add_favorite.php', ...)
     } else {
         favoritesBtn.style.backgroundColor = '#FFE100';
         favoritesBtn.style.color = '#073066';
@@ -304,7 +304,7 @@ reportBtn.addEventListener('click', () => {
     
     if (reportReason && reportReason.trim() !== '') {
         // TODO: Send report to backend
-        fetch('http://localhost:8000/server_try/item/report_item.php', {
+        fetch('http://localhost:8000/server/item/report_item.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

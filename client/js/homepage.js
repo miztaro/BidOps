@@ -25,7 +25,7 @@ const categoryTitle = document.getElementById("viewAll-category-title");
 const categoryDescription = document.getElementById("viewAll-category-description");
 
 function fetchItems() {
-    fetch('../server_try/item/get_items.php')
+    fetch('../server/item/get_items.php')
         .then(response => response.json())
         .then(data => {
             console.log('Loaded items:', data);
@@ -46,7 +46,7 @@ function fetchItems() {
                     price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
                     timeLeft: formatEndDate(bid.end_date),
                     bidsCount: bid.bid_count || 0,
-                    image: bid.image_path ? `../server_try/item/${bid.image_path}` : null
+                    image: bid.image_path ? `../server/item/${bid.image_path}` : null
                 }));
             });
             
@@ -58,7 +58,7 @@ function fetchItems() {
                     price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
                     timeLeft: formatEndDate(bid.end_date),
                     bidsCount: bid.bid_count || 0,
-                    image: bid.image_path ? `../server_try/item/${bid.image_path}` : null
+                    image: bid.image_path ? `../server/item/${bid.image_path}` : null
                 }));
             });
 
@@ -67,7 +67,7 @@ function fetchItems() {
                     id: swap.item_id,
                     title: swap.title,
                     category: swap.category_type,
-                    image: swap.image_path ? `../server_try/item/${swap.image_path}` : null
+                    image: swap.image_path ? `../server/item/${swap.image_path}` : null
                 }));
             });
             
@@ -76,7 +76,7 @@ function fetchItems() {
                     id: swap.item_id,
                     title: swap.title,
                     category: swap.category_type,
-                    image: swap.image_path ? `../server_try/item/${swap.image_path}` : null
+                    image: swap.image_path ? `../server/item/${swap.image_path}` : null
                 }));
             });
         })
@@ -226,7 +226,7 @@ categoryCards.forEach(cards => {
     viewAllBidContainer.innerHTML = "";
     viewAllSwapContainer.innerHTML = "";
 
-    fetch(`../server_try/item/get_items.php?category=${selectedCategory}`)
+    fetch(`../server/item/get_items.php?category=${selectedCategory}`)
       .then(response => response.json())
       .then(data => {
         const items = data.items || [];
@@ -247,7 +247,7 @@ categoryCards.forEach(cards => {
               price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
               timeLeft: formatEndDate(bid.end_date),
               bidsCount: bid.bid_count || 0,
-              image: bid.image_path ? '../server_try/item/' + bid.image_path : null
+              image: bid.image_path ? '../server/item/' + bid.image_path : null
             }));
           });
         } 
@@ -262,7 +262,7 @@ categoryCards.forEach(cards => {
               id: swap.item_id,
               title: swap.title,
               category: swap.category_type,
-              image: swap.image_path ? '../server_try/item/' + swap.image_path : null
+              image: swap.image_path ? '../server/item/' + swap.image_path : null
             }));
           });
         } 
@@ -333,8 +333,8 @@ function applyCurrentCategoryFilter() {
   const isBidActive = bidBtn.classList.contains("active");
 
   const url = selectedCategory === "All Programs" 
-    ? '../server_try/item/get_items.php'
-    : `../server_try/item/get_items.php?category=${selectedCategory}`;
+    ? '../server/item/get_items.php'
+    : `../server/item/get_items.php?category=${selectedCategory}`;
 
   fetch(url)
     .then(response => response.json())
@@ -353,7 +353,7 @@ function applyCurrentCategoryFilter() {
             price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
             timeLeft: formatEndDate(bid.end_date),
             bidsCount: bid.bid_count || 0,
-            image: bid.image_path ? '../server_try/item/' + bid.image_path : null
+            image: bid.image_path ? '../server/item/' + bid.image_path : null
           }));
         });
       } else {
@@ -365,7 +365,7 @@ function applyCurrentCategoryFilter() {
             id: swap.item_id,
             title: swap.title,
             category: swap.category_type,
-            image: swap.image_path ? '../server_try/item/' + swap.image_path : null
+            image: swap.image_path ? '../server/item/' + swap.image_path : null
           }));
         });
       }
@@ -373,7 +373,7 @@ function applyCurrentCategoryFilter() {
     
 }
 function resolveImagePath(fileName) {
-    const basePath = "../server_try/item/";
+    const basePath = "../server/item/";
     if (!fileName) return null;
 
     // Remove existing extension (if any)
