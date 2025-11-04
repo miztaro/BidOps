@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Creating...';
 
-        fetch('http://localhost:8000/server/item/insert_item.php', {
+        fetch('../server/item/insert_item.php', {
             method: 'POST',
             body: formData
         })

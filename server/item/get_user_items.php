@@ -32,7 +32,7 @@ try {
     // Convert image paths to full URLs
     foreach ($items as &$item) {
         if ($item['image']) {
-            $item['image'] = 'http://localhost:8000/server/item/' . $item['image'];
+            $item['image'] = '../server/item/' . $item['image'];
         } else {
             $item['image'] = '../assets/images/default-item.jpg';
         }
