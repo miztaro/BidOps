@@ -4,17 +4,35 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    header("Access-Control-Allow-Origin: http://localhost:8000");
+    $allowed_origins = ['http://localhost', 'http://localhost:8000', 'http://127.0.0.1:5500'];
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    
+    if (in_array($origin, $allowed_origins)) {
+        header("Access-Control-Allow-Origin: $origin");
+    } else {
+        header("Access-Control-Allow-Origin: http://localhost");
+    }
+    
     header("Access-Control-Allow-Methods: POST, OPTIONS");
     header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+    header("Access-Control-Allow-Credentials: true");
     http_response_code(200);
     exit();
 }
 
-header("Access-Control-Allow-Origin: http://localhost:8000");
+$allowed_origins = ['http://localhost', 'http://localhost:8000', 'http://127.0.0.1:5500'];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (in_array($origin, $allowed_origins)) {
+    header("Access-Control-Allow-Origin: $origin");
+} else {
+    header("Access-Control-Allow-Origin: http://localhost");
+}
+
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+header("Access-Control-Allow-Credentials: true");
 
 include_once '../config/database.php';
 session_start();
@@ -37,8 +55,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $starting_price = $_POST['starting_price'] ?? 0;
         $end_date = $_POST['end_date'] ?? '';
         
-        //$seller_id = 'u1'; // using Alice as default seller
-        $seller_id = $_SESSION['user_id']; //use current user
+        $seller_id = $_SESSION['user_id'];
 
         if(empty($title) || empty($category) || empty($description) || empty($listingType)) {
             http_response_code(400);
@@ -53,7 +70,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 exit();
             }
             
-            // converting to date time format sa mysql
             $end_date_mysql = date('Y-m-d H:i:s', strtotime($end_date));
             $now = date('Y-m-d H:i:s');
             
@@ -66,7 +82,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $image_path = null;
         if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-            // use uploads folder directly in server_try
             $upload_dir = "uploads/";
             if(!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0777, true);

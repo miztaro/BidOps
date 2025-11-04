@@ -1,12 +1,40 @@
 <?php
-// server_try/item/place_bid.php
 session_start();
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
 
-include '../config/db_connect.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    $allowed_origins = ['http://localhost', 'http://localhost:8000', 'http://127.0.0.1:5500'];
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    
+    if (in_array($origin, $allowed_origins)) {
+        header("Access-Control-Allow-Origin: $origin");
+    } else {
+        header("Access-Control-Allow-Origin: http://localhost");
+    }
+    
+    header("Access-Control-Allow-Methods: POST, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+    header("Access-Control-Allow-Credentials: true");
+    http_response_code(200);
+    exit();
+}
+
+$allowed_origins = ['http://localhost', 'http://localhost:8000', 'http://127.0.0.1:5500'];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (in_array($origin, $allowed_origins)) {
+    header("Access-Control-Allow-Origin: $origin");
+} else {
+    header("Access-Control-Allow-Origin: http://localhost");
+}
+
+header('Content-Type: application/json');
+header("Access-Control-Allow-Credentials: true");
+
+include_once '../config/database.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -33,11 +61,14 @@ if (!is_numeric($bid_amount) || $bid_amount <= 0) {
 }
 
 try {
+    $database = new Database();
+    $db = $database->getConnection();
+    
     // Check if item exists and is active
-    $stmt = $pdo->prepare("
+    $stmt = $db->prepare("
         SELECT i.*, bi.starting_price, bi.end_date 
-        FROM item i
-        LEFT JOIN biditem bi ON i.item_id = bi.item_id
+        FROM ITEM i
+        LEFT JOIN BIDITEM bi ON i.item_id = bi.item_id
         WHERE i.item_id = :item_id AND i.status = 'active'
     ");
     $stmt->execute(['item_id' => $item_id]);
@@ -61,10 +92,10 @@ try {
     }
     
     // Get current highest bid
-    $stmt = $pdo->prepare("
+    $stmt = $db->prepare("
         SELECT MAX(bid_amount) as highest_bid 
-        FROM bidoffer 
-        WHERE item_id = :item_id AND bid_status = 'active'
+        FROM BIDOFFER 
+        WHERE item_id = :item_id AND bid_status IN ('active', 'pending')
     ");
     $stmt->execute(['item_id' => $item_id]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -82,54 +113,50 @@ try {
     }
     
     // Start transaction
-    $pdo->beginTransaction();
+    $db->beginTransaction();
     
-    // Mark previous highest bids as 'outbid'
-    $stmt = $pdo->prepare("
-        UPDATE bidoffer 
-        SET bid_status = 'outbid' 
+    // Mark previous highest bids as 'lost'
+    $stmt = $db->prepare("
+        UPDATE BIDOFFER 
+        SET bid_status = 'lost' 
         WHERE item_id = :item_id AND bid_status = 'active'
     ");
     $stmt->execute(['item_id' => $item_id]);
     
     // Insert new bid
-    $bid_id = 'BID_' . uniqid();
-    $stmt = $pdo->prepare("
-        INSERT INTO bidoffer (bid_id, item_id, bidder_id, bid_amount, bid_status, created_at)
-        VALUES (:bid_id, :item_id, :bidder_id, :bid_amount, 'active', NOW())
+    $stmt = $db->prepare("
+        INSERT INTO BIDOFFER (item_id, bidder_id, bid_amount, bid_status, created_at)
+        VALUES (:item_id, :bidder_id, :bid_amount, 'active', NOW())
     ");
     
     $stmt->execute([
-        'bid_id' => $bid_id,
         'item_id' => $item_id,
         'bidder_id' => $user_id,
         'bid_amount' => $bid_amount
     ]);
     
-    // Create notification for previous highest bidder
-    $stmt = $pdo->prepare("
+    // Get previous highest bidder for notification
+    $stmt = $db->prepare("
         SELECT DISTINCT bidder_id 
-        FROM bidoffer 
-        WHERE item_id = :item_id AND bid_status = 'outbid' AND bidder_id != :user_id
+        FROM BIDOFFER 
+        WHERE item_id = :item_id AND bid_status = 'lost' AND bidder_id != :user_id
         ORDER BY created_at DESC LIMIT 1
     ");
     $stmt->execute(['item_id' => $item_id, 'user_id' => $user_id]);
     $previous_bidder = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($previous_bidder) {
-        $notif_id = 'NOTIF_' . uniqid();
-        $stmt = $pdo->prepare("
-            INSERT INTO notification (notif_id, user_id, type, message, created_at)
-            VALUES (:notif_id, :user_id, 'outbid', :message, NOW())
+        $stmt = $db->prepare("
+            INSERT INTO NOTIFICATION (user_id, type, message, created_at)
+            VALUES (:user_id, 'bid_won', :message, NOW())
         ");
         $stmt->execute([
-            'notif_id' => $notif_id,
             'user_id' => $previous_bidder['bidder_id'],
             'message' => "You've been outbid on {$item['title']}"
         ]);
     }
     
-    $pdo->commit();
+    $db->commit();
     
     echo json_encode([
         'success' => true,
@@ -138,7 +165,9 @@ try {
     ]);
     
 } catch (PDOException $e) {
-    $pdo->rollBack();
+    if (isset($db)) {
+        $db->rollBack();
+    }
     echo json_encode([
         'success' => false,
         'message' => 'Database error: ' . $e->getMessage()

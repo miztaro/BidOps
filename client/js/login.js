@@ -14,7 +14,8 @@ function handleFormLogin(event) {
     loginBtn.textContent = 'Logging in...';
     loginBtn.disabled = true;
     
-    fetch('http://localhost:8000/server_try/auth/login.php', {
+    // FIXED: Changed from getRole.php to login.php
+    fetch('http://localhost/Val_Branch/server_try/auth/login.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -62,9 +63,8 @@ function handleFormLogin(event) {
 }
 
 function checkExistingSession() {
-    const role = localStorage.getItem('role');
-    
-    fetch('http://localhost:8000/server_try/auth/getRole.php', {
+    // FIXED: Updated URL to correct path without port 8000
+    fetch('http://localhost/Val_Branch/server_try/auth/getRole.php', {
         credentials: 'include'
     })
     .then(response => response.json())
@@ -84,17 +84,12 @@ function checkExistingSession() {
                 email: data.email
             }));
             window.location.href = 'homepage.html';
-        } else {
-            localStorage.removeItem('role');
-            localStorage.removeItem('user');
-            localStorage.removeItem('admin');
         }
+        // If guest, stay on login page (no redirect)
     })
     .catch(error => {
-        console.log('Session verification failed:', error);
-        localStorage.removeItem('role');
-        localStorage.removeItem('user');
-        localStorage.removeItem('admin');
+        // Silent fail - just stay on login page
+        console.log('No active session');
     });
 }
 

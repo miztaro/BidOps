@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    $allowed_origins = ['http://localhost:8000', 'http://127.0.0.1:5500', 'http://127.0.0.1:8000'];
+    $allowed_origins = ['http://localhost', 'http://localhost:8000', 'http://127.0.0.1:5500', 'http://127.0.0.1:8000'];
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
     
     if (in_array($origin, $allowed_origins)) {
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit();
 }
 
-$allowed_origins = ['http://localhost:8000', 'http://127.0.0.1:5500', 'http://127.0.0.1:8000'];
+$allowed_origins = ['http://localhost', 'http://localhost:8000', 'http://127.0.0.1:5500', 'http://127.0.0.1:8000'];
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
 if (in_array($origin, $allowed_origins)) {
