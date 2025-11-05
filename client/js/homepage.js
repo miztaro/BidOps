@@ -206,6 +206,10 @@ function createBidCard(bid){
     bidCard.classList.add("bid-card");
     bidCard.setAttribute("id", `bid-card-${bid.id}`);
 
+    const priceValue = typeof bid.price === 'string' ? 
+    parseFloat(bid.price.replace('₱', '')) || 0 : 
+    parseFloat(bid.price) || 0;
+
     bidCard.dataset.price = bid.price;
     bidCard.dataset.date = bid.dateListed;
 
@@ -226,7 +230,7 @@ function createBidCard(bid){
         <div class="bottom">
             <h6>${bid.title}</h6>
             <p class="category">${bid.category}</p>
-            <p class="start-bid">Starting bid <span class="bid-price">${bid.formattedPrice}</span></p>
+            <p class="start-bid">Starting bid <span class="bid-price">₱${priceValue.toFixed(2)}</span></p>
             <div class="bid-time-and-count">
                 <div class="time"><p>${bid.timeLeft}</p></div>
                 <p class="count"><span>${bid.bidsCount}</span> bids</p>
@@ -452,11 +456,15 @@ function applyCurrentCategoryFilter() {
         const filteredBids = items.filter(item => item.item_type === 'bid');
         
         filteredBids.forEach(bid => {
+          const priceValue = parseFloat(bid.starting_price || 0);
+          
           viewAllBidContainer.appendChild(createBidCard({
             id: bid.item_id,
             title: bid.title,
             category: bid.category_type,
-            price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
+            price: priceValue,
+            formattedPrice: `₱${priceValue.toFixed(2)}`,
+            dateListed: bid.created_date,
             timeLeft: formatEndDate(bid.end_date),
             bidsCount: bid.bid_count || 0,
             image: bid.image_path ? '../server/item/' + bid.image_path : null
@@ -476,8 +484,8 @@ function applyCurrentCategoryFilter() {
         });
       }
     });
-    
 }
+
 function resolveImagePath(fileName) {
     const basePath = "../server/item/";
     if (!fileName) return null;

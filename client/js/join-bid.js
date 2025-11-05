@@ -121,24 +121,35 @@ function loadItemDetails() {
 function populateItemDetails(data) {
     const item = data.item;
     
-    document.querySelector('.item-title').textContent = item.title;
-    document.querySelector('.item-description').textContent = item.description;
+    const itemTitle = document.querySelector('.item-title');
+    const itemDescription = document.querySelector('.item-description');
+    const sellerName = document.querySelector('.seller-details h4');
+    const sellerEmail = document.querySelector('.seller-details p');
+    const viewProfileBtn = document.querySelector('.view-profile-btn');
     
-    document.querySelector('.seller-details h4').textContent = item.seller_name;
-    document.querySelector('.seller-details p').textContent = item.seller_email;
-    document.querySelector('.view-profile-btn').href = `profile.html?user_id=${item.seller_id}`;
+    if (itemTitle) itemTitle.textContent = item.title;
+    if (itemDescription) itemDescription.textContent = item.description;
+    if (sellerName) sellerName.textContent = item.seller_name;
+    if (sellerEmail) sellerEmail.textContent = item.seller_email;
+    if (viewProfileBtn && item.seller_id) {
+        viewProfileBtn.href = `profile.html?user_id=${item.seller_id}`;
+    }
     
     const startingPrice = parseFloat(item.starting_price || 0);
     const currentHighest = parseFloat(item.current_highest_bid || startingPrice);
     
-    document.querySelector('.bid-pricing .price-item:first-child .price-value').textContent = 
-        `₱${startingPrice.toFixed(2)}`;
-    document.querySelector('.bid-pricing .price-item.current-bid .price-value').textContent = 
-        `₱${currentHighest.toFixed(2)}`;
+    const startingPriceElem = document.querySelector('.bid-pricing .price-item:first-child .price-value');
+    const currentBidElem = document.querySelector('.bid-pricing .price-item.current-bid .price-value');
+    
+    if (startingPriceElem) startingPriceElem.textContent = `₱${startingPrice.toFixed(2)}`;
+    if (currentBidElem) currentBidElem.textContent = `₱${currentHighest.toFixed(2)}`;
     
     const minimumBid = currentHighest + minimumIncrement;
-    document.querySelector('.minimum-bid-text').textContent = 
-        `Minimum bid increment: ₱${minimumIncrement.toFixed(2)} (Next minimum: ₱${minimumBid.toFixed(2)})`;
+    const minBidTextElem = document.querySelector('.minimum-bid-text');
+    if (minBidTextElem) {
+        minBidTextElem.textContent = 
+            `Minimum bid increment: ₱${minimumIncrement.toFixed(2)} (Next minimum: ₱${minimumBid.toFixed(2)})`;
+    }
     
     const bidAmountInput = document.getElementById('bidAmount');
     if (bidAmountInput) {
@@ -164,6 +175,11 @@ function setupImageGallery(images) {
     const mainImage = document.getElementById('mainImage');
     const thumbnailContainer = document.querySelector('.thumbnail-container');
     
+    if (!mainImage) {
+        console.error('Main image element not found');
+        return;
+    }
+    
     const firstImage = images[0];
     const imagePath = `../server/item/${firstImage.image_path}`;
     console.log('Setting main image:', imagePath);
@@ -174,36 +190,43 @@ function setupImageGallery(images) {
         mainImage.src = '../assets/images/default-item.jpg';
     };
     
-    thumbnailContainer.innerHTML = '';
-    images.forEach((img, index) => {
-        const thumbnail = document.createElement('img');
-        const thumbPath = `../server/item/${img.image_path}`;
-        thumbnail.src = thumbPath;
-        thumbnail.alt = `Thumbnail ${index + 1}`;
-        thumbnail.className = 'thumbnail' + (index === 0 ? ' active' : '');
-        thumbnail.dataset.image = thumbPath;
-        
-        thumbnail.onerror = function() {
-            console.error('Failed to load thumbnail:', thumbPath);
-            thumbnail.src = '../assets/images/default-item.jpg';
-        };
-        
-        thumbnail.addEventListener('click', () => {
-            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-            thumbnail.classList.add('active');
-            mainImage.src = thumbnail.dataset.image;
+    if (thumbnailContainer) {
+        thumbnailContainer.innerHTML = '';
+        images.forEach((img, index) => {
+            const thumbnail = document.createElement('img');
+            const thumbPath = `../server/item/${img.image_path}`;
+            thumbnail.src = thumbPath;
+            thumbnail.alt = `Thumbnail ${index + 1}`;
+            thumbnail.className = 'thumbnail' + (index === 0 ? ' active' : '');
+            thumbnail.dataset.image = thumbPath;
+            
+            thumbnail.onerror = function() {
+                console.error('Failed to load thumbnail:', thumbPath);
+                thumbnail.src = '../assets/images/default-item.jpg';
+            };
+            
+            thumbnail.addEventListener('click', () => {
+                document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                thumbnail.classList.add('active');
+                mainImage.src = thumbnail.dataset.image;
+            });
+            
+            thumbnailContainer.appendChild(thumbnail);
         });
-        
-        thumbnailContainer.appendChild(thumbnail);
-    });
+    }
 }
 
 function setupDefaultImage() {
     const mainImage = document.getElementById('mainImage');
     const thumbnailContainer = document.querySelector('.thumbnail-container');
     
-    mainImage.src = '../assets/images/default-item.jpg';
-    thumbnailContainer.innerHTML = '';
+    if (mainImage) {
+        mainImage.src = '../assets/images/default-item.jpg';
+    }
+    
+    if (thumbnailContainer) {
+        thumbnailContainer.innerHTML = '';
+    }
     
     console.log('Using default image');
 }
@@ -321,108 +344,11 @@ function updateTimerLabel(text) {
     }
 }
 
-
-// placeBidBtn.addEventListener('click', () => {
-//     const bidAmount = parseFloat(bidAmountInput.value);
-//     const minimumBid = currentHighestBid + minimumIncrement;
-
-//     if (!bidAmount || isNaN(bidAmount)) {
-//         alert('Please enter a valid bid amount.');
-//         return;
-//     }
-
-//     if (bidAmount < minimumBid) {
-//         alert(`Your bid must be at least ₱${minimumBid.toFixed(2)} (Current highest bid + ₱${minimumIncrement.toFixed(2)} increment)`);
-//         return;
-//     }
-
-//     const confirmBid = confirm(`Are you sure you want to place a bid of ₱${bidAmount.toFixed(2)}?`);
-    
-//     if (confirmBid) {
-//         submitBid(bidAmount);
-//     }
-// });
+// buttons r disabled, keeping functions below for future ref
 
 function submitBid(bidAmount) {
-    const placeBidBtn = document.getElementById('placeBidBtn');
-    if (!placeBidBtn) return;
-    
-    placeBidBtn.disabled = true;
-    placeBidBtn.textContent = 'Placing bid...';
-    
-    fetch('../server/item/place_bid.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            item_id: itemId,
-            bid_amount: bidAmount
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        placeBidBtn.disabled = false;
-        placeBidBtn.innerHTML = '<iconify-icon icon="mdi:gavel"></iconify-icon> Place Bid';
-        
-        if (data.success) {
-            alert('Bid placed successfully!');
-            
-            currentHighestBid = bidAmount;
-            const currentBidElement = document.querySelector('.current-bid .price-value');
-            if (currentBidElement) {
-                currentBidElement.textContent = `₱${bidAmount.toFixed(2)}`;
-            }
-            
-            const newMinimum = bidAmount + minimumIncrement;
-            const minBidText = document.querySelector('.minimum-bid-text');
-            if (minBidText) {
-                minBidText.textContent = 
-                    `Minimum bid increment: ₱${minimumIncrement.toFixed(2)} (Next minimum: ₱${newMinimum.toFixed(2)})`;
-            }
-            
-            const bidAmountInput = document.getElementById('bidAmount');
-            if (bidAmountInput) {
-                bidAmountInput.value = '';
-                bidAmountInput.min = newMinimum;
-                bidAmountInput.placeholder = newMinimum.toFixed(2);
-                bidAmountInput.step = "1";
-            }
-            
-            loadItemDetails();
-        } else {
-            alert(data.message || 'Failed to place bid');
-        }
-    })
-    .catch(error => {
-        console.error('Error placing bid:', error);
-        alert('Failed to place bid. Please try again.');
-        placeBidBtn.disabled = false;
-        placeBidBtn.innerHTML = '<iconify-icon icon="mdi:gavel"></iconify-icon> Place Bid';
-    });
+    console.log('Bidding feature is disabled');
 }
-
-
-// favoritesBtn.addEventListener('click', () => {
-//     isFavorite = !isFavorite;
-    
-//     if (isFavorite) {
-//         favoritesBtn.style.backgroundColor = '#B41B1B';
-//         favoritesBtn.style.color = '#fff';
-//         favoritesBtn.innerHTML = '<iconify-icon icon="mdi:heart"></iconify-icon> Added to Favorites';
-//     } else {
-//         favoritesBtn.style.backgroundColor = '#FFE100';
-//         favoritesBtn.style.color = '#073066';
-//         favoritesBtn.innerHTML = '<iconify-icon icon="mdi:heart"></iconify-icon> Add to Favorites';
-//     }
-// });
-
-
-// chatBtn.addEventListener('click', () => {
-//     if (!itemData) return;
-    
-//     window.location.href = `chat.html?seller_id=${itemData.seller_id}&item_id=${itemId}`;
-// });
 
 const reportBtn = document.getElementById('reportBtn');
 
