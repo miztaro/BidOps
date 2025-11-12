@@ -525,3 +525,52 @@ function resolveImagePath(fileName) {
 document.addEventListener("DOMContentLoaded", () => {
     fetchItems();
 });
+
+// Search functions
+function initHomepageSearch() {
+  console.log("[simple-search] Initializing live search...");
+
+  const input = document.querySelector(".header-search input");
+  const button = document.querySelector(".header-search button");
+
+  // Retry until header is fully loaded
+  if (!input || !button) {
+    console.warn("[simple-search] Header not ready. Retrying...");
+    setTimeout(initHomepageSearch, 500);
+    return;
+  }
+
+  const getAllCards = () => Array.from(document.querySelectorAll(".bid-card, .swap-card"));
+
+  function filterVisibleCards(query) {
+    const q = (query || "").trim().toLowerCase();
+    const cards = getAllCards();
+
+    cards.forEach(card => {
+      const title = card.querySelector("h6")?.textContent.toLowerCase() || "";
+      const category = card.querySelector(".category")?.textContent.toLowerCase() || "";
+      const matches = q === "" || title.includes(q) || category.includes(q);
+      card.style.display = matches ? "" : "none";
+    });
+  }
+
+  // Live search
+  input.addEventListener("input", () => filterVisibleCards(input.value));
+
+  // Button click triggers 
+  button.addEventListener("click", (e) => {
+    e.preventDefault();
+    filterVisibleCards(input.value);
+  });
+
+  // Enter key triggers 
+  input.addEventListener("keyup", (e) => {
+    if (e.key === "Enter") filterVisibleCards(input.value);
+  });
+
+  console.log("[simple-search] Ready (live mode)!");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(initHomepageSearch, 1000);
+});
