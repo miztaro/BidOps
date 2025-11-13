@@ -1,32 +1,19 @@
 console.log("Script loaded");
 const home = document.getElementById("homepage-section");
 const viewAll = document.getElementById("viewAll-section");
-
-const bidViewAllBtn = document.getElementById("bid-view-all")
-const swapViewAllBtn = document.getElementById("swap-view-all")
-
-const categoryCards = document.querySelectorAll(".category-card");
-
 const backHomeBtn = document.getElementById("back-home");
-
-const bidBtn = document.querySelector(".bid-btn");
-const swapBtn = document.querySelector(".swap-btn");
 
 const homeBidContainer = document.getElementById("home-bid-cards-list");
 const viewAllBidContainer = document.getElementById("viewAll-bid-cards-list");
-
 const homeSwapContainer = document.getElementById("home-swap-cards-list");
 const viewAllSwapContainer = document.getElementById("viewAll-swap-cards-list");
 
-const categoryBtn = document.getElementById("viewAll-category-btn");
-const categoryDropDown = document.getElementById("viewAll-category-dropDown");
-const dropDownItems = categoryDropDown.querySelectorAll(".dropDown-item");
 const categoryTitle = document.getElementById("viewAll-category-title");
 const categoryDescription = document.getElementById("viewAll-category-description");
 
+// Sort Function
 const sortBtn = document.querySelector(".sort-btn");
 const sortDropdown = document.getElementById("sort-dropdown");
-
 sortBtn.addEventListener("click", (event) => {
   event.stopPropagation();
   const isVisible = sortDropdown.style.display === "block";
@@ -84,7 +71,9 @@ sortDropdown.addEventListener("click", (event) => {
   cards.forEach((card) => container.appendChild(card));
   sortDropdown.style.display = "none";
 });
+// End of Sort Function
 
+// Header
 document.addEventListener("DOMContentLoaded", function() {
     fetch("header.html")
         .then(response => response.text())
@@ -105,7 +94,9 @@ document.addEventListener("DOMContentLoaded", function() {
     })
 .catch(error => console.error("Error determining role:", error));
 });
+// End of Header
 
+// Fetch items Bid & Swap Function
 function fetchItems() {
     fetch('../server/item/get_items.php')
         .then(response => response.json())
@@ -178,7 +169,9 @@ function fetchItems() {
             console.error('Error loading items:', error);
         });
 }
+// End of Fetch items Bid & Swap Function
 
+//Format date Function
 function formatEndDate(endDate) {
     if (!endDate) return 'Ends at: Not specified';
     
@@ -200,7 +193,9 @@ function formatEndDate(endDate) {
     const formattedDate = end.toLocaleDateString('en-US', options);
     return `Ends at ${formattedDate}`;
 }
+//End of Format date Function
 
+//Create Bid Card Function
 function createBidCard(bid){
     const bidCard = document.createElement("div");
     bidCard.classList.add("bid-card");
@@ -240,7 +235,9 @@ function createBidCard(bid){
     `;
     return bidCard;
 }
+//End of Create Bid Card Function
 
+//Create Swap Card Function
 function createSwapCard(swap) {
     const swapCard = document.createElement("div");
     swapCard.classList.add("swap-card");
@@ -275,7 +272,12 @@ function createSwapCard(swap) {
     `;
     return swapCard;
 }
+//End of Create Swap Card Function
 
+//View All Bids Event Handling
+const bidViewAllBtn = document.getElementById("bid-view-all");
+const bidBtn = document.querySelector(".bid-btn");
+const swapBtn = document.querySelector(".swap-btn");
 bidViewAllBtn.addEventListener("click", () => {
   home.style.display = "none";
   viewAll.style.display = "block";
@@ -292,7 +294,10 @@ bidViewAllBtn.addEventListener("click", () => {
   viewAllBidContainer.innerHTML = "";
   fetchItems();
 });
+//End of View All Bids Event Handling
 
+//View All Swaps Event Handling
+const swapViewAllBtn = document.getElementById("swap-view-all");
 swapViewAllBtn.addEventListener("click", () => {
   home.style.display = "none";
   viewAll.style.display = "block";
@@ -309,7 +314,10 @@ swapViewAllBtn.addEventListener("click", () => {
   viewAllSwapContainer.innerHTML = "";
   fetchItems();
 });
+//End of View All Swaps Event Handling
 
+//Category Cards For Each
+const categoryCards = document.querySelectorAll(".category-card");
 categoryCards.forEach(card => {
   const categoryName = card.getAttribute("browse-category");
   const countElem = card.querySelector("p"); 
@@ -386,7 +394,11 @@ categoryCards.forEach(card => {
       });
   });
 });
+//End of Category Cards For Each
 
+//Buttons Event Handling
+const categoryBtn = document.getElementById("viewAll-category-btn");
+const categoryDropDown = document.getElementById("viewAll-category-dropDown");
 backHomeBtn.addEventListener("click", () => {
     viewAll.style.display = "none";
     home.style.display = "block";
@@ -416,7 +428,10 @@ categoryBtn.addEventListener("click", () => {
   categoryDropDown.classList.toggle("active");
   categoryBtn.classList.toggle("active")
 });
+//End of Buttons Event Handling
 
+// Category Dropdown For Each
+const dropDownItems = categoryDropDown.querySelectorAll(".dropDown-item");
 dropDownItems.forEach(item => {
   item.addEventListener("click", () => {
     const selectedCategory = item.textContent.trim();
@@ -437,7 +452,9 @@ document.addEventListener("click", (event) => {
     categoryBtn.classList.remove("active");
   }
 });
+// End of Category Dropdown For Each
 
+//Category DropDown function
 function applyCurrentCategoryFilter() {
   const selectedCategory = categoryTitle.textContent.trim();
   const isBidActive = bidBtn.classList.contains("active");
@@ -485,6 +502,7 @@ function applyCurrentCategoryFilter() {
       }
     });
 }
+//Category DropDown function
 
 function resolveImagePath(fileName) {
     const basePath = "../server/item/";
