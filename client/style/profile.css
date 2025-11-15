@@ -1,0 +1,577 @@
+@font-face {
+  font-family: 'Montserrat-Regular';
+  src: url('/assets/fonts/Montserrat/static/Montserrat-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Montserrat-Medium';
+  src: url('/assets/fonts/Montserrat/static/Montserrat-Medium.ttf') format('truetype');
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: 'Montserrat-SemiBold';
+  src: url('/assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: 'Montserrat-Bold';
+  src: url('/assets/fonts/Montserrat/static/Montserrat-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+}
+
+html{scroll-behavior: smooth;}
+
+.profile-section{
+    padding: 0;
+    font-family: 'Montserrat-Regular',sans-serif;
+    width: 100%;
+    padding-top: 20px; 
+    display: flex;
+}
+
+.left-nav-menu{
+    display: inline-grid;
+    gap:20px;
+    padding-left:30px;
+    flex: 1;
+}
+
+.left-nav-menu .back-home{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    gap: 5px;
+    background-color: transparent;
+    color: #073066;
+    border: none;
+    font-size: 1em;
+    transition: 0.5s ease;
+}
+
+.left-nav-menu .back-home:hover{
+    color: #B41B1B;
+}
+
+.left-nav-menu .user-profile-btn{
+    background-color: #073066;
+    color: #fff;
+    padding: 30px 20px;
+    width: 300px;
+    border-radius: 12px;
+    border:none;
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.left-nav-menu .user-profile-btn:hover{
+    transform: translateX(10px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.left-nav-menu .user-profile-btn .img-container{
+    flex: 1;
+    border-radius: 50%;
+    width: 86px;
+    height: 86px;
+    background-color: #D9D9D9;
+    overflow: hidden;
+}
+
+.left-nav-menu .user-profile-btn .img-container img{
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.left-nav-menu .user-profile-btn .user-info{
+    text-align: left;
+}
+.left-nav-menu .user-profile-btn .user-info h6{
+    font-size: 1em;
+    font-family: 'Montserrat-Bold',sans-serif;
+}
+.left-nav-menu .user-profile-btn .user-info p{
+    font-size: 1em;
+}
+
+.left-nav-menu .user-profile-btn .user-profile-arrow{
+    padding-left: 25px;
+}
+
+
+.left-nav-menu .listings-btn,
+.left-nav-menu .bids-btn,
+.left-nav-menu .swaps-btn{
+    background-color: #D9D9D9;
+    border: 1px solid #073066;
+    border-radius: 12px;
+    padding: 30px 20px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.left-nav-menu .listings-btn.active,
+.left-nav-menu .bids-btn.active,
+.left-nav-menu .swaps-btn.active{
+    background-color: #fff;
+}
+
+.left-nav-menu .listings-btn:hover,
+.left-nav-menu .bids-btn:hover,
+.left-nav-menu .swaps-btn:hover{
+    transform: translateX(10px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+
+.left-nav-menu .listings-btn .listings-logo,
+.left-nav-menu .bids-btn .bids-logo,
+.left-nav-menu .swaps-btn .swaps-logo{
+  font-size: 3em;
+  color: #073066;
+  background-color: rgba(7, 48, 102, 0.63);
+  border-radius: 50%;
+  padding: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.left-nav-menu .listings-btn h6,
+.left-nav-menu .bids-btn h6,
+.left-nav-menu .swaps-btn h6{
+    font-size: 1em;
+    font-family: 'Montserrat-Bold',sans-serif;
+    color:#073066;
+}
+
+.left-nav-menu .listings-btn p,
+.left-nav-menu .bids-btn p,
+.left-nav-menu .swaps-btn p{
+    font-size: 1em;
+    color: #8C8A8A;
+}
+
+.right-side{
+    flex: 4.5;
+    display: flex;
+    flex-direction: column;
+    padding-right: 30px;
+    gap: 10px;
+}
+
+.right-side .title-container{
+    padding: 30px;
+    border-radius: 20px;
+    border:1px solid #073066;
+    width: 100%;
+    flex:1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+}
+
+.right-side .title-container h3{
+    font-size: 3.5em;
+    font-family: 'Montserrat-Bold',sans-serif;
+    color:#073066;
+}
+
+.right-side .title-container .analytics{
+    display: flex;
+    justify-content: space-around;
+    gap: 80px;
+}
+
+.right-side .title-container .analytics > div{
+    text-align: center;
+}
+
+.right-side .title-container .analytics > div h6{
+    font-size: 1.5em;
+    font-family: 'Montserrat-Bold',sans-serif;
+    color:#073066;
+}
+
+.right-side .title-container .analytics > div p{
+    color: #8C8A8A;
+    font-size: 1em;
+}
+
+.right-side .profile-listings-content,
+.right-side .profile-bids-content,
+.right-side .profile-swaps-content{
+    background-color: #D9D9D9;
+    border-radius: 20px;
+    border:none;
+    flex: 9;
+    padding:30px;
+}
+
+.right-side .profile-listings-content table,
+.right-side .profile-bids-content table,
+.right-side .profile-swaps-content table{
+    width: 100%;
+    text-align: center;
+    border-collapse: separate; 
+    border-spacing: 0 10px;
+}
+
+.right-side .profile-listings-content table th,
+.right-side .profile-bids-content table th,
+.right-side .profile-swaps-content table th{
+    font-size: 1em;
+    font-family: 'Montserrat-Bold',sans-serif;
+    color: #073066;
+    padding-bottom: 10px;
+}
+
+.right-side .profile-listings-content table th.listings-filter,
+.right-side .profile-bids-content table th.bids-filter,
+.right-side .profile-swaps-content table th.swaps-filter{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.right-side .profile-listings-content table .listings-body-row,
+.right-side .profile-bids-content table .bids-body-row,
+.right-side .profile-swaps-content table .swaps-body-row{
+    background-color: #fff;
+    border: 1px solid #073066;
+}
+
+.right-side .profile-listings-content table .listings-body-row td,
+.right-side .profile-bids-content table .bids-body-row td,
+.right-side .profile-swaps-content table .swaps-body-row td{
+    padding: 15px;
+}
+
+.listings-body-row td:first-child,
+.bids-body-row td:first-child,
+.swaps-body-row td:first-child{
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.listings-body-row td:last-child,
+.bids-body-row td:last-child,
+.swaps-body-row td:last-child{
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.right-side .profile-listings-content table .listings-body-row .status,
+.right-side .profile-bids-content table .bids-body-row .status,
+.right-side .profile-swaps-content table .swaps-body-row .status {
+    background-color: #0D4D06;
+    padding: 5px 15px;
+    color: #fff;
+    border-radius: 20px;
+    font-size: 0.8em;
+}
+
+.right-side .profile-listings-content table .listings-body-row .status.pending{
+    background-color: #F1A429;
+}
+
+.right-side .profile-listings-content table .listings-body-row .status.completed{
+    background-color: #B41B1B;
+}
+
+.listings-filter-container,
+.bids-filter-container,
+.swaps-filter-container{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.listings-filter-btn,
+.bids-filter-btn,
+.swaps-filter-btn{
+    padding: 3px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 20px;
+    color: #D9D9D9;
+    background-color: #073066;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+}
+
+.listings-filter-btn:hover,
+.bids-filter-btn:hover,
+.swaps-filter-btn:hover{
+    background-color: transparent;
+    color: #073066;
+    border: 1px solid #073066;
+    transition: 0.5s ease;   
+}
+
+.show-all{
+    font-size: 0.8em;
+    font-family: 'Montserrat-Regular', sans-serif;
+    cursor: pointer;
+    transition: 0.5s ease;
+    margin: 0;
+    justify-content: center;
+}
+
+.show-all:hover{
+    color: #B41B1B;
+}
+
+.listings-filter-dropdown,
+.bids-filter-dropdown,
+.swaps-filter-dropdown{
+    position: absolute;
+    bottom: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
+    background-color: #fff;
+    border: 1px solid #073066;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: none;
+    flex-direction: column;
+    z-index: 20;
+    max-height: 280px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+}
+
+.listings-filter-dropdown::-webkit-scrollbar,
+.bids-filter-dropdown::-webkit-scrollbar,
+.swaps-filter-dropdown::-webkit-scrollbar{
+    display: none;
+}
+
+
+.listings-filter-dropdown.active,
+.bids-filter-dropdown.active,
+.swaps-filter-dropdown.active{
+    display: flex;
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+.dropdown-section .dropDown-header{
+    font-size: 1em;
+    font-family: 'Montserrat-Bold', sans-serif;
+    background-color: #fff;
+    padding: 8px 10px;
+    color: #073066;
+    margin: 0;
+    cursor: pointer;
+    border-top: 1px solid #eee;
+}
+
+.dropdown-section .dropDown-header:hover{
+    background-color: #eee;
+}
+
+.dropdown-section .dropDown-header.active{
+    background-color: #073066;
+    color: #fff;
+}
+
+.dropdown-section:first-child .dropDown-header{
+    border-top: none;
+}
+
+.sub-dropdown {
+    display: none;
+    flex-direction: column;
+    background-color: #fff;
+    border-top: 1px solid #eee;
+}
+
+.sub-dropdown .dropDown-item {
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: background 0.2s ease;
+    color: black;
+    font-family: 'Montserrat-Regular',sans-serif;
+}
+
+.sub-dropdown .dropDown-item:hover {
+    background-color: #eee;
+}
+
+.sub-dropdown.show {
+    display: flex;
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+
+.right-side .profile-listings-content table .listings-body-row td,
+.right-side .profile-bids-content table .bids-body-row td,
+.right-side .profile-swaps-content table .swaps-body-row td{
+    color: #073066;
+}
+
+.right-side .profile-listings-content table .listings-body-row .item,
+.right-side .profile-bids-content table .bids-body-row .item,
+.right-side .profile-swaps-content table .swaps-body-row .item{
+    font-family: 'Montserrat-Bold',sans-serif;
+    font-size: 1em;
+}
+
+.right-side .profile-listings-content table .listings-body-row .actions-container,
+.right-side .profile-bids-content table .bids-body-row .actions-container,
+.right-side .profile-swaps-content table .swaps-body-row .actions-container{
+    gap: 10px;
+    color: #073066;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.right-side .profile-listings-content table .listings-body-row .actions-container .view-btn,
+.right-side .profile-bids-content table .bids-body-row .actions-container .view-btn,
+.right-side .profile-swaps-content table .swaps-body-row .actions-container .view-btn{
+    padding: 5px 15px;
+    background-color:#FFE100;
+    border-radius: 20px;
+    border: none;
+    color: #073066;
+    font-size: 0.8em;
+}
+
+.profile-user-info-content {
+    display: flex;
+    align-items: center;
+    background-color: #D9D9D9;
+    border-radius: 20px;
+    padding: 30px;
+    gap: 100px;
+    width: 100%;
+    max-height: 50vh;
+    height: 100%;
+}
+
+.profile-user-info-content .user-img-container{
+    border-radius: 50%;
+    width: 300px;
+    height: 300px;
+    overflow: hidden;
+    background-color: #073066;
+    border: 2px solid #073066;
+}
+
+.profile-user-info-content .user-img-container img{
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.profile-user-info-content .user-info-container{
+    flex:2;
+    display: inline-block;
+}
+
+.user-info-container #user-name-container,
+.user-info-container #user-id-container,
+.user-info-container #user-email-container,
+.user-info-container #user-pass-container,
+.user-info-container #change-pass-btn{
+    display: flex;
+    justify-content: space-between;
+    width: 450px;
+    padding-bottom: 10px;
+    align-items: center;
+}
+
+.user-info-container #user-name-container h6{
+    font-size: 2.8em;
+    font-family: 'Montserrat-Bold',sans-serif;
+    color: #073066;
+    padding-bottom: 10px;
+}
+
+.user-info-container #user-name-container .edit-icon{
+    cursor: pointer;
+    color: #073066;
+    transition: 0.5s ease-in-out;
+}
+
+.user-info-container #user-name-container .edit-icon:hover{
+    color: #B41B1B;
+}
+
+.user-info-container #user-id-container #user-id,
+.user-info-container #user-email-container #user-email,
+.user-info-container #user-pass-container #user-id,
+.user-info-container #user-pass-container #user-pass{
+    font-family: 'Montserrat-SemiBold',sans-serif;
+    font-size: 1em;
+}
+
+.user-info-container #change-pass-btn{
+    max-width: 150px;
+    justify-content: center;
+    align-items: center;
+    padding:5px 8px;
+    border-radius: 20px;
+    border: none;
+    background-color: #073066;
+    color: #fff;
+    font-family: 'Montserrat-SemiBold',sans-serif;
+    font-size: 0.7em;
+    transition: 0.5s ease-in-out;
+}
+
+.profile-user-info-content .profile-buttons-container {
+    display: flex;
+    flex-direction: row;  
+    gap: 10px;                
+    padding: 10px;
+    align-self: flex-end;   
+}
+
+.profile-buttons-container #sign-out-btn,
+.profile-buttons-container #delete-btn{
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: none;
+    background-color: #073066;
+    color: #fff;
+    font-family: 'Montserrat-SemiBold',sans-serif;
+    transition: 0.5s ease-in-out;
+}
+
+.user-info-container #change-pass-btn:hover,
+.profile-buttons-container #sign-out-btn:hover,
+.profile-buttons-container #delete-btn:hover{
+    background-color: transparent;
+    color: #073066;
+    border: 1px solid #073066;
+}
