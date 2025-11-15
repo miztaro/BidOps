@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
-  fetch("user_header.html")  
+  fetch("header.html")  
   .then(response => response.text())
   .then(data => {
     document.getElementById("header").innerHTML = data;
 
     if (role === "admin") {
-      headerFile = "admin_header.html";
+      headerFile = "header.html";
     } else {
-      headerFile = "user_header.html";
+      headerFile = "header.html";
     }
 
     const profileIcon = document.getElementById("user-header-profile-icon");
