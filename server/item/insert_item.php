@@ -21,6 +21,8 @@ session_start();
 
 $database = new Database();
 $db = $database->getConnection();
+$maxTitleLength = 60;
+$maxDescLength = 300;
 
 // if(!isset($_SESSION['user_id'])) {
 //     http_response_code(401);
@@ -43,6 +45,28 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         if(empty($title) || empty($category) || empty($description) || empty($listingType)) {
             http_response_code(400);
             echo json_encode(array("message" => "All fields are required."));
+            exit();
+        }
+        // to check
+        if(empty(trim($title)) || empty(trim($description))) {
+            http_response_code(400);
+            if(empty(trim($title))){
+                echo json_encode(array("message" => "Input valid title."));
+            }
+            elseif(empty(trim($description))){
+                echo json_encode(array("message" => "Input valid description."));
+            }
+            exit();
+        }
+        //to check
+        if(strlen($title) > $maxTitleLength || strlen($description) > $maxDescLength){
+            http_response_code(400);
+            if(strlen($title) > $maxTitleLength){
+                echo json_encode(array("message" => "Maximum input for title is 60 characters."));
+            }
+            elseif(strlen($description) > $maxDescLength){
+                echo json_encode(array("message" => "Maximum input for description is 300 characters."));
+            }
             exit();
         }
 
