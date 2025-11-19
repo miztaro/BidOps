@@ -19,7 +19,7 @@ try {
         SELECT 
             i.*,
             u.user_id as seller_id,
-            u.username as seller_name,  -- FIXED: username instead of name
+            u.username as seller_name,
             u.email as seller_email,
             bi.starting_price,
             bi.start_date,
@@ -27,7 +27,7 @@ try {
             (SELECT COUNT(*) FROM bidoffer WHERE item_id = i.item_id AND bid_status = 'active') as total_bids,
             (SELECT MAX(bid_amount) FROM bidoffer WHERE item_id = i.item_id AND bid_status = 'active') as current_highest_bid
         FROM item i
-        LEFT JOIN user u ON i.seller_id = u.user_id  -- FIXED: user table (lowercase)
+        LEFT JOIN user u ON i.seller_id = u.user_id
         LEFT JOIN biditem bi ON i.item_id = bi.item_id
         WHERE i.item_id = :item_id
     ");
@@ -43,34 +43,43 @@ try {
     $stmt = $db->prepare("SELECT * FROM itemimage WHERE item_id = :item_id ORDER BY image_id");
     $stmt->execute(['item_id' => $item_id]);
     $images = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    
+    // ANONYMOUS BIDDING HISTORY
     
     $bidding_history = [];
     if ($item['item_type'] === 'bid') {
         $stmt = $db->prepare("
             SELECT 
-                bo.*,
-                u.username as bidder_name,  -- FIXED: username instead of name
-                u.email as bidder_email
+                bo.bid_amount,
+                bo.created_at
             FROM bidoffer bo
-            LEFT JOIN user u ON bo.bidder_id = u.user_id  -- FIXED: user table (lowercase)
             WHERE bo.item_id = :item_id
             ORDER BY bo.bid_amount DESC, bo.created_at DESC
         ");
         $stmt->execute(['item_id' => $item_id]);
-        $bidding_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $raw_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        
+        $counter = 1;
+        foreach ($raw_history as $bid) {
+            $bidding_history[] = [
+                "bidder" => "Bidder #" . $counter,   
+                "bid_amount" => $bid["bid_amount"],
+                "created_at" => $bid["created_at"],
+                "time_ago" => getTimeAgo($bid["created_at"])
+            ];
+            $counter++;
+        }
     }
-    
-    foreach ($bidding_history as &$bid) {
-        $bid['time_ago'] = getTimeAgo($bid['created_at']);
-    }
-    
+
     echo json_encode([
         'success' => true,
         'item' => $item,
         'images' => $images,
         'bidding_history' => $bidding_history
     ]);
-    
+
 } catch (PDOException $e) {
     echo json_encode([
         'success' => false,
