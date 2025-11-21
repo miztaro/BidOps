@@ -15,7 +15,6 @@ window.addEventListener('load', () => {
     }
     
     loadHeader();
-    disableAllButtons();
     loadItemDetails();
 });
 
@@ -401,3 +400,59 @@ if (bidAmountInput) {
         }
     });
 }
+
+// placing a bid functionalitiess
+function setupPlaceBidButton() {
+    if (!placeBidBtn || !bidAmountInput) {
+        console.error('Bid button or input not found.');
+        return;
+    }
+
+    placeBidBtn.addEventListener('click', function(event) {
+        event.preventDefault();
+        
+        const bidAmount = parseFloat(bidAmountInput.value);
+        if (isNaN(bidAmount) || bidAmount <= 0) {
+            alert('Please enter a valid bid amount.');
+            return;
+        }
+        
+        fetch('../server/item/place_bid.php', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                item_id: itemId,
+                bid_amount: bidAmount
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Bid placed successfully!');
+                loadItemDetails(); 
+                bidAmountInput.value = '';
+            } else {
+                alert(data.message || 'Failed to place bid');
+            }
+        })
+        .catch(error => {
+            console.error('Error placing bid:', error);
+            alert('Error placing bid. Please try again.');
+        });
+    });
+}
+
+window.addEventListener('load', () => {
+    if (!itemId) {
+        alert('No item specified');
+        window.location.href = 'homepage.html';
+        return;
+    }
+    
+    loadHeader();
+    loadItemDetails();
+    setupPlaceBidButton(); 
+});
