@@ -475,11 +475,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  document.querySelector(".form-container").addEventListener("submit", function (e) {
+    e.preventDefault(); 
+    let formData = new FormData(this);
+
+    fetch("../server/item/update_item.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("Item updated!");
+            document.querySelector(".edit-overlay").classList.remove("active");
+        } else {
+            alert("Update failed: " + data.message);
+        }
+    })
+    .catch(err => console.error(err));
+  });
+
   const editCancelButton = document.querySelector(".edit-cancel-btn")
   editCancelButton.addEventListener("click", (event) =>{
     event.stopPropagation();
     editOverlay.classList.remove("active");
   })
+
+  const editSaveButton = document.querySelector('.edit-save-btn');
+  editSaveButton.addEventListener("click", (event) =>{
+    event.stopPropagation();
+    editOverlay.classList.remove("active");
+  });
 
   function fetchItemData(itemId){
     fetch(`../server/item/get_item_single.php?id=${itemId}`)

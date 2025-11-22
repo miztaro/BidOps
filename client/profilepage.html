@@ -224,7 +224,7 @@
         <section class="edit-overlay">
             <form class="form-container" method="POST" enctype="multipart/form-data" action="../server/item/update_item.php"> 
 
-                <input type="hidden" name="id" id="item-id">
+                <input type="hidden" name="item_id" id="item-id">
 
                 <fieldset class="mode-field">
                     <legend>Bid Details</legend>
@@ -252,7 +252,7 @@
 
                 <fieldset class="price-field">
                     <label for="start_price">Starting Price</label>
-                    <input type="number" name="start_price" id="start-price" step="0.1" required>
+                    <input type="number" name="starting_price" id="start-price" step="0.1" required>
 
                     <label>Start Date</label>
                     <input type="datetime-local" name="start_date" id="start-date" required>
@@ -272,7 +272,7 @@
                 </fieldset>
 
                 <div class="button-section">
-                    <button type="submit" name="save">Save</button>
+                    <button type="submit" name="save" class="edit-save-btn">Save</button>
                     <button class="edit-cancel-btn" type="reset">Cancel</button>
                 </div>
             </form>

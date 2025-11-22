@@ -1,5 +1,14 @@
 <?php
 require "../config/database.php";
+$database = new Database();
+$conn = $database->getConnection();
+
+if ($conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(["error" => "Database connection failed: " . $conn->connect_error]);
+    exit();
+}
+
 
 if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $item_id = intval($_POST['item_id']);
@@ -49,7 +58,4 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
             }
         }
     }
-
-    echo "<h2>Item Updated Successfully!</h2>";
-    echo "<a href='get_item_single.php?id=$item_id'>Back to Edit</a>";
 }
