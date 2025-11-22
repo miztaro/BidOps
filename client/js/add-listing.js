@@ -5,6 +5,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const endDateInput = document.getElementById('end_date');
     const listingForm = document.getElementById('listingForm');
     
+        // Bid Increment Slider
+    const bidIncrement = document.getElementById('bidIncrement');
+    const incrementValue = document.getElementById('incrementValue');
+
+    if (bidIncrement) {
+        // Initialize display
+        incrementValue.textContent = bidIncrement.value + "%";
+
+        // Update display + UI progress on slider move
+        bidIncrement.addEventListener("input", function () {
+            incrementValue.textContent = this.value + "%";
+            this.style.setProperty("--slider-progress", (this.value - this.min) * 100 / (this.max - this.min) + "%");
+        });
+    }
+
     listingType.addEventListener('change', function() {
         if (this.value === 'bid') {
             bidFields.style.display = 'block';
