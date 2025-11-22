@@ -5,7 +5,7 @@ const itemId = urlParams.get('item_id');
 
 let itemData = null;
 let currentHighestBid = 0;
-let minimumIncrement = 5.00;
+let bidIncrementPercent = 0;
 
 window.addEventListener('load', () => {
     if (!itemId) {
@@ -104,11 +104,13 @@ function loadItemDetails() {
             
             console.log('Successfully loaded item:', data.item.title);
             itemData = data.item;
+            
+            bidIncrementPercent = parseFloat(itemData.bid_increment_percent);
             populateItemDetails(data);
+            updateMinimumBid();
             startCountdown(itemData.end_date);
             setupImageGallery(data.images);
             displayBiddingHistory(data.bidding_history);
-            
             currentHighestBid = parseFloat(data.item.current_highest_bid || data.item.starting_price);
         })
         .catch(error => {
@@ -133,21 +135,22 @@ function populateItemDetails(data) {
     if (viewProfileBtn && item.seller_id) {
         viewProfileBtn.href = `profile.html?user_id=${item.seller_id}`;
     }
-    
+
+    const bidIncrementPercent = parseFloat(item.bid_increment_percent || 0);
     const startingPrice = parseFloat(item.starting_price || 0);
     const currentHighest = parseFloat(item.current_highest_bid || startingPrice);
-    
+    const incrementAmount = currentHighest * (bidIncrementPercent / 100);
+    const minimumBid = currentHighest + incrementAmount;
     const startingPriceElem = document.querySelector('.bid-pricing .price-item:first-child .price-value');
     const currentBidElem = document.querySelector('.bid-pricing .price-item.current-bid .price-value');
     
     if (startingPriceElem) startingPriceElem.textContent = `₱${startingPrice.toFixed(2)}`;
     if (currentBidElem) currentBidElem.textContent = `₱${currentHighest.toFixed(2)}`;
     
-    const minimumBid = currentHighest + minimumIncrement;
     const minBidTextElem = document.querySelector('.minimum-bid-text');
     if (minBidTextElem) {
         minBidTextElem.textContent = 
-            `Minimum bid increment: ₱${minimumIncrement.toFixed(2)} (Next minimum: ₱${minimumBid.toFixed(2)})`;
+            `Minimum bid increment: ₱${incrementAmount.toFixed(2)} (Next minimum: ₱${minimumBid.toFixed(2)})`;
     }
     
     const bidAmountInput = document.getElementById('bidAmount');
@@ -400,59 +403,84 @@ if (bidAmountInput) {
         }
     });
 }
+function updateMinimumBid() {
+    // Calculate the increment
+    const incrementAmount = currentHighestBid * (bidIncrementPercent / 100);
+    const minimumBid = currentHighestBid + incrementAmount;
+
+    // Update the minimum bid text and input
+    const minBidTextElem = document.querySelector('.minimum-bid-text');
+    if (minBidTextElem) {
+        minBidTextElem.textContent = 
+            `Minimum bid increment: ₱${incrementAmount.toFixed(2)} (Next minimum: ₱${minimumBid.toFixed(2)})`;
+    }
+    
+    const bidAmountInput = document.getElementById('bidAmount');
+    if (bidAmountInput) {
+        bidAmountInput.min = minimumBid;
+        bidAmountInput.placeholder = minimumBid.toFixed(2);
+        bidAmountInput.step = "1";
+    }
+}
 
 // placing a bid functionalitiess
 function setupPlaceBidButton() {
-    if (!placeBidBtn || !bidAmountInput) {
-        console.error('Bid button or input not found.');
-        return;
-    }
+    if (!placeBidBtn || !bidAmountInput) {
+        console.error('Bid button or input not found.');
+        return;
+    }
 
-    placeBidBtn.addEventListener('click', function(event) {
-        event.preventDefault();
-        
-        const bidAmount = parseFloat(bidAmountInput.value);
-        if (isNaN(bidAmount) || bidAmount <= 0) {
-            alert('Please enter a valid bid amount.');
-            return;
-        }
-        
-        fetch('../server/item/place_bid.php', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                item_id: itemId,
-                bid_amount: bidAmount
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Bid placed successfully!');
-                loadItemDetails(); 
-                bidAmountInput.value = '';
-            } else {
-                alert(data.message || 'Failed to place bid');
-            }
-        })
-        .catch(error => {
-            console.error('Error placing bid:', error);
-            alert('Error placing bid. Please try again.');
-        });
-    });
+    placeBidBtn.addEventListener('click', function(event) {
+        event.preventDefault();
+        
+        const bidAmount = parseFloat(bidAmountInput.value);
+        if (isNaN(bidAmount) || bidAmount <= 0) {
+            alert('Please enter a valid bid amount.');
+            return;
+        }
+
+        const minimumBid = parseFloat(bidAmountInput.min);
+        if (bidAmount < minimumBid) {
+            alert(`Bid must be at least ₱${minimumBid.toFixed(2)}`);
+            return;
+        }
+
+        fetch('../server/item/place_bid.php', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                item_id: itemId,
+                bid_amount: bidAmount
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Bid placed successfully!');
+                loadItemDetails(); 
+                bidAmountInput.value = '';
+            } else {
+                alert(data.message || 'Failed to place bid');
+            }
+        })
+        .catch(error => {
+            console.error('Error placing bid:', error);
+            alert('Error placing bid. Please try again.');
+        });
+    });
 }
 
 window.addEventListener('load', () => {
-    if (!itemId) {
-        alert('No item specified');
-        window.location.href = 'homepage.html';
-        return;
-    }
-    
-    loadHeader();
-    loadItemDetails();
-    setupPlaceBidButton(); 
+    if (!itemId) {
+        alert('No item specified');
+        window.location.href = 'homepage.html';
+        return;
+    }
+    
+    loadHeader();
+    loadItemDetails();
+    setupPlaceBidButton(); 
 });

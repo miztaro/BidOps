@@ -70,9 +70,12 @@ try {
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $current_highest = $result['highest_bid'] ?? $item['starting_price'];
     
+    // Calculate minimum required bid
+    $increment_percent = $item['bid_increment_percent'];
+    $increment_amount = $current_highest * ($increment_percent / 100);
+    $minimum_bid = $current_highest + $increment_amount;
+
     // Validate bid amount (must be higher than current highest)
-    $minimum_bid = $current_highest + 5.00; // Minimum increment of ₱5.00
-    
     if ($bid_amount < $minimum_bid) {
         echo json_encode([
             'success' => false, 

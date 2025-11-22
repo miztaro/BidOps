@@ -24,6 +24,7 @@ try {
             bi.starting_price,
             bi.start_date,
             bi.end_date,
+            bi.bid_increment_percent,  
             (SELECT COUNT(*) FROM bidoffer WHERE item_id = i.item_id AND bid_status = 'active') as total_bids,
             (SELECT MAX(bid_amount) FROM bidoffer WHERE item_id = i.item_id AND bid_status = 'active') as current_highest_bid
         FROM item i
