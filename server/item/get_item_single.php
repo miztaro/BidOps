@@ -1,0 +1,59 @@
+<?php
+// Enable errors for debugging (remove in production)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require '../config/database.php';
+$database = new Database();
+$conn = $database->getConnection();
+
+if ($conn->connect_error) {
+    http_response_code(500);
+    echo json_encode(["error" => "Database connection failed: " . $conn->connect_error]);
+    exit();
+}
+
+header('Content-Type: application/json');
+
+// Validate ID
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    echo json_encode(["error" => "No valid item ID provided"]);
+    exit;
+}
+
+$item_id = intval($_GET['id']);
+
+// Fetch item
+$stmt_item = $conn->prepare("SELECT * FROM item WHERE item_id=?");
+$stmt_item->bind_param("i", $item_id);
+$stmt_item->execute();
+$item_result = $stmt_item->get_result();
+$item = $item_result->fetch_assoc();
+
+// Fetch bid
+$stmt_bid = $conn->prepare("SELECT * FROM biditem WHERE item_id=?");
+$stmt_bid->bind_param("i", $item_id);
+$stmt_bid->execute();
+$bid_result = $stmt_bid->get_result();
+$bid = $bid_result->fetch_assoc();
+
+// Fetch images
+$stmt_img = $conn->prepare("SELECT image_path FROM itemimage WHERE item_id=?");
+$stmt_img->bind_param("i", $item_id);
+$stmt_img->execute();
+$img_result = $stmt_img->get_result();
+
+$images = [];
+while ($row = $img_result->fetch_assoc()) {
+    $images[] = "../server/item/uploads/" . basename($row['image_path']); 
+}
+
+// Return JSON
+echo json_encode([
+    "item" => $item ?: null,
+    "bid" => $bid ?: null,
+    "images" => $images
+]);
+exit;
+?>

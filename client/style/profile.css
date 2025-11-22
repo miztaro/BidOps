@@ -174,15 +174,12 @@ html{scroll-behavior: smooth;}
 }
 
 .right-side .title-container{
-    padding: 30px;
-    border-radius: 20px;
-    border:1px solid #073066;
+    padding: 10px;
     width: 100%;
     flex:1;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    overflow: hidden;
 }
 
 .right-side .title-container h3{
@@ -193,12 +190,20 @@ html{scroll-behavior: smooth;}
 
 .right-side .title-container .analytics{
     display: flex;
-    justify-content: space-around;
-    gap: 80px;
+    justify-content: flex-end;
+    gap: 20px;
 }
 
 .right-side .title-container .analytics > div{
     text-align: center;
+    padding: 40px;
+    border: 1px solid #073066;
+    border-radius: 20px;
+    transition: 0.2s ease;
+}
+
+.right-side .title-container .analytics > div:hover{
+    transform: translateY(-5px);
 }
 
 .right-side .title-container .analytics > div h6{
@@ -218,47 +223,65 @@ html{scroll-behavior: smooth;}
     background-color: #D9D9D9;
     border-radius: 20px;
     border:none;
-    flex: 9;
+    flex: 12;
     padding:30px;
 }
 
-.right-side .profile-listings-content table,
-.right-side .profile-bids-content table,
-.right-side .profile-swaps-content table{
+.right-side .profile-listings-content .table-container,
+.right-side .profile-bids-content .table-container,
+.right-side .profile-swaps-content .table-container{
+    max-height: 57vh;
+    overflow-y: auto;
+    display: block;
+}
+
+.profile-listings-content .table-container table,
+.profile-bids-content .table-container table,
+.profile-swaps-content .table-container table{
     width: 100%;
     text-align: center;
     border-collapse: separate; 
     border-spacing: 0 10px;
 }
 
-.right-side .profile-listings-content table th,
-.right-side .profile-bids-content table th,
-.right-side .profile-swaps-content table th{
+.profile-listings-content .table-container table thead,
+.profile-bids-content .table-container table thead,
+.profile-swaps-content .table-container table thead{
+    top: 0;
+    position:sticky;
+    z-index: 20;
+    background-color: #D9D9D9;
+}
+
+
+.profile-listings-content .table-container table th,
+.profile-bids-content .table-container table th,
+.profile-swaps-content .table-container table th{
     font-size: 1em;
     font-family: 'Montserrat-Bold',sans-serif;
     color: #073066;
     padding-bottom: 10px;
 }
 
-.right-side .profile-listings-content table th.listings-filter,
-.right-side .profile-bids-content table th.bids-filter,
-.right-side .profile-swaps-content table th.swaps-filter{
+.profile-listings-content .table-container table th.listings-filter,
+.profile-bids-content .table-container table th.bids-filter,
+.profile-swaps-content .table-container table th.swaps-filter{
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
 }
 
-.right-side .profile-listings-content table .listings-body-row,
-.right-side .profile-bids-content table .bids-body-row,
-.right-side .profile-swaps-content table .swaps-body-row{
+.profile-listings-content .table-container table .listings-body-row,
+.profile-bids-content .table-container table .bids-body-row,
+.profile-swaps-content .table-container table .swaps-body-row{
     background-color: #fff;
     border: 1px solid #073066;
 }
 
-.right-side .profile-listings-content table .listings-body-row td,
-.right-side .profile-bids-content table .bids-body-row td,
-.right-side .profile-swaps-content table .swaps-body-row td{
+.profile-listings-content .table-container table .listings-body-row td,
+.profile-bids-content .table-container table .bids-body-row td,
+.profile-swaps-content .table-container table .swaps-body-row td{
     padding: 15px;
 }
 
@@ -276,23 +299,29 @@ html{scroll-behavior: smooth;}
   border-bottom-right-radius: 10px;
 }
 
-.right-side .profile-listings-content table .listings-body-row .status,
-.right-side .profile-bids-content table .bids-body-row .status,
-.right-side .profile-swaps-content table .swaps-body-row .status {
-    background-color: #0D4D06;
+.profile-listings-content .table-container table .listings-body-row .status {
     padding: 5px 15px;
     color: #fff;
     border-radius: 20px;
     font-size: 0.8em;
+    background-color: #8C8A8A;
 }
 
-.right-side .profile-listings-content table .listings-body-row .status.pending{
+.profile-listings-content .table-container table .listings-body-row .status.active-items {
+    background-color: #0D4D06;
+}
+
+.profile-listings-content .table-container table .listings-body-row .status.pending-items {
     background-color: #F1A429;
 }
 
-.right-side .profile-listings-content table .listings-body-row .status.completed{
+.profile-listings-content .table-container table .listings-body-row .status.rejected-items {
     background-color: #B41B1B;
 }
+.profile-listings-content .table-container table .listings-body-row .status.sold-items{
+    background-color: #8C8A8A;
+}
+
 
 .listings-filter-container,
 .bids-filter-container,
@@ -345,8 +374,8 @@ html{scroll-behavior: smooth;}
 .bids-filter-dropdown,
 .swaps-filter-dropdown{
     position: absolute;
-    bottom: 48px;
-    left: 50%;
+    top: 28%;
+    left: 90%;
     transform: translateX(-50%);
     width: 250px;
     background-color: #fff;
@@ -355,7 +384,7 @@ html{scroll-behavior: smooth;}
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     display: none;
     flex-direction: column;
-    z-index: 20;
+    z-index: 9999;
     max-height: 280px;
     overflow-y: auto;
     scrollbar-width: none;
@@ -432,38 +461,55 @@ html{scroll-behavior: smooth;}
 }
 
 
-.right-side .profile-listings-content table .listings-body-row td,
-.right-side .profile-bids-content table .bids-body-row td,
-.right-side .profile-swaps-content table .swaps-body-row td{
+.profile-listings-content table .listings-body-row td,
+.profile-bids-content table .bids-body-row td,
+.profile-swaps-content table .swaps-body-row td{
     color: #073066;
 }
 
-.right-side .profile-listings-content table .listings-body-row .item,
-.right-side .profile-bids-content table .bids-body-row .item,
-.right-side .profile-swaps-content table .swaps-body-row .item{
+.profile-listings-content table .listings-body-row .item,
+.profile-bids-content table .bids-body-row .item,
+.profile-swaps-content table .swaps-body-row .item{
     font-family: 'Montserrat-Bold',sans-serif;
     font-size: 1em;
 }
 
-.right-side .profile-listings-content table .listings-body-row .actions-container,
-.right-side .profile-bids-content table .bids-body-row .actions-container,
-.right-side .profile-swaps-content table .swaps-body-row .actions-container{
-    gap: 10px;
+.profile-listings-content table .listings-body-row .actions-container,
+.profile-bids-content table .bids-body-row .actions-container,
+.profile-swaps-content table .swaps-body-row .actions-container{
+    gap: 15px;
     color: #073066;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    padding-left: 40px;
 }
 
-.right-side .profile-listings-content table .listings-body-row .actions-container .view-btn,
-.right-side .profile-bids-content table .bids-body-row .actions-container .view-btn,
-.right-side .profile-swaps-content table .swaps-body-row .actions-container .view-btn{
+.profile-listings-content table .listings-body-row .actions-container .view-btn,
+.profile-bids-content table .bids-body-row .actions-container .view-btn,
+.profile-swaps-content table .swaps-body-row .actions-container .view-btn{
     padding: 5px 15px;
-    background-color:#FFE100;
+    border: 1px solid #F1A429;
+    background-color:transparent;
     border-radius: 20px;
-    border: none;
-    color: #073066;
+    color: #F1A429;
     font-size: 0.8em;
+    transition: 0.3s ease;
+}
+
+.profile-listings-content table .listings-body-row .actions-container .view-btn:hover,
+.profile-bids-content table .bids-body-row .actions-container .view-btn:hover,
+.profile-swaps-content table .swaps-body-row .actions-container .view-btn:hover{
+    background-color: #FFE100;
+    color: #073066;
+    border: #FFE100 ;
+}
+
+.profile-listings-content table .listings-body-row .actions-container .edit-btn:hover,
+.profile-bids-content table .bids-body-row .actions-container .edit-btn:hover,
+.profile-swaps-content table .swaps-body-row .actions-container .edit-btn:hover{
+    color: #B41B1B;
+    transition: 0.5s ease;
 }
 
 .profile-user-info-content {
@@ -561,9 +607,9 @@ html{scroll-behavior: smooth;}
 .profile-buttons-container #delete-btn{
     padding: 10px 15px;
     border-radius: 20px;
-    border: none;
-    background-color: #073066;
-    color: #fff;
+    border: 1px solid #073066;
+    background-color: transparent;
+    color: #073066;
     font-family: 'Montserrat-SemiBold',sans-serif;
     transition: 0.5s ease-in-out;
 }
@@ -571,7 +617,34 @@ html{scroll-behavior: smooth;}
 .user-info-container #change-pass-btn:hover,
 .profile-buttons-container #sign-out-btn:hover,
 .profile-buttons-container #delete-btn:hover{
-    background-color: transparent;
-    color: #073066;
-    border: 1px solid #073066;
+    background-color: #073066;
+    color: #fff;
+    border: none;
+}
+
+/*Edit Overlay*/
+.edit-overlay{
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0,0,0,0.4);
+    width:100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.edit-overlay.active{
+    display: flex;
+}
+
+.edit-overlay .form-container{
+    padding: 30px;
+    width: 75%;
+    height: 80%;
+    background-color: #fff;
+    border-radius: 20px;
+    border: none;
 }

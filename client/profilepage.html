@@ -78,139 +78,204 @@
             </div>
 
             <div id="profile-listings-content" class="profile-listings-content">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Category</th>
-                            <th>Mode</th>
-                            <th>Date Listed</th>
-                            <th>Status</th>
-                            <th class="listings-filter">
-                                <div class="listings-filter-container">
-                                    <button id="listings-filter-btn" class="listings-filter-btn"><iconify-icon icon="flowbite:filter-outline" width="24" height="24"></iconify-icon></button>
-                                    <div class="listings-filter-dropdown">
-                                        <div class="dropdown-section">
-                                            <h6 class="dropDown-header">Programs</h6>
-                                            <div class="sub-dropdown">
-                                                <p class="dropDown-item">All Categories</p>
-                                                <p class="dropDown-item">Accessories</p>
-                                                <p class="dropDown-item">Collectibles</p>
-                                                <p class="dropDown-item">Electronics</p>
-                                                <p class="dropDown-item">Fashion</p>
-                                                <p class="dropDown-item">Gaming</p>
-                                                <p class="dropDown-item">Home</p>
-                                                <p class="dropDown-item">Photography</p>
-                                                <p class="dropDown-item">Sports</p>
-                                                <p class="dropDown-item">Toys</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="dropdown-section">
-                                            <h6 class="dropDown-header">Mode</h6>
-                                            <div class="sub-dropdown">
-                                                <p class="dropDown-item">Swap</p>
-                                                <p class="dropDown-item">Bid</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="dropdown-section">
-                                            <h6 class="dropDown-header">Status</h6>
-                                            <div class="sub-dropdown">
-                                                <p class="dropDown-item">Active</p>
-                                                <p class="dropDown-item">Pending</p>
-                                                <p class="dropDown-item">Completed</p>
-                                            </div>
-                                        </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>Mode</th>
+                                <th>Date Listed</th>
+                                <th>Status</th>
+                                <th class="listings-filter">
+                                    <div class="listings-filter-container">
+                                        <button id="listings-filter-btn" class="listings-filter-btn"><iconify-icon icon="flowbite:filter-outline" width="24" height="24"></iconify-icon></button>
                                     </div>
-                                </div>
-                                <p class="show-all">Clear filter</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="listings-body-row" id="listings-body-row"></tr>
-                    </tbody>
-                </table>
+                                    <p class="show-all">Clear filter</p>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- <tr class="listings-body-row" id="listings-body-row"></tr> -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="listings-filter-dropdown">
+                    <div class="dropdown-section">
+                        <h6 class="dropDown-header">Category</h6>
+                        <div class="sub-dropdown">
+                            <p class="dropDown-item">All Categories</p>
+                            <p class="dropDown-item">Accessories</p>
+                            <p class="dropDown-item">Collectibles</p>
+                            <p class="dropDown-item">Electronics</p>
+                            <p class="dropDown-item">Fashion</p>
+                            <p class="dropDown-item">Gaming</p>
+                            <p class="dropDown-item">Home</p>
+                            <p class="dropDown-item">Photography</p>
+                            <p class="dropDown-item">Sports</p>
+                            <p class="dropDown-item">Toys</p>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-section">
+                        <h6 class="dropDown-header">Mode</h6>
+                        <div class="sub-dropdown">
+                            <p class="dropDown-item">Swap</p>
+                            <p class="dropDown-item">Bid</p>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-section">
+                        <h6 class="dropDown-header">Status</h6>
+                        <div class="sub-dropdown">
+                            <p class="dropDown-item">Active</p>
+                            <p class="dropDown-item">Pending_Approval</p>
+                            <p class="dropDown-item">Approval_Rejected</p>
+                            <p class="dropDown-item">Sold</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div id="profile-bids-content" class="profile-bids-content">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>item</th>
-                            <th>Category</th>
-                            <th>Winning Bid</th>
-                            <th>Date Won</th>
-                            <th class="bids-filter">
-                                <div class="bids-filter-container">
-                                    <button id="bids-filter-btn" class="bids-filter-btn"><iconify-icon icon="flowbite:filter-outline" width="24" height="24"></iconify-icon></button>
-                                    <div class="bids-filter-dropdown">
-                                        <div class="dropdown-section">
-                                            <h6 class="dropDown-header">Programs</h6>
-                                            <div class="sub-dropdown">
-                                                <p class="dropDown-item">All Categories</p>
-                                                <p class="dropDown-item">Accessories</p>
-                                                <p class="dropDown-item">Collectibles</p>
-                                                <p class="dropDown-item">Electronics</p>
-                                                <p class="dropDown-item">Fashion</p>
-                                                <p class="dropDown-item">Gaming</p>
-                                                <p class="dropDown-item">Home</p>
-                                                <p class="dropDown-item">Photography</p>
-                                                <p class="dropDown-item">Sports</p>
-                                                <p class="dropDown-item">Toys</p>                                            
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>item</th>
+                                <th>Category</th>
+                                <th>Winning Bid</th>
+                                <th>Date Won</th>
+                                <th class="bids-filter">
+                                    <div class="bids-filter-container">
+                                        <button id="bids-filter-btn" class="bids-filter-btn"><iconify-icon icon="flowbite:filter-outline" width="24" height="24"></iconify-icon></button>
+                                        <div class="bids-filter-dropdown">
+                                            <div class="dropdown-section">
+                                                <h6 class="dropDown-header">Programs</h6>
+                                                <div class="sub-dropdown">
+                                                    <p class="dropDown-item">All Categories</p>
+                                                    <p class="dropDown-item">Accessories</p>
+                                                    <p class="dropDown-item">Collectibles</p>
+                                                    <p class="dropDown-item">Electronics</p>
+                                                    <p class="dropDown-item">Fashion</p>
+                                                    <p class="dropDown-item">Gaming</p>
+                                                    <p class="dropDown-item">Home</p>
+                                                    <p class="dropDown-item">Photography</p>
+                                                    <p class="dropDown-item">Sports</p>
+                                                    <p class="dropDown-item">Toys</p>                                            
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <p class="show-all">Clear Filter</p>
-                            </th>                        
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="bids-body-row" id="bids-body-row"></tr>
-                    </tbody>
-                </table>
+                                    <p class="show-all">Clear Filter</p>
+                                </th>                        
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bids-body-row" id="bids-body-row"></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div id="profile-swaps-content" class="profile-swaps-content">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Category</th>
-                            <th>Swapped Item</th>
-                            <th>Date Swapped</th>
-                            <th class="swaps-filter">
-                                <div class="swaps-filter-container">
-                                    <button id="swaps-filter-btn" class="swaps-filter-btn"><iconify-icon icon="flowbite:filter-outline" width="24" height="24"></iconify-icon></button>
-                                    <div class="swaps-filter-dropdown">
-                                        <div class="dropdown-section">
-                                            <h6 class="dropDown-header">Categories</h6>
-                                            <div class="sub-dropdown">
-                                                <p class="dropDown-item">All Categories</p>
-                                                <p class="dropDown-item">Accessories</p>
-                                                <p class="dropDown-item">Collectibles</p>
-                                                <p class="dropDown-item">Electronics</p>
-                                                <p class="dropDown-item">Fashion</p>
-                                                <p class="dropDown-item">Gaming</p>
-                                                <p class="dropDown-item">Home</p>
-                                                <p class="dropDown-item">Photography</p>
-                                                <p class="dropDown-item">Sports</p>
-                                                <p class="dropDown-item">Toys</p>                                              
+                <div class="table-container">
+                        <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>Swapped Item</th>
+                                <th>Date Swapped</th>
+                                <th class="swaps-filter">
+                                    <div class="swaps-filter-container">
+                                        <button id="swaps-filter-btn" class="swaps-filter-btn"><iconify-icon icon="flowbite:filter-outline" width="24" height="24"></iconify-icon></button>
+                                        <div class="swaps-filter-dropdown">
+                                            <div class="dropdown-section">
+                                                <h6 class="dropDown-header">Categories</h6>
+                                                <div class="sub-dropdown">
+                                                    <p class="dropDown-item">All Categories</p>
+                                                    <p class="dropDown-item">Accessories</p>
+                                                    <p class="dropDown-item">Collectibles</p>
+                                                    <p class="dropDown-item">Electronics</p>
+                                                    <p class="dropDown-item">Fashion</p>
+                                                    <p class="dropDown-item">Gaming</p>
+                                                    <p class="dropDown-item">Home</p>
+                                                    <p class="dropDown-item">Photography</p>
+                                                    <p class="dropDown-item">Sports</p>
+                                                    <p class="dropDown-item">Toys</p>                                              
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <p class="show-all">Clear Filter</p>
-                            </th>                           
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="swaps-body-row" id="swaps-body-row"></tr>
-                    </tbody>
-                </table>
+                                    <p class="show-all">Clear Filter</p>
+                                </th>                           
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="swaps-body-row" id="swaps-body-row"></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+        </section>
+
+        <section class="edit-overlay">
+            <form class="form-container" method="POST" enctype="multipart/form-data" action="../server/item/update_item.php"> 
+
+                <input type="hidden" name="id" id="item-id">
+
+                <fieldset class="mode-field">
+                    <legend>Bid Details</legend>
+                    <h3>Bid</h3>
+
+                    <label>Status</label>
+                    <input type="text" id="status-display" readonly>
+                    <input type="hidden" name="status" id="status-hidden">
+                </fieldset>
+
+                <fieldset class="item-info-field">
+                    <legend>Item Information</legend>
+
+                    <label>Item Name</label>
+                    <input type="text" name="item_name" id="item-name" required>
+
+                    <label for="category">Category</label>
+                    <input type="text" name="category" id="category" required>
+                </fieldset>
+
+                <fieldset class="description-field">
+                    <legend>Description</legend>
+                    <textarea name="description" id="description" rows="2"></textarea>
+                </fieldset>
+
+                <fieldset class="price-field">
+                    <label for="start_price">Starting Price</label>
+                    <input type="number" name="start_price" id="start-price" step="0.1" required>
+
+                    <label>Start Date</label>
+                    <input type="datetime-local" name="start_date" id="start-date" required>
+
+                    <label>End Date</label>
+                    <input type="datetime-local" name="end_date" id="end-date" required>
+                </fieldset>
+
+                <fieldset class="image-field">
+                    <legend>Existing Images (0/5)</legend>
+                    <div id="image-container"></div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Upload New Images</legend>
+                    <input type="file" name="images[]" multiple accept="image/*">
+                </fieldset>
+
+                <div class="button-section">
+                    <button type="submit" name="save">Save</button>
+                    <button class="edit-cancel-btn" type="reset">Cancel</button>
+                </div>
+            </form>
         </section>
     </main>
     <script src="js/profilepage.js"></script>

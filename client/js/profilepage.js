@@ -3,13 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   .then(response => response.text())
   .then(data => {
     document.getElementById("header").innerHTML = data;
-
-    if (role === "admin") {
-      headerFile = "header.html";
-    } else {
-      headerFile = "header.html";
-    }
-
+    
     const profileIcon = document.getElementById("user-header-profile-icon");
     if(profileIcon) {
       profileIcon.addEventListener("click", () => {
@@ -28,24 +22,41 @@ document.addEventListener('DOMContentLoaded', function() {
     "#profile-user-info-content, #profile-listings-content, #profile-bids-content, #profile-swaps-content"
   );
 
+  fetchListings();
+
   // ---------------- TODO: USER PROFILE DATA & FUNCTIONS ----------------
 
-
-  // ---------------- LISTINGS DATA & FUNCTIONS ----------------
-
-  //NOTE: THIS IS STATIC DATA , Change/Remove when manipulating backend database
-  const listings = [
-    {id: 1,item: "Gaming Laptop",category: "Electronics",mode: "Swap",dateListed: "09 / 16 / 2025",status: "Active"},
-    {id: 2,item: "DSLR Lens",category: "Photography",mode: "Bid",dateListed: "09 / 16 / 2025",status: "Pending"},
-    {id: 3,item: "Board Game",category: "Toys",mode: "Bid",dateListed: "09 / 16 / 2025",status: "Completed"}
-  ];
-
+  //Listings Data & Functions
+  let listings = [];
+  function fetchListings(){
+    fetch('../server/item/get_items.php')
+      .then(response => response.json())
+      .then(data =>{ 
+          listings = data.listings.map(item => ({
+            id: item.item_id,
+            item: item.title,
+            category: item.category_type,
+            mode: item.item_type,
+            dateListed: item.created_date,
+            status: item.status
+          }));
+          renderItems(listings, "listings");
+          document.querySelector("#profile-listings-btn p").textContent = `${listings.length} Items`;
+      })
+      .catch(error => console.error("Error loading listings: ",error));
+  }
+ 
   function createListingRow(listing){
     const row = document.createElement("tr");
     row.classList.add("listings-body-row");
     row.setAttribute("id", `listing-row-${listing.id}`);
 
-    const statusClass = listing.status.toLowerCase();
+    const statusClass = 
+      listing.status.toLowerCase().includes("active") ? "active-items" :
+      listing.status.toLowerCase().includes("pending") ? "pending-items" :
+      listing.status.toLowerCase().includes("rejected") ? "rejected-items" :
+      listing.status.toLowerCase().includes("sold") ? "sold-items" :
+    "";
 
     row.innerHTML = `
       <td class="item">${listing.item}</td>
@@ -56,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <td>
         <div class="actions-container">
           <button class="view-btn">View</button>
-          <iconify-icon icon="flowbite:edit-outline" width="24" height="24"></iconify-icon>
+          ${listing.status.toLowerCase() === "active" ? `<iconify-icon data-id="${listing.id}" class="edit-btn" icon="flowbite:edit-outline" width="24" height="24"></iconify-icon>`: ''}
         </div>
       </td>
     `;
@@ -64,11 +75,12 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function calculateListingStats(listings){
-    return{
+    return {
       total: listings.length,
-      active: listings.filter(l => l.status === "Active").length,
-      pending: listings.filter(l => l.status === "Pending").length,
-      completed: listings.filter(l => l.status === "Completed").length,
+      active: listings.filter(l => l.status.toLowerCase().includes("active")).length,
+      pending: listings.filter(l => l.status.toLowerCase().includes("pending")).length,
+      rejected: listings.filter(l => l.status.toLowerCase().includes("rejected")).length,
+      sold: listings.filter(l => l.status.toLowerCase().includes("sold")).length
     };
   }
 
@@ -82,21 +94,14 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="total-items"><h6>${stats.total}</h6><p>Items</p></div>
       <div class="active-items"><h6>${stats.active}</h6><p>Active</p></div>
       <div class="pending-items"><h6>${stats.pending}</h6><p>Pending</p></div>
-      <div class="completed-items"><h6>${stats.completed}</h6><p>Completed</p></div>
+      <div class="rejected-items"><h6>${stats.rejected}</h6><p>Rejected</p></div>
+      <div class="sold-items"><h6>${stats.sold}</h6><p>Sold</p></div>
     `;
     return analytics;
   }
+  //End of Listings Data & Functions
 
-  const listingBody = document.querySelector(".profile-listings-content tbody");
-  listings.forEach(listing => {
-    const listingRow = createListingRow(listing);
-    listingBody.appendChild(listingRow);
-  });
-
-  document.querySelector("#profile-listings-btn p").textContent = `${listings.length} Items`;
-
-  // ---------------- WINNING BIDS DATA & FUNCTIONS ----------------
-
+  //Winning Bids Data & Functions 
   //NOTE: THIS IS STATIC DATA , Change/Remove when manipulating backend database
   const winningBids = [
     {id: 1,item: "Gaming Laptop",category: "Electronics",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
@@ -147,8 +152,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const bidsRow = createWinningBidRow(bid);
     bidsBody.appendChild(bidsRow);
   });
-
   document.querySelector("#profile-bids-btn p").textContent = `${winningBids.length} Items`;
+  //End of Winning Bids Data & Functions 
 
   // ---------------- SWAPPED ITEMS DATA & FUNCTIONS ----------------
 
@@ -205,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector("#profile-swaps-btn p").textContent = `${swappedItems.length} Items`;
 
   // ---------------- TITLE & SECTION HANDLING ----------------
-  
+
   function updateTitleForSection(sectionId) {
     const titleContainer = document.querySelector(".title-container");
     const titleHeading = document.querySelector(".title-container h3");
@@ -294,33 +299,47 @@ document.addEventListener('DOMContentLoaded', function() {
         swapsBody.appendChild(row);
       }
     });
+
+    if(section === "listings"){
+      updateTitleForSection("profile-listings-content");
+    }
   }
 
-  // Apply Filter (now section-specific)
-  function applyFilter(type, value, section) {
+  function applyFilter(type, value, section){
     const currentFilters = sectionFilters[section];
 
-    if (type === "Category" && value === "All Categories") {
-      currentFilters[type] = null;
-    } else {
-      currentFilters[type] = value;
+    type = type.toLowerCase();
+
+    if(type === "Category" && value === "All Categories"){
+      currentFilters.Category = null;
+    }else if(type === "category"){
+      currentFilters.Category = value;
+    }else if(type === "mode" && value.toLowerCase() === "all"){
+      currentFilters.Mode = null;
+    }else if(type === "mode"){
+      currentFilters.Mode = value;
+    }else if(type === "status" && value.toLowerCase() === "all"){
+      currentFilters.Status = null;
+    }else if(type === "status"){
+      currentFilters.Status = value;
     }
 
     let data = [];
-    if (section === "listings") data = listings;
-    else if (section === "swaps") data = swappedItems;
-    else if (section === "bids") data = winningBids;
+    if(section === "listings") data = listings;
+    else if(section === "bids") data = winningBids;
+    else if(section === "swaps") data = swappedItems;
 
-    const filtered = data.filter(item => {
+    const filtered = data.filter(item =>{
       return (
-        (!currentFilters.Category || item.category === currentFilters.Category) &&
-        (!currentFilters.Mode || item.mode === currentFilters.Mode) &&
-        (!currentFilters.Status || item.status === currentFilters.Status)
+        (!currentFilters.Category || item.category.toLowerCase() === currentFilters.Category.toLowerCase()) &&
+        (!currentFilters.Mode || item.mode.toLowerCase() === currentFilters.Mode.toLowerCase()) &&
+        (!currentFilters.Status || item.status.toLowerCase() === currentFilters.Status.toLowerCase())
       );
     });
 
     renderItems(filtered, section);
   }
+
 
   // ---------------- DROPDOWN HANDLING ----------------
 
@@ -399,8 +418,11 @@ document.addEventListener('DOMContentLoaded', function() {
     item.addEventListener("click", (event) => {
       event.stopPropagation();
       const selectedText = item.textContent.trim();
-      const filterType = item.closest(".dropdown-section")
-      .querySelector(".dropDown-header").textContent.trim();
+      const filterType = item
+      .closest(".dropdown-section")
+      .querySelector(".dropDown-header")
+      .textContent.trim()
+      .toLowerCase();
 
       let section = "listings";
       if (item.closest(".bids-filter-dropdown")) section = "bids";
@@ -436,4 +458,68 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
+
+  //Edit Overlay
+  const editOverlay = document.querySelector(".edit-overlay");
+  document.addEventListener("click", (event) => {
+    const editButton = event.target.closest(".edit-btn");
+    if(editButton){
+      const itemId = editButton.getAttribute("data-id");
+      if(!itemId){
+        alert("Item ID not found.");
+        return;
+      }
+
+      fetchItemData(itemId);       
+      editOverlay.classList.add("active"); 
+    }
+  });
+
+  const editCancelButton = document.querySelector(".edit-cancel-btn")
+  editCancelButton.addEventListener("click", (event) =>{
+    event.stopPropagation();
+    editOverlay.classList.remove("active");
+  })
+
+  function fetchItemData(itemId){
+    fetch(`../server/item/get_item_single.php?id=${itemId}`)
+      .then(response => response.json())
+      .then(data => {
+        populateForm(data);
+      })
+      .catch(error => console.error("Error fetching item data:", error));
+  }
+
+  function populateForm(data){
+    const item = data.item;
+    const bid = data.bid;
+    const images = data.images;
+
+    document.getElementById('item-id').value = item.item_id;
+    document.getElementById('item-name').value = item.title;
+    document.getElementById('category').value = item.category_type;
+    document.getElementById('description').value = item.description;
+
+    document.getElementById('status-display').value = item.status;
+    document.getElementById('status-hidden').value = item.status;
+
+    document.getElementById('start-price').value = bid ? bid.starting_price: 0;
+    document.getElementById('start-date').value = bid ? formatDateTimeLocal(bid.start_date): '';
+    document.getElementById('end-date').value = bid ? formatDateTimeLocal(bid.end_date): '';
+
+    const container = document.getElementById('image-container');
+    container.innerHTML = '';
+    images.forEach(img =>{
+      const figure = document.createElement('figure');
+      figure.innerHTML= `<img src= "${img}" width="120">`;
+      container.appendChild(figure);
+    });
+  }
+
+  function formatDateTimeLocal(dt){
+    if(!dt) return '';
+    const d = new Date(dt);
+    const pad = n => n.toString().padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
 });
