@@ -21,4 +21,4 @@ PC 1: Server
 	- Make sure that bidops file is located in wamp64/www (C:/wamp64/www/bidops)
 	- Alice is the default user so there is no need to log in
 PC 2: User
-In the browser, access http://<PC1-ip>/bidops/client/homepage.html, this should take the user to the homepage
+In the browser, access http://<PC1-ip>/bidops/client/login.html, this should take the login page

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Listings | Swap and Bid</title>
+  <link rel="stylesheet" href="styles/manage-listing.css" />
+</head>
+<body>
+  <div id="header"></div>
+    <main class="content">
+    <section class="heading">
+      <h1>Pending Listings for Review</h1>
+      <p class="subtext">Review and manage submitted listings before they go lvie</p>
+    </section>
+
+    <section class="filter-section">
+      <div class="filter-group">
+        <label>Category:</label>
+        <select id="filter-category">
+          <option value="all">All categories</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Books">Books</option>
+          <option value="Furniture">Furniture</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Sports">Sports</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label>Submission Date:</label>
+        <input type="date" id="filter-date">
+      </div>
+      
+      <div class="filter-group">
+        <label>Sort by:</label>
+        <select id="filter-sort">
+          <option value="all">All time</option>
+          <option value="today">Today</option>
+          <option value="week">Last 7 days</option>
+          <option value="month">Last 30 days</option>
+        </select>
+      </div>
+      
+      <button id="apply-filters">Apply Filters</button>
+    </section>
+
+    <section class="listing" id="listing-container">
+
+      <article class="item-card" data-item-id="1" data-item-type="bid">
+        <div class="item-content">
+          <h3 class="item-title">Calculus Textbook Bundle</h3>
+          <p class="item-desc">Complete set of calculus textbooks with solution manuals. Great condition...</p>
+          <div class="item-meta">
+            <span class="category">General Education</span>
+            <span class="user">Submitted by: lebron_123</span>
+            <span class="date">Oct. 17, 2025</span>
+          </div>
+        </div>
+        <div class="item-actions">
+          <button class="approve" data-action="approve">Approve</button>
+          <button class="reject" data-action="reject">Reject</button>
+        </div>
+      </article>
+
+      <article class="item-card" data-item-id="2" data-item-type="swap">
+        <div class="item-content">
+          <h3 class="item-title">Study Desk with Chair Set</h3>
+          <p class="item-desc">Compact study desk with matching chair. Perfect for small spaces.</p>
+          <div class="item-meta">
+            <span class="category">Architecture</span>
+            <span class="user">Submitted by: bongbong_69</span>
+            <span class="date">Oct. 14, 2025</span>
+          </div>
+        </div>
+        <div class="item-actions">
+          <button class="approve" data-action="approve">Approve</button>
+          <button class="reject" data-action="reject">Reject</button>
+        </div>
+      </article>
+      
+
+      <article class="item-card" data-item-id="2" data-item-type="swap">
+        <div class="item-content">
+          <h3 class="item-title">Study Desk with Chair Set</h3>
+          <p class="item-desc">Compact study desk with matching chair. Perfect for small spaces.</p>
+          <div class="item-meta">
+            <span class="category">Architecture</span>
+            <span class="user">Submitted by: bongbong_69</span>
+            <span class="date">Oct. 14, 2025</span>
+          </div>
+        </div>
+        <div class="item-actions">
+          <button class="approve" data-action="approve">Approve</button>
+          <button class="reject" data-action="reject">Reject</button>
+        </div>
+      </article>
+      
+    <section id="empty-state" class="hidden">
+      <p>No pending listings found.</p>
+    </section>
+    <script src="js/nav-bar.js"></script>
+    <script src="js/manage-listing.js"></script>
+
+
+  </main>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Determine user role securely (from PHP session)
+        fetch("../server_try/auth/getRole.php")
+        .then(response => response.json())
+        .then(data => {
+          const role = data.role; 
+          let headerFile = "";
+
+          if (role === "admin") {
+            headerFile = "header.html";
+            } else {
+        headerFile = "user_header.html";
+        }
+
+      // Load the correct header file
+        fetch(headerFile)
+            .then(response => response.text())
+            .then(header => {
+            document.getElementById("header").innerHTML = header;
+        })
+        .catch(error => console.error("Error loading header:", error));
+    })
+    .catch(error => console.error("Error determining role:", error));
+    });
+    </script>  
+</body>
+</html>
+
+
