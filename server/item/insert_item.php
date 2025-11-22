@@ -47,26 +47,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo json_encode(array("message" => "All fields are required."));
             exit();
         }
-        // to check
         if(empty(trim($title)) || empty(trim($description))) {
             http_response_code(400);
-            if(empty(trim($title))){
-                echo json_encode(array("message" => "Input valid title."));
-            }
-            elseif(empty(trim($description))){
-                echo json_encode(array("message" => "Input valid description."));
-            }
+            echo json_encode(array("message" => empty(trim($title)) ? "Input valid title." : "Input valid description."));
             exit();
         }
-        //to check
         if(strlen($title) > $maxTitleLength || strlen($description) > $maxDescLength){
             http_response_code(400);
-            if(strlen($title) > $maxTitleLength){
-                echo json_encode(array("message" => "Maximum input for title is 60 characters."));
-            }
-            elseif(strlen($description) > $maxDescLength){
-                echo json_encode(array("message" => "Maximum input for description is 300 characters."));
-            }
+            echo json_encode(array("message" => strlen($title) > $maxTitleLength ? "Maximum input for title is 60 characters." : "Maximum input for description is 300 characters."));
             exit();
         }
 
@@ -77,7 +65,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 exit();
             }
             
-            // converting to date time format sa mysql
             $end_date_mysql = date('Y-m-d H:i:s', strtotime($end_date));
             $now = date('Y-m-d H:i:s');
             
@@ -90,11 +77,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $image_path = null;
         if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-            // use uploads folder directly in server
             $upload_dir = "uploads/";
-            if(!is_dir($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
+            if(!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
             $file_extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
             $filename = "item_" . time() . "_" . uniqid() . "." . $file_extension;
@@ -114,76 +98,57 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        $db->beginTransaction();
+        // Begin transaction
+        $db->begin_transaction();
 
         try {
             $query = "INSERT INTO ITEM (title, description, category_type, item_type, seller_id, status) 
-                      VALUES (:title, :description, :category, :item_type, :seller_id, 'active')";
-            
+                      VALUES (?, ?, ?, ?, ?, 'active')";
             $stmt = $db->prepare($query);
-            $stmt->bindParam(":title", $title);
-            $stmt->bindParam(":description", $description);
-            $stmt->bindParam(":category", $category);
-            $stmt->bindParam(":item_type", $listingType);
-            $stmt->bindParam(":seller_id", $seller_id);
+            $stmt->bind_param("sssss", $title, $description, $category, $listingType, $seller_id);
 
-            if(!$stmt->execute()) {
-                throw new Exception("Failed to create item.");
-            }
-
-            $item_id = $db->lastInsertId();
+            if(!$stmt->execute()) throw new Exception("Failed to create item.");
+            $item_id = $db->insert_id;
 
             if($image_path) {
-                $imageQuery = "INSERT INTO ITEMIMAGE (image_path, item_id) VALUES (:image_path, :item_id)";
+                $imageQuery = "INSERT INTO ITEMIMAGE (image_path, item_id) VALUES (?, ?)";
                 $imageStmt = $db->prepare($imageQuery);
-                $imageStmt->bindParam(":image_path", $image_path);
-                $imageStmt->bindParam(":item_id", $item_id);
-                
-                if(!$imageStmt->execute()) {
-                    throw new Exception("Failed to save image.");
-                }
+                $imageStmt->bind_param("si", $image_path, $item_id);
+                if(!$imageStmt->execute()) throw new Exception("Failed to save image.");
             }
 
             if($listingType == 'bid') {
                 $bidQuery = "INSERT INTO BIDITEM (item_id, starting_price, start_date, end_date) 
-                            VALUES (:item_id, :starting_price, NOW(), :end_date)";
+                            VALUES (?, ?, NOW(), ?)";
                 $bidStmt = $db->prepare($bidQuery);
-                $bidStmt->bindParam(":item_id", $item_id);
-                $bidStmt->bindParam(":starting_price", $starting_price);
-                $bidStmt->bindParam(":end_date", $end_date_mysql);
-                
-                if(!$bidStmt->execute()) {
-                    throw new Exception("Failed to create bid item.");
-                }
+                $bidStmt->bind_param("ids", $item_id, $starting_price, $end_date_mysql);
+                if(!$bidStmt->execute()) throw new Exception("Failed to create bid item.");
             } else {
-                $swapQuery = "INSERT INTO SWAPITEM (item_id) VALUES (:item_id)";
+                $swapQuery = "INSERT INTO SWAPITEM (item_id) VALUES (?)";
                 $swapStmt = $db->prepare($swapQuery);
-                $swapStmt->bindParam(":item_id", $item_id);
-                
-                if(!$swapStmt->execute()) {
-                    throw new Exception("Failed to create swap item.");
-                }
+                $swapStmt->bind_param("i", $item_id);
+                if(!$swapStmt->execute()) throw new Exception("Failed to create swap item.");
             }
 
             $db->commit();
 
             http_response_code(201);
-            echo json_encode(array(
+            echo json_encode([
                 "message" => "Item created successfully!",
                 "item_id" => $item_id
-            ));
+            ]);
 
         } catch (Exception $e) {
-            $db->rollBack();
+            $db->rollback();
             throw $e;
         }
 
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(array("message" => "Error creating item: " . $e->getMessage()));
+        echo json_encode(["message" => "Error creating item: " . $e->getMessage()]);
     }
 } else {
     http_response_code(405);
-    echo json_encode(array("message" => "Method not allowed."));
+    echo json_encode(["message" => "Method not allowed."]);
 }
 ?>

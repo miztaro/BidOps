@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Handle CORS (so your frontend can access this API)
+// Handle CORS
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Methods: GET, OPTIONS");
@@ -28,7 +28,7 @@ try {
     $category = isset($_GET['category']) ? $_GET['category'] : '';
     $item_type = isset($_GET['item_type']) ? $_GET['item_type'] : '';
 
-    // Main query for items
+    // Base query
     $query = "SELECT 
                 i.item_id,
                 i.title,
@@ -45,16 +45,19 @@ try {
               LEFT JOIN ITEMIMAGE ii ON i.item_id = ii.item_id
               WHERE i.status IN ('active')";
 
-    // Add filters if provided
     $params = [];
+    $types = '';
+
     if (!empty($category) && $category != 'All Programs') {
-        $query .= " AND i.category_type = :category";
-        $params[':category'] = $category;
+        $query .= " AND i.category_type = ?";
+        $params[] = $category;
+        $types .= 's';
     }
 
     if (!empty($item_type)) {
-        $query .= " AND i.item_type = :item_type";
-        $params[':item_type'] = $item_type;
+        $query .= " AND i.item_type = ?";
+        $params[] = $item_type;
+        $types .= 's';
     }
 
     $query .= " ORDER BY i.created_date DESC";
@@ -62,15 +65,16 @@ try {
     // Prepare and execute
     $stmt = $db->prepare($query);
 
-    foreach ($params as $key => $value) {
-        $stmt->bindValue($key, $value);
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
     }
 
     $stmt->execute();
+    $result = $stmt->get_result();
 
-    // Build results
-    $items = array();
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $items = [];
+
+    while ($row = $result->fetch_assoc()) {
         $starting_price = 0;
         $end_date = null;
         $bid_count = 0;
@@ -78,31 +82,30 @@ try {
         // If item is a bid, get more details
         if ($row['item_type'] === 'bid') {
             // Get bid details
-            $bidQuery = "SELECT starting_price, end_date FROM BIDITEM WHERE item_id = :item_id";
+            $bidQuery = "SELECT starting_price, end_date FROM BIDITEM WHERE item_id = ?";
             $bidStmt = $db->prepare($bidQuery);
-            $bidStmt->bindParam(":item_id", $row['item_id']);
+            $bidStmt->bind_param('i', $row['item_id']);
             $bidStmt->execute();
-
-            if ($bidData = $bidStmt->fetch(PDO::FETCH_ASSOC)) {
+            $bidResult = $bidStmt->get_result();
+            if ($bidData = $bidResult->fetch_assoc()) {
                 $starting_price = $bidData['starting_price'];
                 $end_date = $bidData['end_date'];
             }
 
             // Count bids
             $countQuery = "SELECT COUNT(*) as bid_count FROM BIDOFFER 
-                           WHERE item_id = :item_id 
-                           AND bid_status IN ('active', 'pending')";
+                           WHERE item_id = ? AND bid_status IN ('active', 'pending')";
             $countStmt = $db->prepare($countQuery);
-            $countStmt->bindParam(":item_id", $row['item_id']);
+            $countStmt->bind_param('i', $row['item_id']);
             $countStmt->execute();
-
-            if ($countData = $countStmt->fetch(PDO::FETCH_ASSOC)) {
+            $countResult = $countStmt->get_result();
+            if ($countData = $countResult->fetch_assoc()) {
                 $bid_count = $countData['bid_count'];
             }
         }
 
-        // Add to result array
-        $items[] = array(
+        // Add item to array
+        $items[] = [
             "item_id" => $row['item_id'],
             "title" => $row['title'],
             "description" => $row['description'],
@@ -116,15 +119,15 @@ try {
             "image_path" => $row['image_path'],
             "end_date" => $end_date,
             "bid_count" => $bid_count
-        );
+        ];
     }
 
     // Return JSON response
     http_response_code(200);
-    echo json_encode(array("items" => $items));
+    echo json_encode(["items" => $items]);
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(array("message" => "Error retrieving items: " . $e->getMessage()));
+    echo json_encode(["message" => "Error retrieving items: " . $e->getMessage()]);
 }
 ?>

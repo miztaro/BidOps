@@ -30,8 +30,10 @@ try {
         JOIN USER u ON i.seller_id = u.user_id 
         WHERE i.item_id = ? AND i.item_type = 'swap' AND i.status = 'active'
     ");
-    $stmt->execute([$item_id]);
-    $target_item = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt->bind_param("i", $item_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $target_item = $result->fetch_assoc();
     
     if (!$target_item) {
         echo json_encode(['success' => false, 'message' => 'Swap item not found or not available']);
@@ -44,7 +46,8 @@ try {
         $image_path = uploadItemImage($_FILES['item_image'], $new_item_id);
         if ($image_path) {
             $stmt = $db->prepare("INSERT INTO ITEMIMAGE (image_path, item_id) VALUES (?, ?)");
-            $stmt->execute([$image_path, $new_item_id]);
+            $stmt->bind_param("si", $image_path, $new_item_id);
+            $stmt->execute();
         }
     }
     
@@ -53,8 +56,8 @@ try {
         INSERT INTO swapoffer (swap_id, item_id, user_id, swap_status, created_at)
         VALUES (?, ?, ?, 'pending', NOW())
     ");
-    
-    $stmt->execute([$swap_id, $item_id, $offerer_id]);
+    $stmt->bind_param("sii", $swap_id, $item_id, $offerer_id);
+    $stmt->execute();
     
     echo json_encode([
         'success' => true,
@@ -71,19 +74,20 @@ try {
 }
 
 function insertNewItem($db, $user_id, $title, $description, $category) {
-    $stmt = $db->query("SELECT MAX(item_id) as max_id FROM ITEM");
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $new_item_id = intval($result['max_id']) + 1;
+    $result = $db->query("SELECT MAX(item_id) as max_id FROM ITEM");
+    $row = $result->fetch_assoc();
+    $new_item_id = intval($row['max_id']) + 1;
     
     $stmt = $db->prepare("
         INSERT INTO ITEM (item_id, title, description, category_type, status, item_type, seller_id)
         VALUES (?, ?, ?, ?, 'active', 'swap', ?)
     ");
-    
-    $stmt->execute([$new_item_id, $title, $description, $category, $user_id]);
+    $stmt->bind_param("isssi", $new_item_id, $title, $description, $category, $user_id);
+    $stmt->execute();
     
     $stmt = $db->prepare("INSERT INTO swapitem (item_id) VALUES (?)");
-    $stmt->execute([$new_item_id]);
+    $stmt->bind_param("i", $new_item_id);
+    $stmt->execute();
     
     return $new_item_id;
 }

@@ -60,18 +60,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
         }
 
+        //Get MySQLi connection
         $database = new Database();
         $db = $database->getConnection();
 
-        $queryUser = "SELECT user_id, username, email, password, is_banned FROM USER WHERE username = :username AND is_deleted = 0";
+        /* ----------------------
+            CHECK USER LOGIN
+        -----------------------*/
+
+        $queryUser = "SELECT user_id, username, email, password, is_banned 
+                      FROM USER 
+                      WHERE username = ? AND is_deleted = 0";
+
         $stmtUser = $db->prepare($queryUser);
-        $stmtUser->bindParam(":username", $data->username);
+        $stmtUser->bind_param("s", $data->username);
         $stmtUser->execute();
+        $resultUser = $stmtUser->get_result();
 
         $found = false;
 
-        if ($stmtUser->rowCount() > 0) {
-            $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+        if ($resultUser->num_rows > 0) {
+            $user = $resultUser->fetch_assoc();
             
             if ($user['is_banned']) {
                 echo json_encode([
@@ -80,10 +89,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 ]);
                 exit();
             }
-            
+
             if ($data->password === $user['password']) {
                 session_regenerate_id(true);
-                
+
                 $_SESSION['role'] = 'user';
                 $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['username'] = $user['username'];
@@ -102,21 +111,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     ],
                     "message" => "Login successful!"
                 ]);
+                exit();
             }
         }
 
+        /* ----------------------
+            CHECK ADMIN LOGIN
+        -----------------------*/
         if (!$found) {
-            $queryAdmin = "SELECT admin_id, username, password FROM ADMIN WHERE username = :username";
+            $queryAdmin = "SELECT admin_id, username, password FROM ADMIN WHERE username = ?";
             $stmtAdmin = $db->prepare($queryAdmin);
-            $stmtAdmin->bindParam(":username", $data->username);
+            $stmtAdmin->bind_param("s", $data->username);
             $stmtAdmin->execute();
+            $resultAdmin = $stmtAdmin->get_result();
 
-            if ($stmtAdmin->rowCount() > 0) {
-                $admin = $stmtAdmin->fetch(PDO::FETCH_ASSOC);
-                
+            if ($resultAdmin->num_rows > 0) {
+                $admin = $resultAdmin->fetch_assoc();
+
                 if ($data->password === $admin['password']) {
                     session_regenerate_id(true);
-                    
+
                     $_SESSION['role'] = 'admin';
                     $_SESSION['admin_id'] = $admin['admin_id'];
                     $_SESSION['username'] = $admin['username'];
@@ -132,16 +146,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         ],
                         "message" => "Admin login successful!"
                     ]);
+                    exit();
                 }
             }
         }
 
-        if (!$found) {
-            echo json_encode([
-                "success" => false,
-                "message" => "Invalid username or password!"
-            ]);
-        }
+        /* ----------------------
+            INVALID LOGIN
+        -----------------------*/
+        echo json_encode([
+            "success" => false,
+            "message" => "Invalid username or password!"
+        ]);
 
     } catch (Exception $e) {
         http_response_code(500);
