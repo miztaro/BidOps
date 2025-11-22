@@ -16,6 +16,9 @@ try {
     $database = new Database();
     $db = $database->getConnection();
 
+    /* -----------------------------
+        FETCH SWAP ITEM DETAILS
+    ------------------------------*/
     $query = "SELECT 
                 i.item_id,
                 i.title,
@@ -29,26 +32,31 @@ try {
                 u.email as seller_email
               FROM ITEM i
               JOIN USER u ON i.seller_id = u.user_id
-              WHERE i.item_id = :item_id AND i.item_type = 'swap'";
-    
-    $stmt = $db->prepare($query);
-    $stmt->bindParam(':item_id', $item_id);
-    $stmt->execute();
+              WHERE i.item_id = ? AND i.item_type = 'swap'";
 
-    $item = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt = $db->prepare($query);
+    $stmt->bind_param("i", $item_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $item = $result->fetch_assoc();
 
     if (!$item) {
         echo json_encode(['success' => false, 'message' => 'Swap item not found']);
         exit;
     }
 
-    $imageQuery = "SELECT image_path FROM ITEMIMAGE WHERE item_id = :item_id";
+    /* -----------------------------
+        FETCH ITEM IMAGES
+    ------------------------------*/
+    $imageQuery = "SELECT image_path FROM ITEMIMAGE WHERE item_id = ? ORDER BY image_id";
     $imageStmt = $db->prepare($imageQuery);
-    $imageStmt->bindParam(':item_id', $item_id);
+    $imageStmt->bind_param("i", $item_id);
     $imageStmt->execute();
-    
-    $images = $imageStmt->fetchAll(PDO::FETCH_ASSOC);
+    $images = $imageStmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
+    /* -----------------------------
+        RETURN RESPONSE
+    ------------------------------*/
     echo json_encode([
         'success' => true,
         'item' => $item,

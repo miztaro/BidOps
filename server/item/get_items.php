@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-
+// Handle CORS
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Methods: GET, OPTIONS");
@@ -34,42 +34,52 @@ try {
     $category = isset($_GET['category']) ? $_GET['category'] : '';
     $item_type = isset($_GET['item_type']) ? $_GET['item_type'] : '';
 
-
-    $query = "SELECT i.item_id, i.title, i.description, i.category_type, i.status, 
-                     i.created_date, i.item_type, i.seller_id, u.username AS seller_name, ii.image_path
+    // Base query
+    $query = "SELECT 
+                i.item_id,
+                i.title,
+                i.description,
+                i.category_type,
+                i.status,
+                i.created_date,
+                i.item_type,
+                i.seller_id,
+                u.username as seller_name,
+                ii.image_path
               FROM ITEM i
               JOIN USER u ON i.seller_id = u.user_id
               LEFT JOIN ITEMIMAGE ii ON i.item_id = ii.item_id
               WHERE i.status = 'active'";
 
-    $types = '';
     $params = [];
+    $types = '';
 
     if (!empty($category) && $category != 'All Programs') {
         $query .= " AND i.category_type = ?";
-        $types .= 's';
         $params[] = $category;
+        $types .= 's';
     }
 
     if (!empty($item_type)) {
         $query .= " AND i.item_type = ?";
-        $types .= 's';
         $params[] = $item_type;
+        $types .= 's';
     }
 
     $query .= " ORDER BY i.created_date DESC";
 
- 
-    $stmt = $conn->prepare($query);
-    if ($params) {
+    // Prepare and execute
+    $stmt = $db->prepare($query);
+
+    if (!empty($params)) {
         $stmt->bind_param($types, ...$params);
     }
     $stmt->execute();
     $result = $stmt->get_result();
 
     $items = [];
+
     while ($row = $result->fetch_assoc()) {
-       
         $starting_price = 0;
         $end_date = null;
         $bid_count = 0;
@@ -82,6 +92,8 @@ try {
             $bidStmt->execute();
             $bidResult = $bidStmt->get_result();
             if ($bidData = $bidResult->fetch_assoc()) {
+            $bidResult = $bidStmt->get_result();
+            if ($bidData = $bidResult->fetch_assoc()) {
                 $starting_price = $bidData['starting_price'];
                 $end_date = $bidData['end_date'];
             }
@@ -91,6 +103,8 @@ try {
             $countStmt = $conn->prepare("SELECT COUNT(*) AS bid_count FROM BIDOFFER WHERE item_id = ? AND bid_status IN ('active','pending')");
             $countStmt->bind_param("i", $row['item_id']);
             $countStmt->execute();
+            $countResult = $countStmt->get_result();
+            if ($countData = $countResult->fetch_assoc()) {
             $countResult = $countStmt->get_result();
             if ($countData = $countResult->fetch_assoc()) {
                 $bid_count = $countData['bid_count'];
@@ -112,6 +126,7 @@ try {
             "image_path" => $row['image_path'],
             "end_date" => $end_date,
             "bid_count" => $bid_count
+        ];
         ];
     }
 

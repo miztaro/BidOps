@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Create Account</title>
+  <link rel="stylesheet" href="../client/style/login.css">
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+</head>
+
+<body>
+
+  <!-- TOP: SLU logo centered -->
+  <header class="top-logo">
+    <img src="../assets/images/LoginHeader.png" alt="Saint Louis University Logo">
+  </header>
+
+  <main class="stage">
+    <div class="card">
+
+      <!-- LEFT SIDE -->
+      <section class="left-card">
+        <h2 class="left-title">Complete Setting Up<br>Account</h2>
+
+        <form method="POST" action="/server/auth/complete-registration.php">
+          <label for="username" class="lbl">Username</label>
+          <input id="username" class="input" name="username" type="text" placeholder="Create your username" required>
+
+          <label for="password" class="lbl">Password</label>
+          <input id="password" class="input" name="password" type="password" placeholder="Create your password" required>
+
+          <label for="confirm-password" class="lbl">Repeat your password</label>
+          <input id="confirm-password" class="input" name="confirm-password" type="password" placeholder="Repeat your password" required>
+
+          <button class="btn primary" type="submit">Create</button>
+        </form>
+      </section>
+
+      <!-- RIGHT SIDE -->
+      <aside class="right-panel">
+        <div class="welcome">
+          <h3>Welcome to Your Campus Marketplace</h3>
+          <p>A secure platform exclusively for SLU faculty members to swap and bid items within our academic community.</p>
+
+          <div class="features">
+            <div class="feature-item">
+              <iconify-icon icon="icon-park-solid:transaction"></iconify-icon>
+              Secure faculty-only access
+            </div>
+
+            <div class="feature-item">
+              <iconify-icon icon="material-symbols:shield"></iconify-icon>
+              Easy item swapping & bidding
+            </div>
+
+            <div class="feature-item">
+              <iconify-icon icon="fa7-solid:user-friends"></iconify-icon>
+              Connect with colleagues
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+</body>
+</html>

@@ -3,7 +3,7 @@ session_start();
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
-include '../config/db_connect.php';
+include '../config/database.php';
 
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Please login']);
@@ -13,7 +13,10 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 try {
-    $stmt = $pdo->prepare("
+    $database = new Database();
+    $db = $database->getConnection();
+
+    $query = "
         SELECT 
             i.item_id as id,
             i.title,
@@ -24,26 +27,29 @@ try {
         LEFT JOIN itemimage ii ON i.item_id = ii.item_id
         WHERE i.seller_id = ? AND i.status = 'active' AND i.item_type = 'swap'
         ORDER BY i.created_date DESC
-    ");
-    
-    $stmt->execute([$user_id]);
-    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Convert image paths to full URLs
-    foreach ($items as &$item) {
-        if ($item['image']) {
-            $item['image'] = '../server/item/' . $item['image'];
+    ";
+
+    $stmt = $db->prepare($query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $items = [];
+    while ($row = $result->fetch_assoc()) {
+        if ($row['image']) {
+            $row['image'] = '../server/item/' . $row['image'];
         } else {
-            $item['image'] = '../assets/images/default-item.jpg';
+            $row['image'] = '../assets/images/default-item.jpg';
         }
+        $items[] = $row;
     }
-    
+
     echo json_encode([
         'success' => true,
         'items' => $items
     ]);
-    
-} catch (PDOException $e) {
+
+} catch (Exception $e) {
     echo json_encode([
         'success' => false,
         'message' => 'Database error: ' . $e->getMessage()

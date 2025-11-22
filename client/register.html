@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Register</title>
+  <link rel="stylesheet" href="../client/style/register.css">
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script> <!-- Google API -->
+  <script src="../client/js/register.js" defer></script> <!-- Your JS -->
+</head>
+<body>
+
+  <!-- TOP: SLU logo centered -->
+  <header class="top-logo">
+    <img src="../assets/images/LoginHeader.png" alt="Saint Louis University Logo">
+  </header>
+
+  <!-- MAIN: card wrapper -->
+  <main class="stage">
+    <div class="card">
+      <!-- Left: login card -->
+      <section class="left-card">
+        <h2 class="left-title">Create your<br>Account</h2>
+        <p class="subtext">
+          Sign in using your official<br>
+          Saint Louis University account
+        </p>
+
+        <!-- Google login button -->
+        <div id="google-register-btn" class="btn google">
+          <img src="../assets/images/LoginGoogleBtn.png" alt="Google" class="gicon">
+          <span>Continue with Google</span>
+        </div>
+
+        <p class="login">
+          Already have an account? <a href="login.html" class="login">Log In</a>
+        </p>
+      </section>
+
+      <!-- Right: blue info panel -->
+      <aside class="right-panel">
+        <div class="welcome">
+          <h3>Welcome to Your Campus Marketplace</h3>
+          <p>A secure platform exclusively for SLU faculty members to swap and bid items within our academic community.</p>
+          <div class="features">
+            <div class="feature-item">
+              <iconify-icon icon="icon-park-solid:transaction" width="16" height="16"></iconify-icon>
+              Secure faculty-only access
+            </div>
+            <div class="feature-item">
+              <iconify-icon icon="material-symbols:shield" width="16" height="16"></iconify-icon>
+              Easy item swapping & bidding
+            </div>
+            <div class="feature-item">
+              <iconify-icon icon="fa7-solid:user-friends" width="16" height="16"></iconify-icon>
+              Connect with colleagues
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+</body>
+</html>
