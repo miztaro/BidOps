@@ -127,7 +127,6 @@ try {
             "end_date" => $end_date,
             "bid_count" => $bid_count
         ];
-        ];
     }
 
     $stmt->close();
