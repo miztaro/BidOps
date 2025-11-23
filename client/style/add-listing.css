@@ -75,6 +75,25 @@ textarea {
     min-height: 100px;
 }
 
+.char-count {
+    display: block;
+    text-align: right;
+    font-size: 0.8em;
+    color: #8C8A8A;
+    margin-top: -15px;
+    margin-bottom: 15px;
+    font-family: Arial, sans-serif;
+}
+
+.char-count span {
+    font-weight: bold;
+}
+
+input:invalid,
+textarea:invalid {
+    border-color: #f44336;
+}
+
 .buttons {
     display: flex;
     gap: 10px;

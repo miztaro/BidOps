@@ -21,8 +21,10 @@ session_start();
 
 $database = new Database();
 $db = $database->getConnection();
-$maxTitleLength = 60;
+$maxTitleLength = 50; 
+$minTitleLength = 3;
 $maxDescLength = 300;
+$minDescLength = 10;
 
 // if(!isset($_SESSION['user_id'])) {
 //     http_response_code(401);
@@ -47,14 +49,36 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo json_encode(array("message" => "All fields are required."));
             exit();
         }
+        
         if(empty(trim($title)) || empty(trim($description))) {
             http_response_code(400);
-            echo json_encode(array("message" => empty(trim($title)) ? "Input valid title." : "Input valid description."));
+            echo json_encode(array("message" => empty(trim($title)) ? "Title cannot be empty." : "Description cannot be empty."));
             exit();
         }
-        if(strlen($title) > $maxTitleLength || strlen($description) > $maxDescLength){
+        
+        // Check minimum length
+        if(strlen($title) < $minTitleLength) {
             http_response_code(400);
-            echo json_encode(array("message" => strlen($title) > $maxTitleLength ? "Maximum input for title is 60 characters." : "Maximum input for description is 300 characters."));
+            echo json_encode(array("message" => "Title must be at least {$minTitleLength} characters."));
+            exit();
+        }
+        
+        if(strlen($description) < $minDescLength) {
+            http_response_code(400);
+            echo json_encode(array("message" => "Description must be at least {$minDescLength} characters."));
+            exit();
+        }
+        
+        // Check maximum length
+        if(strlen($title) > $maxTitleLength) {
+            http_response_code(400);
+            echo json_encode(array("message" => "Title cannot exceed {$maxTitleLength} characters."));
+            exit();
+        }
+        
+        if(strlen($description) > $maxDescLength) {
+            http_response_code(400);
+            echo json_encode(array("message" => "Description cannot exceed {$maxDescLength} characters."));
             exit();
         }
 
@@ -62,6 +86,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             if(empty($end_date)) {
                 http_response_code(400);
                 echo json_encode(array("message" => "End date and time are required for bid listings."));
+                exit();
+            }
+            
+            if(empty($starting_price) || $starting_price <= 0) {
+                http_response_code(400);
+                echo json_encode(array("message" => "Starting price must be greater than 0."));
                 exit();
             }
             

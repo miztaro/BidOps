@@ -5,6 +5,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const endDateInput = document.getElementById('end_date');
     const listingForm = document.getElementById('listingForm');
     
+    // Title character limit
+    const titleInput = document.getElementById('title');
+    const titleCount = document.getElementById('titleCount');
+    const MAX_TITLE_LENGTH = 50;
+    
+    // Update character count as user types
+    titleInput.addEventListener('input', function() {
+        const currentLength = this.value.length;
+        titleCount.textContent = currentLength;
+        
+        // Change color when near limit
+        if (currentLength >= MAX_TITLE_LENGTH) {
+            titleCount.style.color = '#B41B1B';
+        } else if (currentLength >= MAX_TITLE_LENGTH - 10) {
+            titleCount.style.color = '#FFA500';
+        } else {
+            titleCount.style.color = '#8C8A8A';
+        }
+    });
+    
     listingType.addEventListener('change', function() {
         if (this.value === 'bid') {
             bidFields.style.display = 'block';
@@ -25,6 +45,17 @@ document.addEventListener('DOMContentLoaded', function() {
     listingForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
+        // Validate title length
+        if (titleInput.value.length < 3) {
+            showMessage('Title must be at least 3 characters long.', 'error');
+            return;
+        }
+        
+        if (titleInput.value.length > MAX_TITLE_LENGTH) {
+            showMessage('Title cannot exceed 50 characters.', 'error');
+            return;
+        }
+
         if (listingType.value === 'bid') {
             const endDate = new Date(endDateInput.value);
             const now = new Date();
@@ -43,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Creating...';
 
-        fetch('../server/item/insert_item.php', {
+        fetch('../server_try/item/insert_item.php', {
             method: 'POST',
             body: formData
         })
