@@ -4,6 +4,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const startingPriceInput = document.getElementById('starting_price');
     const endDateInput = document.getElementById('end_date');
     const listingForm = document.getElementById('listingForm');
+
+    // Bid Increment Slider
+    const bidIncrement = document.getElementById('bidIncrement');
+    const incrementValue = document.getElementById('incrementValue');
+
+    if (bidIncrement) {
+        incrementValue.textContent = bidIncrement.value + "%";
+        bidIncrement.addEventListener("input", function () {
+            incrementValue.textContent = this.value + "%";
+            this.style.setProperty("--slider-progress", (this.value - this.min) * 100 / (this.max - this.min) + "%");
+        });
+    }
     
     // Title character limit
     const titleInput = document.getElementById('title');

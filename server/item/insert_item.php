@@ -40,6 +40,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $listingType = $_POST['listingType'] ?? '';
         $starting_price = $_POST['starting_price'] ?? 0;
         $end_date = $_POST['end_date'] ?? '';
+        $bid_increment_percent = $_POST['bid_increment_percent'] ?? 5;
+        $bid_increment_percent = intval($bid_increment_percent);
+
+        if ($bid_increment_percent < 1 || $bid_increment_percent > 20) {
+        $bid_increment_percent = 5;
+        }
         
         $seller_id = 'u1'; // using Alice as default seller
         //$seller_id = $_SESSION['user_id']; //use current user
@@ -148,10 +154,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             if($listingType == 'bid') {
-                $bidQuery = "INSERT INTO BIDITEM (item_id, starting_price, start_date, end_date) 
+                $bidQuery = "INSERT INTO BIDITEM (item_id, starting_price, start_date, end_date, bid_increment_percent
                             VALUES (?, ?, NOW(), ?)";
                 $bidStmt = $db->prepare($bidQuery);
-                $bidStmt->bind_param("ids", $item_id, $starting_price, $end_date_mysql);
+                $bidStmt->bind_param("ids", $item_id, $starting_price, $end_date_mysql, $bid_increment_percent);
                 if(!$bidStmt->execute()) throw new Exception("Failed to create bid item.");
             } else {
                 $swapQuery = "INSERT INTO SWAPITEM (item_id) VALUES (?)";

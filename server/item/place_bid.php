@@ -76,8 +76,12 @@ try {
     $row = $result->fetch_assoc();
     $current_highest = $row['highest_bid'] ?? $item['starting_price'];
 
+    // Calculate minimum required bid
+    $increment_percent = $item['bid_increment_percent'];
+    $increment_amount = $current_highest * ($increment_percent / 100);
+    $minimum_bid = $current_highest + $increment_amount;
+
     // Validate bid amount
-    $minimum_bid = $current_highest + 5.00; // Minimum increment
     if ($bid_amount < $minimum_bid) {
         echo json_encode([
             'success' => false, 
