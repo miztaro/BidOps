@@ -73,7 +73,7 @@ sortDropdown.addEventListener("click", (event) => {
 });
 // End of Sort Function
 
-// Header
+// Header and Footer fetch
 document.addEventListener("DOMContentLoaded", function() {
     fetch("header.html")
         .then(response => response.text())
@@ -92,9 +92,15 @@ document.addEventListener("DOMContentLoaded", function() {
         script.defer = true;
         document.body.appendChild(script);
     })
-.catch(error => console.error("Error determining role:", error));
+    .catch(error => console.error("Error determining role:", error));
+    // Load FOOTER
+    fetch("footer.html")
+        .then(response => response.text())
+        .then(footer => {
+            document.getElementById("footer").innerHTML = footer;
+        })
+        .catch(error => console.error("Footer load error:", error));
 });
-// End of Header
 
 // Fetch items Bid & Swap Function
 function fetchItems() {
