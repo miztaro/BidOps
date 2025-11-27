@@ -20,43 +20,51 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
     $description = $_POST['description'];
     $category_type = $_POST['category'];
     $status = $_POST['status'];
+    $item_type = $_POST['item_type'] ?? '';
 
-    $starting_price = $_POST['starting_price'];
-    $start_date = $_POST['start_date'];
-    $end_date = $_POST['end_date'];
-
-    // Basic validation
-    if (!$item_id || !$title || !$category_type || !$status || !$starting_price || !$start_date || !$end_date) {
+    // Basic validation for all items
+    if (!$item_id || !$title || !$category_type || !$status) {
         http_response_code(400);
         echo json_encode(["success" => false, "message" => "All required fields must be filled out."]);
         exit();
     }
 
-    //Price validation
-    $starting_price = floatval($_POST['starting_price']);
-    if (!is_numeric($starting_price) || $starting_price < 0) { // change to minimum bid amount 
-        http_response_code(400);
-        echo json_encode(["success" => false, "message" => "Starting price must be a positive number."]);
-        exit();
-    }
+    // Bid-specific validation
+    if (strtolower($item_type) === 'bid') {
+        $starting_price = $_POST['starting_price'] ?? null;
+        $start_date = $_POST['start_date'] ?? null;
+        $end_date = $_POST['end_date'] ?? null;
 
-    //Date validation
-    $start_date = str_replace('T', ' ', $_POST['start_date']) . ':00';
-    $end_date = str_replace('T', ' ', $_POST['end_date']) . ':00';
+        if (!$starting_price || !$start_date || !$end_date) {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "Starting price and dates are required for bid items."]);
+            exit();
+        }
 
-    $start_timestamp = strtotime($start_date);
-    $end_timestamp = strtotime($end_date);
+        // Price validation
+        $starting_price = floatval($starting_price);
+        if (!is_numeric($starting_price) || $starting_price < 0) {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "Starting price must be a positive number."]);
+            exit();
+        }   
 
-    if ($start_timestamp === false || $end_timestamp === false) {
-        http_response_code(400);
-        echo json_encode(["success" => false, "message" => "Invalid date format."]);
-        exit();
-    }
+        // Date validation
+        $start_date = str_replace('T', ' ', $start_date) . ':00';
+        $end_date = str_replace('T', ' ', $end_date) . ':00';
+        $start_timestamp = strtotime($start_date);
+        $end_timestamp = strtotime($end_date);
 
-    if($end_timestamp <= $start_timestamp){
-        http_response_code(400);
-        echo json_encode(["success" => false, "message" => "End date must be after the start date."]);
-        exit();
+        if ($start_timestamp === false || $end_timestamp === false || $end_timestamp <= $start_timestamp) {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "Invalid start/end dates."]);
+            exit();
+        }
+    } else {
+        // Swap items: set default values
+        $starting_price = 0;
+        $start_date = date("Y-m-d H:i:s");
+        $end_date = date("Y-m-d H:i:s");
     }
 
     //Update 'item' Table

@@ -520,7 +520,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Append remaining existing images
-    const existingImages = images.filter(src => !src.startsWith('data:'));
+    const existingImages = images.filter(src => typeof src === 'string' && !src.startsWith('data:'));
     formData.append('existing_images', JSON.stringify(existingImages));
 
     fetch("../server/item/update_item.php", {
@@ -581,14 +581,18 @@ document.addEventListener('DOMContentLoaded', function () {
   function populateForm(data) {
     const item = data.item;
     const bid = data.bid;
-    const existingImages = Array.isArray(data.images) ? data.images.map(img => img.split('/').pop()) : [];
+    const existingImages = Array.isArray(data.images) ? data.images : [];
     const categories = data.categories || [];
     const statusDisplayDiv = document.getElementById('status-display');
     const statusClass = getStatusClass(item.status);
 
-    images = [...existingImages];
+    images = [
+      ...existingImages,
+      ...images.filter(img => img instanceof File)
+    ];
+
     removedImages = [];
-    newFiles = [];
+    // newFiles = [];
 
     const imageContainer = document.getElementById('image-container');
     imageContainer.dataset.originalImages = JSON.stringify(existingImages);
@@ -604,6 +608,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const startDateInput = document.getElementById('start-date');
     const endDateInput = document.getElementById('end-date');
     const modeFieldH3 = document.querySelector('.mode-field h3');
+    const itemTypeInput = document.getElementById('item-type');
+    itemTypeInput.value = item.item_type || '';
 
     // Set values
     itemIdInput.value = item.item_id;
@@ -623,8 +629,24 @@ document.addEventListener('DOMContentLoaded', function () {
     if (priceFieldSection) {
       if (isSwap) {
         priceFieldSection.style.display = 'none';
+
+        startPriceInput.required = false;
+        endDateInput.required = false;
+
+        startPriceInput.disabled = true;
+        startDateInput.disabled = true;
+        endDateInput.disabled = true;
+
       } else {
         priceFieldSection.style.display = 'flex';
+
+        startPriceInput.required = true;
+        endDateInput.required = true;
+
+        startPriceInput.disabled = false;
+        startDateInput.disabled = false;
+        endDateInput.disabled = false;
+
         startPriceInput.value = bid ? bid.starting_price : 0;
         startDateInput.value = bid ? formatDateTimeLocal(bid.start_date) : formatDateTimeLocal(new Date());
         startDateInput.readOnly = true;
@@ -632,7 +654,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }
 
-    categoryInput.innerHTML = ''; 
+    categoryInput.innerHTML = '';
     categories.forEach(cat => {
       const option = document.createElement('option');
       option.value = cat;
@@ -664,7 +686,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const imgSrc = img instanceof File
         ? URL.createObjectURL(img)
-        : `../server/item/uploads/${encodeURIComponent(img)}`;
+        : `../server/item/${img}`;
 
       div.innerHTML = `
             <img src="${imgSrc}" alt="">
@@ -689,18 +711,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const files = Array.from(event.target.files);
 
     files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        images.push(e.target.result);
-        newFiles.push(file);
-        renderImages();
-      };
-      reader.readAsDataURL(file);
+      images.push(file);   
+      newFiles.push(file); 
     });
 
-    event.target.value = '';
+    renderImages();   
+    event.target.value = ''; 
   });
-
 
   function formatDateTimeLocal(dt) {
     if (!dt) return '';
