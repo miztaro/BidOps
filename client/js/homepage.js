@@ -82,15 +82,16 @@ document.addEventListener("DOMContentLoaded", function() {
         const script = document.createElement("script");
         const profileIcon = document.getElementById("user-header-profile-icon");
 
-        if(profileIcon) {
-            profileIcon.addEventListener("click", () => {
-                window.location.href = "profilepage.html";
-            });
-        }
-        
-        script.src = "js/header.js";
-        script.defer = true;
-        document.body.appendChild(script);
+
+      if (profileIcon) {
+        profileIcon.addEventListener("click", () => {
+          window.location.href = "profilepage.html";
+        });
+      }
+
+      script.src = "js/header.js";
+      script.defer = true;
+      document.body.appendChild(script);
     })
     .catch(error => console.error("Error determining role:", error));
     // Load FOOTER
@@ -100,127 +101,128 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("footer").innerHTML = footer;
         })
         .catch(error => console.error("Footer load error:", error));
+
 });
 
 // Fetch items Bid & Swap Function
 function fetchItems() {
-    fetch('../server/item/get_items.php')
-        .then(response => response.json())
-        .then(data => {
-            console.log('Loaded items:', data);
-            const items = data.items || [];
-            const bids = items.filter(item => item.item_type === 'bid');
-            const swaps = items.filter(item => item.item_type === 'swap');
+  fetch('../server/item/get_items.php')
+    .then(response => response.json())
+    .then(data => {
+      console.log('Loaded items:', data);
+      const items = data.items || [];
+      const bids = items.filter(item => item.item_type === 'bid');
+      const swaps = items.filter(item => item.item_type === 'swap');
 
-            homeBidContainer.innerHTML = '';
-            viewAllBidContainer.innerHTML = '';
-            homeSwapContainer.innerHTML = '';
-            viewAllSwapContainer.innerHTML = '';
+      homeBidContainer.innerHTML = '';
+      viewAllBidContainer.innerHTML = '';
+      homeSwapContainer.innerHTML = '';
+      viewAllSwapContainer.innerHTML = '';
 
-            bids.slice(0, 4).forEach(bid => {
-                const priceValue = parseFloat(bid.starting_price || 0); 
-                const bidData = {
-                    id: bid.item_id,
-                    title: bid.title,
-                    category: bid.category_type,
-                    price: priceValue,
-                    formattedPrice: `₱${priceValue.toFixed(2)}`, 
-                    dateListed: bid.created_date,
-                    timeLeft: formatEndDate(bid.end_date),
-                    bidsCount: bid.bid_count || 0,
-                    image: bid.image_path ? `../server/item/${bid.image_path}` : null
-                };
-                homeBidContainer.appendChild(createBidCard(bidData));
-            });
+      bids.slice(0, 4).forEach(bid => {
+        const priceValue = parseFloat(bid.starting_price || 0);
+        const bidData = {
+          id: bid.item_id,
+          title: bid.title,
+          category: bid.category_type,
+          price: priceValue,
+          formattedPrice: `₱${priceValue.toFixed(2)}`,
+          dateListed: bid.created_date,
+          timeLeft: formatEndDate(bid.end_date),
+          bidsCount: bid.bid_count || 0,
+          image: bid.images && bid.images.length > 0 ? `../server/item/${bid.images[0]}` : null
+        };
+        homeBidContainer.appendChild(createBidCard(bidData));
+      });
 
-            bids.forEach(bid => {
-                const priceValue = parseFloat(bid.starting_price || 0);
-                const bidData = {
-                    id: bid.item_id,
-                    title: bid.title,
-                    category: bid.category_type,
-                    price: priceValue,
-                    formattedPrice: `₱${priceValue.toFixed(2)}`,
-                    dateListed: bid.created_date,
-                    timeLeft: formatEndDate(bid.end_date),
-                    bidsCount: bid.bid_count || 0,
-                    image: bid.image_path ? `../server/item/${bid.image_path}` : null
-                };
-                viewAllBidContainer.appendChild(createBidCard(bidData));
-            });
+      bids.forEach(bid => {
+        const priceValue = parseFloat(bid.starting_price || 0);
+        const bidData = {
+          id: bid.item_id,
+          title: bid.title,
+          category: bid.category_type,
+          price: priceValue,
+          formattedPrice: `₱${priceValue.toFixed(2)}`,
+          dateListed: bid.created_date,
+          timeLeft: formatEndDate(bid.end_date),
+          bidsCount: bid.bid_count || 0,
+          image: bid.images && bid.images.length > 0 ? `../server/item/${bid.images[0]}` : null
+        };
+        viewAllBidContainer.appendChild(createBidCard(bidData));
+      });
 
-            swaps.slice(0, 4).forEach(swap => {
-                const swapData = {
-                    id: swap.item_id,
-                    title: swap.title,
-                    category: swap.category_type,
-                    dateListed: swap.created_date,
-                    image: swap.image_path ? `../server/item/${swap.image_path}` : null
-                };
-                homeSwapContainer.appendChild(createSwapCard(swapData));
-            });
+      swaps.slice(0, 4).forEach(swap => {
+        const swapData = {
+          id: swap.item_id,
+          title: swap.title,
+          category: swap.category_type,
+          dateListed: swap.created_date,
+          image: swap.images && swap.images.length > 0 ? `../server/item/${swap.images[0]}` : null
+        };
+        homeSwapContainer.appendChild(createSwapCard(swapData));
+      });
 
-            swaps.forEach(swap => {
-                const swapData = {
-                    id: swap.item_id,
-                    title: swap.title,
-                    category: swap.category_type,
-                    dateListed: swap.created_date,
-                    image: swap.image_path ? `../server/item/${swap.image_path}` : null
-                };
-                viewAllSwapContainer.appendChild(createSwapCard(swapData));
-            });
-        })
-        .catch(error => {
-            console.error('Error loading items:', error);
-        });
+      swaps.forEach(swap => {
+        const swapData = {
+          id: swap.item_id,
+          title: swap.title,
+          category: swap.category_type,
+          dateListed: swap.created_date,
+          image: swap.images && swap.images.length > 0 ? `../server/item/${swap.images[0]}` : null
+        };
+        viewAllSwapContainer.appendChild(createSwapCard(swapData));
+      });
+    })
+    .catch(error => {
+      console.error('Error loading items:', error);
+    });
 }
 // End of Fetch items Bid & Swap Function
 
 //Format date Function
 function formatEndDate(endDate) {
-    if (!endDate) return 'Ends at: Not specified';
-    
-    const end = new Date(endDate);
-    const now = new Date();
-    
-    if (end <= now) {
-        return 'Ended';
-    }
-    
-    const options = { 
-        month: 'short', 
-        day: 'numeric',
-        hour: '2-digit', 
-        minute: '2-digit',
-        hour12: true
-    };
-    
-    const formattedDate = end.toLocaleDateString('en-US', options);
-    return `Ends at ${formattedDate}`;
+  if (!endDate) return 'Ends at: Not specified';
+
+  const end = new Date(endDate);
+  const now = new Date();
+
+  if (end <= now) {
+    return 'Ended';
+  }
+
+  const options = {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  };
+
+  const formattedDate = end.toLocaleDateString('en-US', options);
+  return `Ends at ${formattedDate}`;
 }
 //End of Format date Function
 
 //Create Bid Card Function
-function createBidCard(bid){
-    const bidCard = document.createElement("div");
-    bidCard.classList.add("bid-card");
-    bidCard.setAttribute("id", `bid-card-${bid.id}`);
+function createBidCard(bid) {
+  const bidCard = document.createElement("div");
+  bidCard.classList.add("bid-card");
+  bidCard.setAttribute("id", `bid-card-${bid.id}`);
 
-    const priceValue = typeof bid.price === 'string' ? 
-    parseFloat(bid.price.replace('₱', '')) || 0 : 
+  const priceValue = typeof bid.price === 'string' ?
+    parseFloat(bid.price.replace('₱', '')) || 0 :
     parseFloat(bid.price) || 0;
 
-    bidCard.dataset.price = bid.price;
-    bidCard.dataset.date = bid.dateListed;
+  bidCard.dataset.price = bid.price;
+  bidCard.dataset.date = bid.dateListed;
 
-    const imageContent = bid.image 
-        ? `<img src="${bid.image}" alt="${bid.title}">`
-        : `<div style="background: #073066; height: 100%; display: flex; align-items: center; justify-content: center; color: white;">
+  const imageContent = bid.image
+    ? `<img src="${bid.image}" alt="${bid.title}">`
+    : `<div style="background: #073066; height: 100%; display: flex; align-items: center; justify-content: center; color: white;">
               <iconify-icon icon="mdi:package-variant" width="50" height="50"></iconify-icon>
            </div>`;
 
-    bidCard.innerHTML = `
+  bidCard.innerHTML = `
         <div class="top">
             ${imageContent}
             <button class="heart-button-bid" id="heart-button-${bid.id}">
@@ -239,25 +241,25 @@ function createBidCard(bid){
             <button class="join-bid-btn"><a href="join-bid.html?item_id=${bid.id}">Join Bid</a></button>
         </div>
     `;
-    return bidCard;
+  return bidCard;
 }
 //End of Create Bid Card Function
 
 //Create Swap Card Function
 function createSwapCard(swap) {
-    const swapCard = document.createElement("div");
-    swapCard.classList.add("swap-card");
-    swapCard.setAttribute("id", `swap-card-${swap.id}`);
+  const swapCard = document.createElement("div");
+  swapCard.classList.add("swap-card");
+  swapCard.setAttribute("id", `swap-card-${swap.id}`);
 
-    swapCard.dataset.title = swap.title.toLowerCase();
+  swapCard.dataset.title = swap.title.toLowerCase();
 
-    const imageContent = swap.image 
-        ? `<img src="${swap.image}" alt="${swap.title}">`
-        : `<div style="background: #073066; height: 100%; display: flex; align-items: center; justify-content: center; color: white;">
+  const imageContent = swap.image
+    ? `<img src="${swap.image}" alt="${swap.title}">`
+    : `<div style="background: #073066; height: 100%; display: flex; align-items: center; justify-content: center; color: white;">
               <iconify-icon icon="mdi:swap-horizontal" width="50" height="50"></iconify-icon>
            </div>`;
 
-    swapCard.innerHTML = `
+  swapCard.innerHTML = `
         <div class="top">
             <div class="offer-wrap"><p>Swap Offer</p></div>
             <p class="posted-items">Recently posted</p>
@@ -276,7 +278,7 @@ function createSwapCard(swap) {
             </button>
         </div>
     `;
-    return swapCard;
+  return swapCard;
 }
 //End of Create Swap Card Function
 
@@ -296,7 +298,7 @@ bidViewAllBtn.addEventListener("click", () => {
 
   categoryTitle.textContent = "All Categories";
   categoryDescription.textContent = "All Categories"
-  
+
   viewAllBidContainer.innerHTML = "";
   fetchItems();
 });
@@ -326,13 +328,13 @@ swapViewAllBtn.addEventListener("click", () => {
 const categoryCards = document.querySelectorAll(".category-card");
 categoryCards.forEach(card => {
   const categoryName = card.getAttribute("browse-category");
-  const countElem = card.querySelector("p"); 
+  const countElem = card.querySelector("p");
 
   fetch(`../server/item/get_items.php?category=${categoryName}`)
     .then(response => response.json())
     .then(data => {
       const items = data.items || [];
-      countElem.textContent = `${items.length} ${items.length <= 1  ? 'item' : 'items'}` ;
+      countElem.textContent = `${items.length} ${items.length <= 1 ? 'item' : 'items'}`;
     });
 
   card.addEventListener("click", () => {
@@ -372,10 +374,10 @@ categoryCards.forEach(card => {
               price: `₱${parseFloat(bid.starting_price || '0').toFixed(2)}`,
               timeLeft: formatEndDate(bid.end_date),
               bidsCount: bid.bid_count || 0,
-              image: bid.image_path ? '../server/item/' + bid.image_path : null
+              image: bid.images && bid.images.length > 0 ? `../server/item/${bid.images[0]}` : null
             }));
           });
-        } 
+        }
         else if (filteredSwaps.length > 0) {
           swapBtn.classList.add("active");
           bidBtn.classList.remove("active");
@@ -386,10 +388,10 @@ categoryCards.forEach(card => {
               id: swap.item_id,
               title: swap.title,
               category: swap.category_type,
-              image: swap.image_path ? '../server/item/' + swap.image_path : null
+              image: swap.images && swap.images.length > 0 ? `../server/item/${swap.images[0]}` : null
             }));
           });
-        } 
+        }
         else {
           bidBtn.classList.remove("active");
           swapBtn.classList.remove("active");
@@ -406,27 +408,27 @@ categoryCards.forEach(card => {
 const categoryBtn = document.getElementById("viewAll-category-btn");
 const categoryDropDown = document.getElementById("viewAll-category-dropDown");
 backHomeBtn.addEventListener("click", () => {
-    viewAll.style.display = "none";
-    home.style.display = "block";
-    document.getElementById("header").style.display = "block";
+  viewAll.style.display = "none";
+  home.style.display = "block";
+  document.getElementById("header").style.display = "block";
 });
 
 bidBtn.addEventListener("click", () => {
-    bidBtn.classList.add("active");
-    swapBtn.classList.remove("active");
+  bidBtn.classList.add("active");
+  swapBtn.classList.remove("active");
 
-    viewAllBidContainer.style.display="grid";
-    viewAllSwapContainer.style.display="none";
-    applyCurrentCategoryFilter();
+  viewAllBidContainer.style.display = "grid";
+  viewAllSwapContainer.style.display = "none";
+  applyCurrentCategoryFilter();
 });
 
 swapBtn.addEventListener("click", () => {
-    bidBtn.classList.remove("active");
-    swapBtn.classList.add("active");
+  bidBtn.classList.remove("active");
+  swapBtn.classList.add("active");
 
-    viewAllBidContainer.style.display = "none";
-    viewAllSwapContainer.style.display = "grid";
-    applyCurrentCategoryFilter();
+  viewAllBidContainer.style.display = "none";
+  viewAllSwapContainer.style.display = "grid";
+  applyCurrentCategoryFilter();
 });
 
 categoryBtn.addEventListener("click", () => {
@@ -465,7 +467,7 @@ function applyCurrentCategoryFilter() {
   const selectedCategory = categoryTitle.textContent.trim();
   const isBidActive = bidBtn.classList.contains("active");
 
-  const url = selectedCategory === "All Categories" 
+  const url = selectedCategory === "All Categories"
     ? '../server/item/get_items.php'
     : `../server/item/get_items.php?category=${selectedCategory}`;
 
@@ -473,14 +475,14 @@ function applyCurrentCategoryFilter() {
     .then(response => response.json())
     .then(data => {
       const items = data.items || [];
-      
+
       if (isBidActive) {
         viewAllBidContainer.innerHTML = "";
         const filteredBids = items.filter(item => item.item_type === 'bid');
-        
+
         filteredBids.forEach(bid => {
           const priceValue = parseFloat(bid.starting_price || 0);
-          
+
           viewAllBidContainer.appendChild(createBidCard({
             id: bid.item_id,
             title: bid.title,
@@ -490,19 +492,19 @@ function applyCurrentCategoryFilter() {
             dateListed: bid.created_date,
             timeLeft: formatEndDate(bid.end_date),
             bidsCount: bid.bid_count || 0,
-            image: bid.image_path ? '../server/item/' + bid.image_path : null
+            image: bid.images && bid.image.images.length > 0 ? `../server/item/${bid.images[0]}`: null
           }));
         });
       } else {
         viewAllSwapContainer.innerHTML = "";
         const filteredSwaps = items.filter(item => item.item_type === 'swap');
-        
+
         filteredSwaps.forEach(swap => {
           viewAllSwapContainer.appendChild(createSwapCard({
             id: swap.item_id,
             title: swap.title,
             category: swap.category_type,
-            image: swap.image_path ? '../server/item/' + swap.image_path : null
+            image: swap.images && swap.images.length > 0 ? `../server/item/${swap.images[0]}` : null
           }));
         });
       }
@@ -511,43 +513,43 @@ function applyCurrentCategoryFilter() {
 //Category DropDown function
 
 function resolveImagePath(fileName) {
-    const basePath = "../server/item/";
-    if (!fileName) return null;
+  const basePath = "../server/item/";
+  if (!fileName) return null;
 
-    // Remove existing extension (if any)
-    const baseName = fileName.replace(/\.(jpg|jpeg|png)$/i, "");
+  // Remove existing extension (if any)
+  const baseName = fileName.replace(/\.(jpg|jpeg|png)$/i, "");
 
-    // Try multiple extensions
-    const possibleExtensions = [".jpeg", ".jpg", ".png"];
-    const img = new Image();
+  // Try multiple extensions
+  const possibleExtensions = [".jpeg", ".jpg", ".png"];
+  const img = new Image();
 
-    // Return the first one that loads successfully
-    return new Promise((resolve) => {
-        let resolved = false;
+  // Return the first one that loads successfully
+  return new Promise((resolve) => {
+    let resolved = false;
 
-        possibleExtensions.forEach((ext) => {
-            const testSrc = `${basePath}${baseName}${ext}`;
-            const testImg = new Image();
-            testImg.onload = () => {
-                if (!resolved) {
-                    resolved = true;
-                    resolve(testSrc);
-                }
-            };
-            testImg.onerror = () => {
-                // do nothing, will try next
-            };
-            testImg.src = testSrc;
-        });
-
-        // fallback (in case none work)
-        setTimeout(() => {
-            if (!resolved) resolve(`${basePath}${fileName}`);
-        }, 500);
+    possibleExtensions.forEach((ext) => {
+      const testSrc = `${basePath}${baseName}${ext}`;
+      const testImg = new Image();
+      testImg.onload = () => {
+        if (!resolved) {
+          resolved = true;
+          resolve(testSrc);
+        }
+      };
+      testImg.onerror = () => {
+        // do nothing, will try next
+      };
+      testImg.src = testSrc;
     });
+
+    // fallback (in case none work)
+    setTimeout(() => {
+      if (!resolved) resolve(`${basePath}${fileName}`);
+    }, 500);
+  });
 }
 document.addEventListener("DOMContentLoaded", () => {
-    fetchItems();
+  fetchItems();
 });
 
 // Search functions
