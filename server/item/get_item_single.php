@@ -46,14 +46,22 @@ $img_result = $stmt_img->get_result();
 
 $images = [];
 while ($row = $img_result->fetch_assoc()) {
-    $images[] = "../server/item/uploads/" . basename($row['image_path']); 
+    $images[] = $row['image_path']; 
+}
+
+//Fetch Categories
+$categories = [];
+$cat_result = $conn->query("SELECT DISTINCT category_type FROM item ORDER BY category_type ASC");
+while($row = $cat_result->fetch_assoc()){
+    $categories[] = $row['category_type'];
 }
 
 // Return JSON
 echo json_encode([
     "item" => $item ?: null,
     "bid" => $bid ?: null,
-    "images" => $images
+    "images" => $images,
+    "categories" => $categories
 ]);
 exit;
 ?>

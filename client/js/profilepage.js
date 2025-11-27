@@ -1,22 +1,22 @@
-document.addEventListener('DOMContentLoaded', function() {
-  fetch("header.html")  
-  .then(response => response.text())
-  .then(data => {
-    document.getElementById("header").innerHTML = data;
-    
-    const profileIcon = document.getElementById("user-header-profile-icon");
-    if(profileIcon) {
-      profileIcon.addEventListener("click", () => {
-        window.location.href = "profilepage.html";
-      });
-    }
+document.addEventListener('DOMContentLoaded', function () {
+  fetch("header.html")
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById("header").innerHTML = data;
 
-    const backHomeBtn = document.getElementById("back-home");
-    backHomeBtn.addEventListener("click", () => {
-      window.location.href = "homepage.html";
-    });
-  })
-  .catch(error => console.error("Error loading header:", error));  
+      const profileIcon = document.getElementById("user-header-profile-icon");
+      if (profileIcon) {
+        profileIcon.addEventListener("click", () => {
+          window.location.href = "profilepage.html";
+        });
+      }
+
+      const backHomeBtn = document.getElementById("back-home");
+      backHomeBtn.addEventListener("click", () => {
+        window.location.href = "homepage.html";
+      });
+    })
+    .catch(error => console.error("Error loading header:", error));
 
   const contents = document.querySelectorAll(
     "#profile-user-info-content, #profile-listings-content, #profile-bids-content, #profile-swaps-content"
@@ -28,53 +28,61 @@ document.addEventListener('DOMContentLoaded', function() {
 
   //Listings Data & Functions
   let listings = [];
-  function fetchListings(){
+  function fetchListings() {
     fetch('../server/item/get_items.php')
       .then(response => response.json())
-      .then(data =>{ 
-          listings = data.listings.map(item => ({
-            id: item.item_id,
-            item: item.title,
-            category: item.category_type,
-            mode: item.item_type,
-            dateListed: item.created_date,
-            status: item.status
-          }));
-          renderItems(listings, "listings");
-          document.querySelector("#profile-listings-btn p").textContent = `${listings.length} Items`;
+      .then(data => {
+
+        if (!data.listings) {
+          console.error("No listings found in response:", data);
+          return;
+        }
+
+        listings = data.listings.map(item => ({
+          id: item.item_id,
+          item: item.title,
+          category: item.category_type,
+          mode: item.item_type,
+          dateListed: item.created_date,
+          status: item.status,
+        }));
+        renderItems(listings, "listings");
+        document.querySelector("#profile-listings-btn p").textContent = `${listings.length} Items`;
       })
-      .catch(error => console.error("Error loading listings: ",error));
+      .catch(error => console.error("Error loading listings: ", error));
   }
- 
-  function createListingRow(listing){
+
+  function getStatusClass(status) {
+    status = status.toLowerCase();
+    if (status.includes("active")) return "active-items";
+    if (status.includes("pending")) return "pending-items";
+    if (status.includes("rejected")) return "rejected-items";
+    if (status.includes("sold")) return "sold-items";
+    return "";
+  }
+
+  function createListingRow(listing) {
     const row = document.createElement("tr");
     row.classList.add("listings-body-row");
     row.setAttribute("id", `listing-row-${listing.id}`);
-
-    const statusClass = 
-      listing.status.toLowerCase().includes("active") ? "active-items" :
-      listing.status.toLowerCase().includes("pending") ? "pending-items" :
-      listing.status.toLowerCase().includes("rejected") ? "rejected-items" :
-      listing.status.toLowerCase().includes("sold") ? "sold-items" :
-    "";
 
     row.innerHTML = `
       <td class="item">${listing.item}</td>
       <td>${listing.category}</td>
       <td>${listing.mode}</td>
       <td>${listing.dateListed}</td>
-      <td><div class="status ${statusClass}">${listing.status}</div></td>
+      <td><div class="status ${getStatusClass(listing.status)}">${listing.status}</div></td>
       <td>
         <div class="actions-container">
           <button class="view-btn">View</button>
-          ${listing.status.toLowerCase() === "active" ? `<iconify-icon data-id="${listing.id}" class="edit-btn" icon="flowbite:edit-outline" width="24" height="24"></iconify-icon>`: ''}
+          ${listing.status.toLowerCase() === "active" ? `<iconify-icon data-id="${listing.id}" class="edit-btn" icon="flowbite:edit-outline" width="24" height="24"></iconify-icon>` : ''}
         </div>
       </td>
     `;
     return row;
   }
 
-  function calculateListingStats(listings){
+  function calculateListingStats(listings) {
     return {
       total: listings.length,
       active: listings.filter(l => l.status.toLowerCase().includes("active")).length,
@@ -84,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
 
-  function createListingAnalytics(listings){
+  function createListingAnalytics(listings) {
     const stats = calculateListingStats(listings);
 
     const analytics = document.createElement("div");
@@ -104,10 +112,10 @@ document.addEventListener('DOMContentLoaded', function() {
   //Winning Bids Data & Functions 
   //NOTE: THIS IS STATIC DATA , Change/Remove when manipulating backend database
   const winningBids = [
-    {id: 1,item: "Gaming Laptop",category: "Electronics",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
-    {id: 2,item: "DSLR Lens",category: "Photography",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
-    {id: 3,item: "Board Game",category: "Toys",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
-    {id: 4,item: "ps5 cONTROLLER",category: "Gaming",winningBid: "P100" ,dateWon: "09 / 16 / 2025"},
+    { id: 1, item: "Gaming Laptop", category: "Electronics", winningBid: "P100", dateWon: "09 / 16 / 2025" },
+    { id: 2, item: "DSLR Lens", category: "Photography", winningBid: "P100", dateWon: "09 / 16 / 2025" },
+    { id: 3, item: "Board Game", category: "Toys", winningBid: "P100", dateWon: "09 / 16 / 2025" },
+    { id: 4, item: "ps5 cONTROLLER", category: "Gaming", winningBid: "P100", dateWon: "09 / 16 / 2025" },
   ];
 
   function createWinningBidRow(bid) {
@@ -129,13 +137,13 @@ document.addEventListener('DOMContentLoaded', function() {
     return row;
   }
 
-  function calculateBidsStats(bids){
-    return{
+  function calculateBidsStats(bids) {
+    return {
       total: bids.length
     };
   }
 
-  function createBidsAnalytics(bids){
+  function createBidsAnalytics(bids) {
     const stats = calculateBidsStats(bids);
 
     const analytics = document.createElement("div");
@@ -158,13 +166,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // ---------------- SWAPPED ITEMS DATA & FUNCTIONS ----------------
 
   //NOTE: THIS IS STATIC DATA , Change/Remove when manipulating backend database
-  const swappedItems= [
-    {id: 1,item: "Gaming Laptop",category: "Electronics",swappedItem: "Calculator" ,dateSwapped: "09 / 16 / 2025"},
-    {id: 2,item: "DSLR Lens",category: "Photography",swappedItem: "Mechanical KB" ,dateSwapped: "09 / 16 / 2025"},
-    {id: 3,item: "Board Game",category: "Toys",swappedItem: "Monitor" ,dateSwapped: "09 / 16 / 2025"},
+  const swappedItems = [
+    { id: 1, item: "Gaming Laptop", category: "Electronics", swappedItem: "Calculator", dateSwapped: "09 / 16 / 2025" },
+    { id: 2, item: "DSLR Lens", category: "Photography", swappedItem: "Mechanical KB", dateSwapped: "09 / 16 / 2025" },
+    { id: 3, item: "Board Game", category: "Toys", swappedItem: "Monitor", dateSwapped: "09 / 16 / 2025" },
   ];
 
-  function createSwappedRow(swap){
+  function createSwappedRow(swap) {
     const row = document.createElement("tr");
     row.classList.add("swaps-body-row");
     row.setAttribute("id", `swapped-item-row-${swap.id}`);
@@ -183,13 +191,13 @@ document.addEventListener('DOMContentLoaded', function() {
     return row;
   }
 
-  function calculateSwapsStats(swaps){
-    return{
+  function calculateSwapsStats(swaps) {
+    return {
       total: swaps.length
     };
   }
 
-  function createSwapsAnalytics(swaps){
+  function createSwapsAnalytics(swaps) {
     const stats = calculateSwapsStats(swaps);
 
     const analytics = document.createElement("div");
@@ -216,23 +224,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const titleHeading = document.querySelector(".title-container h3");
     const currentAnalytics = document.querySelector(".title-container .analytics");
 
-    if(sectionId === "profile-user-info-content"){
-      titleContainer.style.display="none";
+    if (sectionId === "profile-user-info-content") {
+      titleContainer.style.display = "none";
       return;
     }
 
-    titleContainer.style.display= "flex";
+    titleContainer.style.display = "flex";
 
     if (sectionId === "profile-bids-content") {
       titleHeading.textContent = "My Winning Bids";
       const bidsAnalytics = createBidsAnalytics(winningBids);
       currentAnalytics.replaceWith(bidsAnalytics);
-    } 
+    }
     else if (sectionId === "profile-swaps-content") {
       titleHeading.textContent = "My Swaps";
       const swapsAnalytics = createSwapsAnalytics(swappedItems);
       currentAnalytics.replaceWith(swapsAnalytics);
-    } 
+    }
     else if (sectionId === "profile-listings-content") {
       titleHeading.textContent = "My Listings";
       const listingAnalytics = createListingAnalytics(listings);
@@ -247,12 +255,12 @@ document.addEventListener('DOMContentLoaded', function() {
     "profile-swaps-content": document.getElementById("profile-swaps-btn")
   };
 
-  function showContent(id) { 
+  function showContent(id) {
 
     contents.forEach(c => {
-      if(c.id === id){
+      if (c.id === id) {
         c.style.display = (id === "profile-user-info-content") ? "flex" : "block";
-      }else{
+      } else {
         c.style.display = "none";
       }
     });
@@ -300,36 +308,36 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-    if(section === "listings"){
+    if (section === "listings") {
       updateTitleForSection("profile-listings-content");
     }
   }
 
-  function applyFilter(type, value, section){
+  function applyFilter(type, value, section) {
     const currentFilters = sectionFilters[section];
 
     type = type.toLowerCase();
 
-    if(type === "Category" && value === "All Categories"){
+    if (type === "Category" && value === "All Categories") {
       currentFilters.Category = null;
-    }else if(type === "category"){
+    } else if (type === "category") {
       currentFilters.Category = value;
-    }else if(type === "mode" && value.toLowerCase() === "all"){
+    } else if (type === "mode" && value.toLowerCase() === "all") {
       currentFilters.Mode = null;
-    }else if(type === "mode"){
+    } else if (type === "mode") {
       currentFilters.Mode = value;
-    }else if(type === "status" && value.toLowerCase() === "all"){
+    } else if (type === "status" && value.toLowerCase() === "all") {
       currentFilters.Status = null;
-    }else if(type === "status"){
+    } else if (type === "status") {
       currentFilters.Status = value;
     }
 
     let data = [];
-    if(section === "listings") data = listings;
-    else if(section === "bids") data = winningBids;
-    else if(section === "swaps") data = swappedItems;
+    if (section === "listings") data = listings;
+    else if (section === "bids") data = winningBids;
+    else if (section === "swaps") data = swappedItems;
 
-    const filtered = data.filter(item =>{
+    const filtered = data.filter(item => {
       return (
         (!currentFilters.Category || item.category.toLowerCase() === currentFilters.Category.toLowerCase()) &&
         (!currentFilters.Mode || item.mode.toLowerCase() === currentFilters.Mode.toLowerCase()) &&
@@ -376,8 +384,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const allFilterBtns = document.querySelectorAll(".listings-filter-btn, .bids-filter-btn, .swaps-filter-btn");
   const allFilterDropdowns = document.querySelectorAll(".listings-filter-dropdown, .bids-filter-dropdown, .swaps-filter-dropdown");
   const filterHeaders = document.querySelectorAll(".dropDown-header");
-  const subDropDownItems = document.querySelectorAll(".sub-dropdown .dropDown-item");
   const showAllBtns = document.querySelectorAll(".show-all");
+  const subDropDownItems = document.querySelectorAll(".sub-dropdown .dropDown-item");
 
   // Handle dropdown header click
   filterHeaders.forEach(header => {
@@ -413,16 +421,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Handle dropdown item selection
   subDropDownItems.forEach(item => {
     item.addEventListener("click", (event) => {
       event.stopPropagation();
       const selectedText = item.textContent.trim();
       const filterType = item
-      .closest(".dropdown-section")
-      .querySelector(".dropDown-header")
-      .textContent.trim()
-      .toLowerCase();
+        .closest(".dropdown-section")
+        .querySelector(".dropDown-header")
+        .textContent.trim()
+        .toLowerCase();
 
       let section = "listings";
       if (item.closest(".bids-filter-dropdown")) section = "bids";
@@ -463,51 +470,102 @@ document.addEventListener('DOMContentLoaded', function() {
   const editOverlay = document.querySelector(".edit-overlay");
   document.addEventListener("click", (event) => {
     const editButton = event.target.closest(".edit-btn");
-    if(editButton){
+    if (editButton) {
       const itemId = editButton.getAttribute("data-id");
-      if(!itemId){
+      if (!itemId) {
         alert("Item ID not found.");
         return;
       }
 
-      fetchItemData(itemId);       
-      editOverlay.classList.add("active"); 
+      fetchItemData(itemId);
+      editOverlay.classList.add("active");
     }
   });
 
-  document.querySelector(".form-container").addEventListener("submit", function (e) {
-    e.preventDefault(); 
-    let formData = new FormData(this);
+  document.querySelector(".form-container").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    if (!this.checkValidity()) {
+      this.reportValidity();
+      return;
+    }
+
+    // Detect changes in fields
+    const fields = ['item-name', 'category', 'description', 'start-price', 'end-date'];
+    let changed = fields.some(id => {
+      const input = document.getElementById(id);
+      return input && input.value !== input.dataset.original;
+    });
+
+    // Detect changes in images
+    const originalImages = JSON.parse(document.getElementById('image-container').dataset.originalImages || '[]');
+    if (images.length !== originalImages.length || removedImages.length > 0 || newFiles.length > 0) {
+      changed = true;
+    }
+
+    if (!changed) {
+      alert("No changes detected.");
+      document.querySelector(".edit-overlay").classList.remove("active");
+      return;
+    }
+
+    const formData = new FormData(this);
+
+    // Append removed images (URLs to delete from DB)
+    formData.append('removed_images', JSON.stringify(removedImages));
+
+    // Append new files
+    newFiles.forEach((file, i) => {
+      formData.append('images[]', file, file.name);
+    });
+
+    // Append remaining existing images
+    const existingImages = images.filter(src => !src.startsWith('data:'));
+    formData.append('existing_images', JSON.stringify(existingImages));
 
     fetch("../server/item/update_item.php", {
-        method: "POST",
-        body: formData
+      method: "POST",
+      body: formData
     })
-    .then(res => res.json())
-    .then(data => {
+      .then(res => res.json())
+      .then(data => {
         if (data.success) {
-            alert("Item updated!");
-            document.querySelector(".edit-overlay").classList.remove("active");
+          alert("Item updated!");
+          document.querySelector(".edit-overlay").classList.remove("active");
+          removedImages = [];
+          newFiles = [];
         } else {
-            alert("Update failed: " + data.message);
+          alert("Update failed: " + data.message);
         }
-    })
-    .catch(err => console.error(err));
+      })
+      .catch(err => console.error(err));
   });
 
-  const editCancelButton = document.querySelector(".edit-cancel-btn")
-  editCancelButton.addEventListener("click", (event) =>{
+  const editCancelButton = document.querySelector(".edit-cancel-btn");
+  editCancelButton.addEventListener("click", (event) => {
     event.stopPropagation();
-    editOverlay.classList.remove("active");
-  })
 
-  const editSaveButton = document.querySelector('.edit-save-btn');
-  editSaveButton.addEventListener("click", (event) =>{
-    event.stopPropagation();
+    const inputs = document.querySelectorAll(".form-container input, .form-container textarea, .form-container select");
+    inputs.forEach(input => {
+      if (input.dataset.original !== undefined) {
+        input.value = input.dataset.original;
+      }
+    });
+
+    const imageContainer = document.getElementById('image-container');
+    if (imageContainer.dataset.originalImages) {
+      const originalImages = JSON.parse(imageContainer.dataset.originalImages);
+
+      images = [...originalImages];
+      newFiles = [];
+      removedImages = [];
+
+      renderImages();
+    }
     editOverlay.classList.remove("active");
   });
 
-  function fetchItemData(itemId){
+  function fetchItemData(itemId) {
     fetch(`../server/item/get_item_single.php?id=${itemId}`)
       .then(response => response.json())
       .then(data => {
@@ -516,36 +574,139 @@ document.addEventListener('DOMContentLoaded', function() {
       .catch(error => console.error("Error fetching item data:", error));
   }
 
-  function populateForm(data){
+  let images = [];
+  let removedImages = [];
+  let newFiles = [];
+
+  function populateForm(data) {
     const item = data.item;
     const bid = data.bid;
-    const images = data.images;
+    const existingImages = Array.isArray(data.images) ? data.images.map(img => img.split('/').pop()) : [];
+    const categories = data.categories || [];
+    const statusDisplayDiv = document.getElementById('status-display');
+    const statusClass = getStatusClass(item.status);
 
-    document.getElementById('item-id').value = item.item_id;
-    document.getElementById('item-name').value = item.title;
-    document.getElementById('category').value = item.category_type;
-    document.getElementById('description').value = item.description;
+    images = [...existingImages];
+    removedImages = [];
+    newFiles = [];
 
-    document.getElementById('status-display').value = item.status;
-    document.getElementById('status-hidden').value = item.status;
+    const imageContainer = document.getElementById('image-container');
+    imageContainer.dataset.originalImages = JSON.stringify(existingImages);
+    renderImages();
 
-    document.getElementById('start-price').value = bid ? bid.starting_price: 0;
-    document.getElementById('start-date').value = bid ? formatDateTimeLocal(bid.start_date): '';
-    document.getElementById('end-date').value = bid ? formatDateTimeLocal(bid.end_date): '';
+    // Inputs
+    const itemIdInput = document.getElementById('item-id');
+    const itemNameInput = document.getElementById('item-name');
+    const categoryInput = document.getElementById('category');
+    const descriptionInput = document.getElementById('description');
+    const statusHiddenInput = document.getElementById('status-hidden');
+    const startPriceInput = document.getElementById('start-price');
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
+    const modeFieldH3 = document.querySelector('.mode-field h3');
 
-    const container = document.getElementById('image-container');
-    container.innerHTML = '';
-    images.forEach(img =>{
-      const figure = document.createElement('figure');
-      figure.innerHTML= `<img src= "${img}" width="120">`;
-      container.appendChild(figure);
+    // Set values
+    itemIdInput.value = item.item_id;
+    itemNameInput.value = item.title;
+    categoryInput.value = item.category_type;
+    descriptionInput.value = item.description;
+    statusDisplayDiv.textContent = item.status;
+    statusDisplayDiv.className = `status-display ${statusClass}`;
+    statusHiddenInput.value = item.status;
+
+    const isSwap = item.item_type?.toLowerCase() === "swap";
+    if (modeFieldH3) {
+      modeFieldH3.textContent = isSwap ? "Swap" : "Bid";
+    }
+
+    const priceFieldSection = document.querySelector('.price-field');
+    if (priceFieldSection) {
+      if (isSwap) {
+        priceFieldSection.style.display = 'none';
+      } else {
+        priceFieldSection.style.display = 'flex';
+        startPriceInput.value = bid ? bid.starting_price : 0;
+        startDateInput.value = bid ? formatDateTimeLocal(bid.start_date) : formatDateTimeLocal(new Date());
+        startDateInput.readOnly = true;
+        endDateInput.value = bid ? formatDateTimeLocal(bid.end_date) : '';
+      }
+    }
+
+    categoryInput.innerHTML = ''; 
+    categories.forEach(cat => {
+      const option = document.createElement('option');
+      option.value = cat;
+      option.textContent = cat;
+      if (cat === item.category_type) option.selected = true;
+      categoryInput.appendChild(option);
+    });
+
+    // Store original values for reset
+    itemIdInput.dataset.original = itemIdInput.value;
+    itemNameInput.dataset.original = itemNameInput.value;
+    categoryInput.dataset.original = categoryInput.options[categoryInput.selectedIndex].value;
+    descriptionInput.dataset.original = descriptionInput.value;
+    statusDisplayDiv.dataset.original = statusDisplayDiv.textContent;
+    statusHiddenInput.dataset.original = statusHiddenInput.value;
+    startPriceInput.dataset.original = startPriceInput.value;
+    startDateInput.dataset.original = startDateInput.value;
+    endDateInput.dataset.original = endDateInput.value;
+  }
+
+  // Render images (existing + new)
+  function renderImages() {
+    const imageContainer = document.getElementById('image-container');
+    imageContainer.innerHTML = '';
+
+    images.forEach((img, index) => {
+      const div = document.createElement('div');
+      div.classList.add('image-preview');
+
+      const imgSrc = img instanceof File
+        ? URL.createObjectURL(img)
+        : `../server/item/uploads/${encodeURIComponent(img)}`;
+
+      div.innerHTML = `
+            <img src="${imgSrc}" alt="">
+            <button class="remove-btn">&times;</button>
+        `;
+
+      div.querySelector('.remove-btn').addEventListener('click', () => {
+        if (img instanceof File) {
+          const fileIndex = newFiles.indexOf(img);
+          if (fileIndex > -1) newFiles.splice(fileIndex, 1);
+        } else {
+          removedImages.push(img);
+        }
+        images.splice(index, 1);
+        renderImages();
+      });
+      imageContainer.appendChild(div);
     });
   }
 
-  function formatDateTimeLocal(dt){
-    if(!dt) return '';
+  document.getElementById('image-upload').addEventListener('change', (event) => {
+    const files = Array.from(event.target.files);
+
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        images.push(e.target.result);
+        newFiles.push(file);
+        renderImages();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    event.target.value = '';
+  });
+
+
+  function formatDateTimeLocal(dt) {
+    if (!dt) return '';
     const d = new Date(dt);
-    const pad = n => n.toString().padStart(2,'0');
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    if (isNaN(d)) return '';
+    const pad = n => n.toString().padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 });
