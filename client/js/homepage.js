@@ -484,7 +484,7 @@ function applyCurrentCategoryFilter() {
             dateListed: bid.created_date,
             timeLeft: formatEndDate(bid.end_date),
             bidsCount: bid.bid_count || 0,
-            image: bid.images && bid.image.images.length > 0 ? `../server/item/${bid.images[0]}`: null
+            image: bid.images && bid.images.length > 0 ? `../server/item/${bid.images[0]}` : null
           }));
         });
       } else {
