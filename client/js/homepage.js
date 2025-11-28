@@ -73,14 +73,15 @@ sortDropdown.addEventListener("click", (event) => {
 });
 // End of Sort Function
 
-// Header
-document.addEventListener("DOMContentLoaded", function () {
-  fetch("header.html")
-    .then(response => response.text())
-    .then(header => {
-      document.getElementById("header").innerHTML = header;
-      const script = document.createElement("script");
-      const profileIcon = document.getElementById("user-header-profile-icon");
+// Header and Footer fetch
+document.addEventListener("DOMContentLoaded", function() {
+    fetch("header.html")
+        .then(response => response.text())
+        .then(header => {
+        document.getElementById("header").innerHTML = header;
+        const script = document.createElement("script");
+        const profileIcon = document.getElementById("user-header-profile-icon");
+
 
       if (profileIcon) {
         profileIcon.addEventListener("click", () => {
@@ -93,8 +94,15 @@ document.addEventListener("DOMContentLoaded", function () {
       document.body.appendChild(script);
     })
     .catch(error => console.error("Error determining role:", error));
+    // Load FOOTER
+    fetch("footer.html")
+        .then(response => response.text())
+        .then(footer => {
+            document.getElementById("footer").innerHTML = footer;
+        })
+        .catch(error => console.error("Footer load error:", error));
+
 });
-// End of Header
 
 // Fetch items Bid & Swap Function
 function fetchItems() {
