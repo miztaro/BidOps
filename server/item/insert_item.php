@@ -154,10 +154,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             if($listingType == 'bid') {
-                $bidQuery = "INSERT INTO BIDITEM (item_id, starting_price, start_date, end_date, bid_increment_percent
-                            VALUES (?, ?, NOW(), ?)";
+                $bidQuery = "INSERT INTO BIDITEM (item_id, starting_price, start_date, end_date, bid_increment_percent)
+                            VALUES (?, ?, NOW(), ?, ?)";
                 $bidStmt = $db->prepare($bidQuery);
-                $bidStmt->bind_param("ids", $item_id, $starting_price, $end_date_mysql, $bid_increment_percent);
+                $bidStmt->bind_param("idss", $item_id, $starting_price, $end_date_mysql, $bid_increment_percent);
                 if(!$bidStmt->execute()) throw new Exception("Failed to create bid item.");
             } else {
                 $swapQuery = "INSERT INTO SWAPITEM (item_id) VALUES (?)";
