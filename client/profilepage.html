@@ -315,6 +315,81 @@
             </form>
         </section>
     </main>
+    <!-- Bidding History Modal -->
+<section class="bid-modal-overlay" id="bid-modal-overlay">
+    <div class="bid-modal-container">
+        <!-- Close Button -->
+        <button class="bid-modal-close" id="bid-modal-close">
+            <iconify-icon icon="material-symbols:close" width="32" height="32"></iconify-icon>
+        </button>
+
+        <!-- Modal Content -->
+        <div class="bid-modal-content">
+            <!-- Left Side: Item Details -->
+            <div class="bid-modal-left">
+                <div class="bid-item-images">
+                    <div class="main-image-container">
+                        <img id="bid-main-image" src="" alt="Item Image">
+                    </div>
+                    <div class="thumbnail-container" id="bid-thumbnails">
+                        <!-- Thumbnails will be inserted here -->
+                    </div>
+                </div>
+
+                <div class="bid-item-details">
+                    <h2 id="bid-item-title">Item Title</h2>
+                    <p class="bid-item-category"><strong>Category:</strong> <span id="bid-item-category">-</span></p>
+                    <p class="bid-item-description" id="bid-item-description">Item description goes here...</p>
+                    
+                    <div class="bid-price-info">
+                        <div class="price-box">
+                            <p class="label">Starting Price</p>
+                            <p class="value" id="bid-starting-price">₱0.00</p>
+                        </div>
+                        <div class="price-box highlight">
+                            <p class="label">Current Highest Bid</p>
+                            <p class="value" id="bid-current-highest">₱0.00</p>
+                        </div>
+                    </div>
+
+                    <div class="bid-timer" id="bid-timer">
+                        <p class="timer-label">Auction Ending In:</p>
+                        <div class="timer-display">
+                            <div class="time-unit">
+                                <span class="time-value" id="timer-days">00</span>
+                                <span class="time-label">Days</span>
+                            </div>
+                            <div class="time-unit">
+                                <span class="time-value" id="timer-hours">00</span>
+                                <span class="time-label">Hours</span>
+                            </div>
+                            <div class="time-unit">
+                                <span class="time-value" id="timer-minutes">00</span>
+                                <span class="time-label">Minutes</span>
+                            </div>
+                            <div class="time-unit">
+                                <span class="time-value" id="timer-seconds">00</span>
+                                <span class="time-label">Seconds</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Bidding History -->
+            <div class="bid-modal-right">
+                <div class="bid-history-header">
+                    <h3>Bidding History</h3>
+                    <p class="total-bids" id="total-bids">0 Bids</p>
+                </div>
+
+                <div class="bid-history-list" id="bid-history-list">
+                    <!-- Bid history items will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
     <script src="js/profilepage.js"></script>
 </body>
 
