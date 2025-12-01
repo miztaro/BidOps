@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile Page</title>
     <link rel="stylesheet" href="style/profile.css">
+    <link rel="stylesheet" href="style/profile-list-style/list-edit-item.css">
+    <link rel="stylesheet" href="style/profile-list-style/list-view-item.css">
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 </head>
 
@@ -314,83 +316,160 @@
                 </section>
             </form>
         </section>
+
+        <section class="view-overlay" id="list-view-overlay">
+            <form id="view-form-container" class="form-container" method=" " enctype="multipart/form-data" action=" ">
+                <input type="hidden" id="view-item-id" name="item_id" value="">
+
+                <button type="button" class="close-btn" id="close-view-btn"><iconify-icon icon="hugeicons:cancel-01"
+                        width="24" height="24"></iconify-icon></button>
+                <section class="header-sec">
+                    <div class="view-mode-field">
+                        <h3>Bid</h3>
+                        <p>Item Id: <span>0134</span></p>
+                    </div>
+
+                    <div class="view-status-field">
+                        <p>approval_rejected</p>
+                    </div>
+                </section>
+
+                <section class="body-sec">
+                    <section class="left-side">
+                        <div class="main-image"><img src="" alt=""></div>
+                        <div class="images-preview"></div>
+                    </section>
+                    <section class="right-side">
+                        <div class="name-cat-field" id="name-cat-field">
+                            <h3>Item Name</h3>
+                            <p>Toys</p>
+                        </div>
+
+                        <div class="description-field">
+                            <p>The description will be here</p>
+                        </div>
+
+                        <div class="price-field">
+                            <div class="start-price">
+                                <h6>Starting Price</h6>
+                                <p>P 300.00</p>
+                            </div>
+                            <div class="win-price">
+                                <h6>Winning Price</h6>
+                                <p>P 3544.00</p>
+                            </div>
+                        </div>
+
+                        <div class="date-field">
+                            <div class="start-date">
+                                <h6>Start Date</h6>
+                                <p>10/24/2025</p>
+
+                            </div>
+                            <div class="end-date">
+                                <h6>End Date</h6>
+                                <p>10/26/2025</p>
+                            </div>
+                        </div>
+
+                        <div class="swap-field">
+                            <div class="swapped-item">
+                                <h6>Swapped Item</h6>
+                                <p>Item Name</p>
+                            </div>
+
+                            <div class="swap-partner">
+                                <h6>Swap Partner</h6>
+                                <p>User Id</p>
+                            </div>
+                        </div>
+
+                        <button type="button" class="remove-btn">Remove</button>
+                    </section>
+                </section>
+            </form>
+        </section>
+
+        <!-- Bidding History Modal -->
+        <section class="bid-modal-overlay" id="bid-modal-overlay">
+            <div class="bid-modal-container">
+                <!-- Close Button -->
+                <button class="bid-modal-close" id="bid-modal-close">
+                    <iconify-icon icon="material-symbols:close" width="32" height="32"></iconify-icon>
+                </button>
+
+                <!-- Modal Content -->
+                <div class="bid-modal-content">
+                    <!-- Left Side: Item Details -->
+                    <div class="bid-modal-left">
+                        <div class="bid-item-images">
+                            <div class="main-image-container">
+                                <img id="bid-main-image" src="" alt="Item Image">
+                            </div>
+                            <div class="thumbnail-container" id="bid-thumbnails">
+                                <!-- Thumbnails will be inserted here -->
+                            </div>
+                        </div>
+
+                        <div class="bid-item-details">
+                            <h2 id="bid-item-title">Item Title</h2>
+                            <p class="bid-item-category"><strong>Category:</strong> <span
+                                    id="bid-item-category">-</span></p>
+                            <p class="bid-item-description" id="bid-item-description">Item description goes here...</p>
+
+                            <div class="bid-price-info">
+                                <div class="price-box">
+                                    <p class="label">Starting Price</p>
+                                    <p class="value" id="bid-starting-price">₱0.00</p>
+                                </div>
+                                <div class="price-box highlight">
+                                    <p class="label">Current Highest Bid</p>
+                                    <p class="value" id="bid-current-highest">₱0.00</p>
+                                </div>
+                            </div>
+
+                            <div class="bid-timer" id="bid-timer">
+                                <p class="timer-label">Auction Ending In:</p>
+                                <div class="timer-display">
+                                    <div class="time-unit">
+                                        <span class="time-value" id="timer-days">00</span>
+                                        <span class="time-label">Days</span>
+                                    </div>
+                                    <div class="time-unit">
+                                        <span class="time-value" id="timer-hours">00</span>
+                                        <span class="time-label">Hours</span>
+                                    </div>
+                                    <div class="time-unit">
+                                        <span class="time-value" id="timer-minutes">00</span>
+                                        <span class="time-label">Minutes</span>
+                                    </div>
+                                    <div class="time-unit">
+                                        <span class="time-value" id="timer-seconds">00</span>
+                                        <span class="time-label">Seconds</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Bidding History -->
+                    <div class="bid-modal-right">
+                        <div class="bid-history-header">
+                            <h3>Bidding History</h3>
+                            <p class="total-bids" id="total-bids">0 Bids</p>
+                        </div>
+
+                        <div class="bid-history-list" id="bid-history-list">
+                            <!-- Bid history items will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
-    <!-- Bidding History Modal -->
-<section class="bid-modal-overlay" id="bid-modal-overlay">
-    <div class="bid-modal-container">
-        <!-- Close Button -->
-        <button class="bid-modal-close" id="bid-modal-close">
-            <iconify-icon icon="material-symbols:close" width="32" height="32"></iconify-icon>
-        </button>
-
-        <!-- Modal Content -->
-        <div class="bid-modal-content">
-            <!-- Left Side: Item Details -->
-            <div class="bid-modal-left">
-                <div class="bid-item-images">
-                    <div class="main-image-container">
-                        <img id="bid-main-image" src="" alt="Item Image">
-                    </div>
-                    <div class="thumbnail-container" id="bid-thumbnails">
-                        <!-- Thumbnails will be inserted here -->
-                    </div>
-                </div>
-
-                <div class="bid-item-details">
-                    <h2 id="bid-item-title">Item Title</h2>
-                    <p class="bid-item-category"><strong>Category:</strong> <span id="bid-item-category">-</span></p>
-                    <p class="bid-item-description" id="bid-item-description">Item description goes here...</p>
-                    
-                    <div class="bid-price-info">
-                        <div class="price-box">
-                            <p class="label">Starting Price</p>
-                            <p class="value" id="bid-starting-price">₱0.00</p>
-                        </div>
-                        <div class="price-box highlight">
-                            <p class="label">Current Highest Bid</p>
-                            <p class="value" id="bid-current-highest">₱0.00</p>
-                        </div>
-                    </div>
-
-                    <div class="bid-timer" id="bid-timer">
-                        <p class="timer-label">Auction Ending In:</p>
-                        <div class="timer-display">
-                            <div class="time-unit">
-                                <span class="time-value" id="timer-days">00</span>
-                                <span class="time-label">Days</span>
-                            </div>
-                            <div class="time-unit">
-                                <span class="time-value" id="timer-hours">00</span>
-                                <span class="time-label">Hours</span>
-                            </div>
-                            <div class="time-unit">
-                                <span class="time-value" id="timer-minutes">00</span>
-                                <span class="time-label">Minutes</span>
-                            </div>
-                            <div class="time-unit">
-                                <span class="time-value" id="timer-seconds">00</span>
-                                <span class="time-label">Seconds</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Side: Bidding History -->
-            <div class="bid-modal-right">
-                <div class="bid-history-header">
-                    <h3>Bidding History</h3>
-                    <p class="total-bids" id="total-bids">0 Bids</p>
-                </div>
-
-                <div class="bid-history-list" id="bid-history-list">
-                    <!-- Bid history items will be inserted here -->
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-    <script src="js/profilepage.js"></script>
+    <script type="module" src="js/profilepage.js"></script>
+    <script type="module" src="js/profile-list-event/list-edit-item.js"></script>
+    <script type="module" src="js/profile-list-event/list-view-item.js"></script>
 </body>
 
 </html>

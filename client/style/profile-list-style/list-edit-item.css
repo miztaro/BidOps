@@ -1,0 +1,304 @@
+/*Edit Overlay*/
+@import "../index.css";
+
+.edit-overlay {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.edit-overlay.active {
+    display: flex;
+    pointer-events: all;
+}
+
+.edit-overlay .form-container {
+    padding: 30px;
+    max-width: 50%;
+    width: auto;
+    height: auto;
+    background-color: var(--primary-white);
+    border-radius: 20px;
+    border: none;
+
+    transform: translateY(-50px);
+    opacity: 0;
+    transition: transform 0.8s ease, opacity 0.8s ease;
+}
+
+.edit-overlay.active .form-container {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.edit-overlay .form-container label {
+    font-family: 'Montserrat-SemiBold', sans-serif;
+    color: var(--primary);
+    font-size: 1em;
+}
+
+.form-container .mode-field {
+    width: 100%;
+    padding: 20px;
+    text-decoration: none;
+    border: none;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
+    background-color: var(--primary-base);
+    gap: 15px;
+}
+
+.form-container .mode-field h3 {
+    color: var(--primary);
+    font-family: 'Montserrat-Bold', sans-serif;
+    font-size: 2em;
+}
+
+.form-container .mode-field .status-display {
+    border: none;
+    border-radius: 20px;
+    padding: 3px;
+    text-align: center;
+    color: var(--primary-white);
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 10vh;
+    width: 100%;
+    height: 50%;
+}
+
+.edit-overlay .status-display.active-items {
+    background-color: var(--primary-green);
+}
+
+.edit-overlay .status-display.pending-items {
+    background-color: var(--accent-hover);
+}
+
+.edit-overlay .status-display.rejected-items {
+    background-color: var(--primary-red);
+}
+
+.edit-overlay .status-display.sold-items {
+    background-color: var(--dark-secondary);
+}
+
+.form-container .item-info-field {
+    display: flex;
+    border: none;
+    padding-top: 20px;
+    gap: 80px;
+    align-items: center;
+}
+
+
+.item-info-field .item-sec {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    color: var(--dark-secondary);
+}
+
+.item-info-field .item-sec input {
+    border-radius: 15px;
+    border: 1px solid var(--dark-secondary);
+    padding: 10px;
+}
+
+.item-info-field .category-sec {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    color: var(--dark-secondary);
+}
+
+.item-info-field .category-sec select {
+    border-radius: 15px;
+    border: 1px solid var(--dark-secondary);
+    padding: 10px;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.form-container .description-field {
+    padding-top: 20px;
+}
+
+.form-container .description-field textarea {
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    display: flex;
+    text-align: start;
+    border: 1px solid var(--dark-secondary);
+    border-radius: 15px;
+    resize: none;
+}
+
+.form-container .price-field {
+    display: flex;
+    padding-top: 30px;
+    gap: 80px;
+    align-items: center;
+    width: 100%;
+}
+
+.price-field .price-sec {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+.price-field .price-sec input {
+    border: 1px solid var(--dark-secondary);
+    border-radius: 15px;
+    padding: 10px;
+    width: 100%;
+}
+
+.price-field .date-sec {
+    flex: 1;
+    display: flex;
+    gap: 15px;
+}
+
+.date-sec .container {
+    display: flex;
+    flex-direction: column;
+}
+
+#start-date {
+    color: var(--dark-secondary);
+}
+
+.date-sec .container input {
+    border: 1px solid var(--dark-secondary);
+    border-radius: 15px;
+    padding: 10px;
+}
+
+.form-container .image-field {
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+#image-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.image-preview {
+    width: 120px;
+    height: 120px;
+    border: 1px solid var(--primary-base);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-preview .remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 25px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    line-height: 20px;
+}
+
+.image-preview:hover .remove-btn {
+    display: flex;
+}
+
+.form-container .upload-buttons-field {
+    padding-top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 80px;
+}
+
+.file-input-wrapper {
+    flex: 2;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 2px dashed var(--dark-secondary);
+    border-radius: 15px;
+    cursor: pointer;
+    color: var(--dark-secondary);
+}
+
+.file-input-wrapper input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.form-container .button-section {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    align-items: end;
+}
+
+.button-section button {
+    padding: 5px;
+    background-color: transparent;
+    border: 1px solid var(--primary);
+    border-radius: 20px;
+    color: var(--primary);
+    transition: 0.3s ease-in-out;
+    font-family: 'Montserrat-SemiBold', sans-serif;
+    max-width: 100px;
+    width: 100%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.button-section button:hover {
+    background-color: var(--primary);
+    color: var(--primary-white);
+}
