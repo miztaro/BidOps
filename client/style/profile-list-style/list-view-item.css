@@ -140,6 +140,7 @@
     overflow: hidden;
     margin-bottom: 12px;
     border: 1px solid var(--primary);
+    background-color: var(--primary);
 }
 
 .left-side .main-image img {
@@ -260,8 +261,6 @@
     font-size: 1em;
     color: var(--dark-secondary);
 }
-
-
 
 .right-side .remove-btn {
     padding: 10px;

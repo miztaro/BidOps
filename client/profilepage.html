@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style/profile.css">
     <link rel="stylesheet" href="style/profile-list-style/list-edit-item.css">
     <link rel="stylesheet" href="style/profile-list-style/list-view-item.css">
+    <link rel="stylesheet" href="style/profile-bids-style/bids-view-item.css">
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 </head>
 
@@ -466,10 +467,86 @@
                 </div>
             </div>
         </section>
+
+        <section class="bids-view-overlay" id="bids-view-overlay">
+            <div class="bids-view-container">
+                <input type="hidden" id="winBid-view-item-id" name="item_id" value="">
+
+                <button type="button" class="close-btn" id="bids-close-view-btn"><iconify-icon
+                        icon="hugeicons:cancel-01" width="24" height="24"></iconify-icon>
+                </button>
+
+                <section class="bids-head-sec">
+                    <div class="title-side">
+                        <h3>Winning Bid</h3>
+                    </div>
+                    <div class="buttons-side">
+                        <button class="rate-btn">Rate <iconify-icon icon="ic:round-star" width="24"
+                                height="24"></iconify-icon></button>
+                        <button class="message-btn">Message <iconify-icon icon="ic:baseline-message" width="24"
+                                height="24"></iconify-icon></button>
+                    </div>
+                </section>
+
+                <section class="bids-body-sec">
+                    <section class="left-side">
+                        <div class="main-image"><img src="" alt=""></div>
+                        <div class="images-preview"><img src="" alt=""></div>
+                    </section>
+
+                    <section class="right-side">
+                        <div class="name-category-con">
+                            <h6>Calculator</h6>
+                            <p>Education</p>
+                        </div>
+                        <div class="description-con">
+                            <p>Description will be here</p>
+                        </div>
+                        <div class="price-con">
+                            <h6>Winning Price</h6>
+                            <p>P250.00</p>
+                        </div>
+                        <div class="date-con">
+                            <div class="start-date">
+                                <h6>Start Date</h6>
+                                <p>10/15/2025</p>
+                            </div>
+                            <div class="date-won">
+                                <h6>Date Won</h6>
+                                <p>10/20/2025</p>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+            </div>
+        </section>
+
+        <section class="bids-rate-overlay" id="bids-rate-overlay">
+            <div class="bids-rate-container">
+                <section class="head-section">
+                    <h3>Rate Swapper</h3>
+                </section>
+
+                <section class="body-sec">
+                    <div class="star-con" id="bids-star-rating">
+                        <input type="hidden" id="rating-value" value="0">
+                    </div>
+                    <div class="comment-con">
+                        <h6>Comment</h6>
+                        <textarea name="" id="" placeholder="Write your comment here.."></textarea>
+                    </div>
+                    <div class="buttons-con">
+                        <button class="submit-rate-btn">Submit</button>
+                        <button class="cancel-rate-btn">Cancel</button>
+                    </div>
+                </section>
+            </div>
+        </section>
     </main>
     <script type="module" src="js/profilepage.js"></script>
     <script type="module" src="js/profile-list-event/list-edit-item.js"></script>
     <script type="module" src="js/profile-list-event/list-view-item.js"></script>
+    <script type="module" src="js/profile-bids-event/bids-view-item.js"></script>
 </body>
 
 </html>

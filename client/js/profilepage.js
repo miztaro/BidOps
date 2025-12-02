@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
       <td>${bid.dateWon}</td>
       <td>
         <div class="actions-container">
-          <button class="view-btn">View</button>
+          <button class="bids-view-btn" data-id="${bid.id}">View</button>
         </div>
       </td>
     `;

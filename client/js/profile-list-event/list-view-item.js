@@ -70,8 +70,8 @@ function fetchItem(itemId) {
         xhr.onload = function () {
             if (xhr.status === 200) {
                 const data = JSON.parse(xhr.responseText);
-                displayItem(data); // still update your overlay
-                resolve(data); // resolve the promise with the data
+                displayItem(data); 
+                resolve(data); 
             } else {
                 console.error("AJAX error: status", xhr.status);
                 reject(xhr.status);
@@ -86,7 +86,6 @@ function fetchItem(itemId) {
         xhr.send();
     });
 }
-
 
 function displayItem(data) {
     const { item, bid, images } = data;
