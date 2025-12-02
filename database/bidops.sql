@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS `chat` (
   `buyer_id` varchar(20) NOT NULL,
   `item_id` int NOT NULL,
   PRIMARY KEY (`chat_id`),
+  UNIQUE KEY `unique_chat` (`buyer_id`, `seller_id`, `item_id`),
   KEY `fk_chat_seller` (`seller_id`),
   KEY `fk_chat_buyer` (`buyer_id`),
   KEY `fk_chat_item` (`item_id`)
@@ -133,7 +134,6 @@ CREATE TABLE IF NOT EXISTS `chat` (
 --
 -- Dumping data for table `chat`
 --
-
 INSERT INTO `chat` (`chat_id`, `created_at`, `seller_id`, `buyer_id`, `item_id`) VALUES
 (401, '2025-09-26 12:45:00', 'u1', 'u2', 1),
 (402, '2025-10-02 09:30:00', 'u2', 'u4', 2),
