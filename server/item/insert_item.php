@@ -26,12 +26,6 @@ $minTitleLength = 3;
 $maxDescLength = 300;
 $minDescLength = 10;
 
-// if(!isset($_SESSION['user_id'])) {
-//     http_response_code(401);
-//     echo json_encode(array("message" => "Please log in to create a listing."));
-//     exit();
-// }
-
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
         $title = $_POST['title'] ?? '';
@@ -47,8 +41,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $bid_increment_percent = 5;
         }
        
-        $seller_id = 'u1'; // using Alice as default seller
-        //$seller_id = $_SESSION['user_id']; //use current user
+        $seller_id = $_SESSION['user_id']; //use current user
 
         if(empty($title) || empty($category) || empty($description) || empty($listingType)) {
             http_response_code(400);

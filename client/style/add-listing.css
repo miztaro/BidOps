@@ -11,34 +11,30 @@
     padding: 10px;
 }
 
-
 .modal-container {
     background: white;
     border-radius: 24px;
     width: 100%;
     max-width: 800px;
     max-height: 90vh;
-    overflow-y: auto;
+    overflow-y: hidden;
     box-shadow: 0 12px 40px rgba(0,0,0,0.25);
 }
-
 
 /* Modal Header Styles */
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px 32px 20px;
+    padding: 20px 32px 10px;
 }
-
 
 .modal-header h2 {
     margin: 0;
     color: #3b56ac;
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 800;
 }
-
 
 .modal-close {
     background: none;
@@ -55,13 +51,11 @@
     transition: all 0.2s ease;
 }
 
-
 .modal-close:hover {
     color: #333;
     background-color: #f5f5f5;
     transform: scale(1.1);
 }
-
 
 /* Listing Type Row */
 .listing-type-row {
@@ -72,14 +66,12 @@
     border-bottom: 2px solid #f0f0f0;
 }
 
-
 .listing-type-label {
     font-weight: 700;
     color: #333;
     font-size: 15px;
     white-space: nowrap;
 }
-
 
 .listing-type-select {
     padding: 6px 5px;
@@ -95,19 +87,16 @@
     height: 35px;
 }
 
-
 .listing-type-select:focus {
     outline: none;
     border-color: #4CAF50;
     box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
 }
 
-
 /* Modal Body Section */
 .modal-body {
     padding: 0 32px 32px;
 }
-
 
 .form-container {
     background: #f9f9f9;
@@ -115,19 +104,18 @@
     padding: 32px;
     margin-top: 12px;
     border: 1px solid #e8e8e8;
+     max-height: calc(90vh - 180px); /* reduce height so header + buttons still visible */
+    overflow-y: auto;
 }
-
 
 /* Layout Grids */
 .row {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
-
 
 .row:last-child {
     margin-bottom: 0;
 }
-
 
 .two-cols {
     display: grid;
@@ -135,13 +123,11 @@
     gap: 24px;
 }
 
-
 .three-cols {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 24px;
 }
-
 
 /* Form Elements */
 label {
@@ -152,7 +138,6 @@ label {
     font-size: 13px;
     letter-spacing: 0.3px;
 }
-
 
 input[type="text"],
 input[type="number"],
@@ -171,7 +156,6 @@ textarea {
     box-sizing: border-box;
 }
 
-
 input[type="text"]:focus,
 input[type="number"]:focus,
 input[type="datetime-local"]:focus,
@@ -182,7 +166,6 @@ textarea:focus {
     box-shadow: 0 0 0 4px rgba(76,175,80,0.15);
 }
 
-
 input[type="text"],
 input[type="number"],
 input[type="datetime-local"],
@@ -190,14 +173,12 @@ select {
     height: 50px;
 }
 
-
 textarea {
     resize: vertical;
-    min-height: 140px;
-    line-height: 1.6;
+    min-height: 60px;
+    line-height: 0.6;
     padding: 16px;
 }
-
 
 /* Price Input */
 .price-input {
@@ -205,7 +186,6 @@ textarea {
     display: flex;
     align-items: center;
 }
-
 
 .price-input .currency {
     position: absolute;
@@ -216,11 +196,9 @@ textarea {
     z-index: 1;
 }
 
-
 .price-input input {
     padding-left: 36px !important;
 }
-
 
 /* Bid Increment Slider */
 .small-col {
@@ -228,12 +206,10 @@ textarea {
     width: 100%;
 }
 
-
 .increment-slider-container {
     width: 100%;
     margin-bottom: 20px;
 }
-
 
 .increment-slider {
     width: 100%;
@@ -244,7 +220,6 @@ textarea {
     -webkit-appearance: none;
     margin: 12px 0 6px;
 }
-
 
 .increment-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -258,7 +233,6 @@ textarea {
     transition: all 0.2s ease;
 }
 
-
 .increment-slider::-moz-range-thumb {
     width: 24px;
     height: 24px;
@@ -270,12 +244,10 @@ textarea {
     transition: all 0.2s ease;
 }
 
-
 .increment-slider::-webkit-slider-thumb:hover {
     transform: scale(1.1);
     box-shadow: 0 4px 12px rgba(255,215,0,0.6);
 }
-
 
 .slider-labels {
     display: flex;
@@ -286,22 +258,20 @@ textarea {
     font-weight: 600;
 }
 
-
 #incrementValue {
     font-weight: 800;
     color: #FF8C00;
     margin-left: 4px;
 }
 
-
 /* Image Upload Area */
 .image-upload-area {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
     border: 2px dashed #dcdcdc;
     border-radius: 8px;
-    padding: 18px;
+    padding: 8px;
     text-align: center;
     position: relative;
     transition: border-color 0.15s ease;
@@ -312,13 +282,11 @@ textarea {
     border: 3px dashed #e0e0e0;
 }
 
-
 .image-upload-area:hover {
     border-color: #4CAF50;
     background: #f8fff8;
     transform: translateY(-2px);
 }
-
 
 .image-upload-area iconify-icon {
     color: #bdbdbd;
@@ -326,11 +294,9 @@ textarea {
     transition: color 0.3s ease;
 }
 
-
 .image-upload-area:hover iconify-icon {
     color: #4CAF50;
 }
-
 
 .image-upload-area p {
     margin: 0 0 10px;
@@ -340,13 +306,11 @@ textarea {
     font-weight: 500;
 }
 
-
 .upload-note {
     color: #9e9e9e !important;
     font-size: 13px !important;
     font-weight: 400;
 }
-
 
 .image-upload-area input[type="file"] {
     position: absolute;
@@ -357,7 +321,6 @@ textarea {
     cursor: pointer;
 }
 
-
 .upload-placeholder {
     display: flex;
     flex-direction: column;
@@ -366,7 +329,6 @@ textarea {
     color: #8c8a8a;
     padding: 8px 6px;
 }
-
 
 .image-preview {
     display: flex;
@@ -378,7 +340,6 @@ textarea {
     z-index: 2;
     position: relative;
 }
-
 
 .preview-item {
     position: relative;
@@ -393,14 +354,12 @@ textarea {
     justify-content: center;
 }
 
-
 .preview-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
-
 
 .preview-remove {
     position: absolute;
@@ -421,11 +380,9 @@ textarea {
     z-index: 3;
 }
 
-
 .preview-remove:hover {
     background: rgba(0,0,0,0.8);
 }
-
 
 /* Responsive Preview */
 @media (max-width: 600px) {
@@ -435,14 +392,12 @@ textarea {
     }
 }
 
-
 @media (max-width: 480px) {
     .image-preview {
         width: 72px;
         height: 72px;
     }
 }
-
 
 /* Character Count */
 .char-count {
@@ -453,17 +408,14 @@ textarea {
     font-weight: 500;
 }
 
-
 .char-count span {
     font-weight: 700;
 }
-
 
 /* Message Styles */
 #modalMessage {
     margin-bottom: 24px;
 }
-
 
 .message {
     padding: 16px 20px;
@@ -475,20 +427,17 @@ textarea {
     border-left: 4px solid;
 }
 
-
 .message.success {
     background: #f0f9f0;
     color: #2e7d32;
     border-left-color: #4CAF50;
 }
 
-
 .message.error {
     background: #fff0f0;
     color: #c62828;
     border-left-color: #f44336;
 }
-
 
 /* Buttons Styles */
 .form-actions {
@@ -499,7 +448,6 @@ textarea {
     padding-top: 32px;
     border-top: 2px solid #e8e8e8;
 }
-
 
 .cancel-btn,
 .create-btn {
@@ -513,13 +461,11 @@ textarea {
     letter-spacing: 0.5px;
 }
 
-
 .cancel-btn {
     background: #f8f9fa;
     color: #666;
     border: 2px solid #e0e0e0;
 }
-
 
 .cancel-btn:hover {
     background: #e9ecef;
@@ -529,20 +475,17 @@ textarea {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-
 .create-btn {
     background: linear-gradient(135deg, #4CAF50 0%, #43a047 100%);
     color: white;
     border: none;
 }
 
-
 .create-btn:hover:not(:disabled) {
     background: linear-gradient(135deg, #43a047 0%, #388e3c 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(76,175,80,0.4);
 }
-
 
 .create-btn:disabled {
     background: #e0e0e0;
@@ -552,67 +495,55 @@ textarea {
     box-shadow: none;
 }
 
-
 /* Responsive Layout */
 @media (max-width: 900px) {
     .modal-container {
         max-width: 95%;
         border-radius: 20px;
     }
-   
     .two-cols,
     .three-cols {
         grid-template-columns: 1fr;
         gap: 20px;
     }
-   
     .form-actions {
         flex-direction: column;
         gap: 12px;
     }
-   
     .cancel-btn,
     .create-btn {
         width: 100%;
         min-width: auto;
     }
-   
     .modal-header,
     .modal-body,
     .listing-type-row {
         padding-left: 24px;
         padding-right: 24px;
     }
-   
     .form-container {
         padding: 24px;
     }
 }
-
 
 /* Responsive Small Screens */
 @media (max-width: 600px) {
     .modal-header {
         padding: 20px 20px 16px;
     }
-   
     .modal-body {
         padding: 0 20px 24px;
     }
-   
     .listing-type-row {
         padding: 0 20px 20px;
     }
-   
     .form-container {
         padding: 20px;
         margin-top: 12px;
     }
-   
     .row {
         margin-bottom: 20px;
     }
-   
     input[type="text"],
     input[type="number"],
     input[type="datetime-local"],
@@ -620,7 +551,6 @@ textarea {
     textarea {
         padding: 12px 14px;
     }
-   
     .form-actions {
         margin-top: 32px;
         padding-top: 24px;
