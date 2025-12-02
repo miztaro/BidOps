@@ -21,7 +21,7 @@ session_start();
 
 $database = new Database();
 $db = $database->getConnection();
-$maxTitleLength = 50; 
+$maxTitleLength = 50;
 $minTitleLength = 3;
 $maxDescLength = 300;
 $minDescLength = 10;
@@ -46,7 +46,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($bid_increment_percent < 1 || $bid_increment_percent > 20) {
         $bid_increment_percent = 5;
         }
-        
+       
         $seller_id = 'u1'; // using Alice as default seller
         //$seller_id = $_SESSION['user_id']; //use current user
 
@@ -55,33 +55,33 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo json_encode(array("message" => "All fields are required."));
             exit();
         }
-        
+       
         if(empty(trim($title)) || empty(trim($description))) {
             http_response_code(400);
             echo json_encode(array("message" => empty(trim($title)) ? "Title cannot be empty." : "Description cannot be empty."));
             exit();
         }
-        
+       
         // Check minimum length
         if(strlen($title) < $minTitleLength) {
             http_response_code(400);
             echo json_encode(array("message" => "Title must be at least {$minTitleLength} characters."));
             exit();
         }
-        
+       
         if(strlen($description) < $minDescLength) {
             http_response_code(400);
             echo json_encode(array("message" => "Description must be at least {$minDescLength} characters."));
             exit();
         }
-        
+       
         // Check maximum length
         if(strlen($title) > $maxTitleLength) {
             http_response_code(400);
             echo json_encode(array("message" => "Title cannot exceed {$maxTitleLength} characters."));
             exit();
         }
-        
+       
         if(strlen($description) > $maxDescLength) {
             http_response_code(400);
             echo json_encode(array("message" => "Description cannot exceed {$maxDescLength} characters."));
@@ -94,16 +94,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 echo json_encode(array("message" => "End date and time are required for bid listings."));
                 exit();
             }
-            
+           
             if(empty($starting_price) || $starting_price <= 0) {
                 http_response_code(400);
                 echo json_encode(array("message" => "Starting price must be greater than 0."));
                 exit();
             }
-            
+           
             $end_date_mysql = date('Y-m-d H:i:s', strtotime($end_date));
             $now = date('Y-m-d H:i:s');
-            
+           
             if($end_date_mysql <= $now) {
                 http_response_code(400);
                 echo json_encode(array("message" => "End date must be in the future."));
@@ -111,34 +111,92 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        $image_path = null;
-        if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-            $upload_dir = "uploads/";
-            if(!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+        $savedImages = [];
+        $maxFiles = 5;
+        $maxSizeBytes = 10 * 1024 * 1024; 
+        $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
-            $file_extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
-            $filename = "item_" . time() . "_" . uniqid() . "." . $file_extension;
-            $target_file = $upload_dir . $filename;
+        // Normalize incoming file arrays
+        $fileInputs = [];
+        if (isset($_FILES['images'])) {
+            $fileInputs = $_FILES['images'];
+        } elseif (isset($_FILES['image'])) {
+            $fileInputs = $_FILES['image'];
+        }
 
-            $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-            if(!in_array(strtolower($file_extension), $allowed_types)) {
-                http_response_code(400);
-                echo json_encode(array("message" => "Only JPG, JPEG, PNG, GIF & WEBP files are allowed."));
-                exit();
-            }
+        // Helper to process normalized $_FILES-like array
+        if (!empty($fileInputs) && isset($fileInputs['name'])) {
+            if (is_array($fileInputs['name'])) {
+                $countFiles = count($fileInputs['name']);
+                $toProcess = min($countFiles, $maxFiles);
+                $upload_dir = __DIR__ . "/uploads/";
+                if(!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
-            if(move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-                $image_path = $target_file;
+                for ($i = 0; $i < $toProcess; $i++) {
+                    if ($fileInputs['error'][$i] !== 0) continue;
+                    $originalName = $fileInputs['name'][$i];
+                    $tmpName = $fileInputs['tmp_name'][$i];
+                    $size = $fileInputs['size'][$i];
+
+
+                    $file_extension = pathinfo($originalName, PATHINFO_EXTENSION);
+                    if (!in_array(strtolower($file_extension), $allowed_types)) {
+                        http_response_code(400);
+                        echo json_encode(array("message" => "Only JPG, JPEG, PNG, GIF & WEBP files are allowed."));
+                        exit();
+                    }
+                    if ($size > $maxSizeBytes) {
+                        http_response_code(400);
+                        echo json_encode(array("message" => "Each image must be less than 10MB."));
+                        exit();
+                    }
+
+                    $filename = "item_" . time() . "_" . uniqid() . "." . $file_extension;
+                    $target_file = $upload_dir . $filename;
+                    if (move_uploaded_file($tmpName, $target_file)) {
+                        // store relative path 
+                        $savedImages[] = "uploads/" . $filename;
+                    } else {
+                        throw new Exception("Failed to upload file: {$originalName}");
+                    }
+                }
             } else {
-                throw new Exception("Failed to upload image.");
+                if ($fileInputs['error'] == 0) {
+                    $originalName = $fileInputs['name'];
+                    $tmpName = $fileInputs['tmp_name'];
+                    $size = $fileInputs['size'];
+
+
+                    $file_extension = pathinfo($originalName, PATHINFO_EXTENSION);
+                    if (!in_array(strtolower($file_extension), $allowed_types)) {
+                        http_response_code(400);
+                        echo json_encode(array("message" => "Only JPG, JPEG, PNG, GIF & WEBP files are allowed."));
+                        exit();
+                    }
+                    if ($size > $maxSizeBytes) {
+                        http_response_code(400);
+                        echo json_encode(array("message" => "Image must be less than 10MB."));
+                        exit();
+                    }
+
+                    $upload_dir = __DIR__ . "/uploads/";
+                    if(!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+
+                    $filename = "item_" . time() . "_" . uniqid() . "." . $file_extension;
+                    $target_file = $upload_dir . $filename;
+                    if (move_uploaded_file($tmpName, $target_file)) {
+                        $savedImages[] = "uploads/" . $filename;
+                    } else {
+                        throw new Exception("Failed to upload image.");
+                    }
+                }
             }
         }
 
-        // Begin transaction
         $db->begin_transaction();
 
         try {
-            $query = "INSERT INTO ITEM (title, description, category_type, item_type, seller_id, status) 
+            $query = "INSERT INTO ITEM (title, description, category_type, item_type, seller_id, status)
                       VALUES (?, ?, ?, ?, ?, 'active')";
             $stmt = $db->prepare($query);
             $stmt->bind_param("sssss", $title, $description, $category, $listingType, $seller_id);
@@ -146,11 +204,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             if(!$stmt->execute()) throw new Exception("Failed to create item.");
             $item_id = $db->insert_id;
 
-            if($image_path) {
+            if (!empty($savedImages)) {
                 $imageQuery = "INSERT INTO ITEMIMAGE (image_path, item_id) VALUES (?, ?)";
                 $imageStmt = $db->prepare($imageQuery);
-                $imageStmt->bind_param("si", $image_path, $item_id);
-                if(!$imageStmt->execute()) throw new Exception("Failed to save image.");
+                foreach ($savedImages as $path) {
+                    $imageStmt->bind_param("si", $path, $item_id);
+                    if (!$imageStmt->execute()) throw new Exception("Failed to save image record.");
+                }
             }
 
             if($listingType == 'bid') {
