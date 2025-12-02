@@ -42,19 +42,7 @@ function disableAllButtons() {
         favoritesBtn.replaceWith(favoritesBtn.cloneNode(true));
     }
     
-    // Disable Chat with Seller button
-    const chatBtn = document.querySelector('.chat-btn');
-    if (chatBtn) {
-        chatBtn.disabled = true;
-        chatBtn.style.opacity = '0.6';
-        chatBtn.style.cursor = 'not-allowed';
-        chatBtn.title = 'Chat feature is currently disabled';
-        chatBtn.innerHTML = '<iconify-icon icon="mdi:message"></iconify-icon> Chat Seller';
-        
-        // Remove the click event listener
-        chatBtn.replaceWith(chatBtn.cloneNode(true));
-    }
-}
+    
 
 function setupBackButton() {
     if (backToPreviousBtn) {
@@ -277,4 +265,5 @@ function submitSwapOffer(itemName, itemDescription, itemCategory, itemImage, mes
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit Swap Offer';
     });
+}
 }
