@@ -94,7 +94,8 @@ html {
 
 .left-nav-menu .listings-btn,
 .left-nav-menu .bids-btn,
-.left-nav-menu .swaps-btn {
+.left-nav-menu .swaps-btn,
+.left-nav-menu .transactions-btn {
     background-color: var(--primary-base);
     border: 1px solid var(--primary);
     border-radius: 12px;
@@ -108,13 +109,15 @@ html {
 
 .left-nav-menu .listings-btn.active,
 .left-nav-menu .bids-btn.active,
-.left-nav-menu .swaps-btn.active {
+.left-nav-menu .swaps-btn.active,
+.left-nav-menu .transactions-btn.active {
     background-color: var(--primary-white);
 }
 
 .left-nav-menu .listings-btn:hover,
 .left-nav-menu .bids-btn:hover,
-.left-nav-menu .swaps-btn:hover {
+.left-nav-menu .swaps-btn:hover,
+.left-nav-menu .transactions-btn:hover {
     transform: translateX(10px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
@@ -122,7 +125,8 @@ html {
 
 .left-nav-menu .listings-btn .listings-logo,
 .left-nav-menu .bids-btn .bids-logo,
-.left-nav-menu .swaps-btn .swaps-logo {
+.left-nav-menu .swaps-btn .swaps-logox,
+.left-nav-menu .transactions-btn .transactions-logo {
     font-size: 3em;
     color: var(--primary);
     background-color: rgba(7, 48, 102, 0.63);
@@ -134,7 +138,8 @@ html {
 
 .left-nav-menu .listings-btn h6,
 .left-nav-menu .bids-btn h6,
-.left-nav-menu .swaps-btn h6 {
+.left-nav-menu .swaps-btn h6,
+.left-nav-menu .transactions-btn h6 {
     font-size: 1em;
     font-family: 'Montserrat-Bold', sans-serif;
     color: var(--primary);
@@ -142,7 +147,8 @@ html {
 
 .left-nav-menu .listings-btn p,
 .left-nav-menu .bids-btn p,
-.left-nav-menu .swaps-btn p {
+.left-nav-menu .swaps-btn p,
+.left-nav-menu .transactions-btn p {
     font-size: 1em;
     color: #8C8A8A;
 }
@@ -317,7 +323,8 @@ html {
 
 .listings-filter-btn,
 .bids-filter-btn,
-.swaps-filter-btn {
+.swaps-filter-btn,
+.transactions {
     padding: 3px 10px;
     display: flex;
     justify-content: center;
