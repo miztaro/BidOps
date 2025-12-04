@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<!-- This shows all the userratings for now. update once the login implementation is created! -->
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Profile Page</title>
     <link rel="stylesheet" href="style/profile.css" />
+    <link rel="stylesheet" href="style/feedbacks.css" />
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 </head>
 
@@ -18,9 +19,33 @@
                 <iconify-icon icon="line-md:arrow-left" width="34" height="34"></iconify-icon>Back Home
             </button>
         </section>
-
         <section class="right-side">
+            <div class="title-container">
+                <h3>Feedbacks</h3>
+                <div class="analytics"></div>
+            </div>
+
+            <div id="profile-feedback-content" class="profile-feedback-content">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Rater</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Completed At</th>
+                                <th>Transaction Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedback-tbody">
+                            <!-- taken from JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </section>
+
     </main>
 
     <div id="footer"></div>
@@ -39,6 +64,7 @@
     </script>
 
     <!-- JS Files -->
+     <script type="module" src="js/feedbacks.js"></script>
     <script type="module" src="js/profilepage.js"></script>
     <script type="module" src="js/profile-list-event/list-edit-item.js"></script>
     <script type="module" src="js/profile-list-event/list-view-item.js"></script>
