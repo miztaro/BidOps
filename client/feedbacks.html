@@ -15,8 +15,8 @@
 
     <main class="profile-section">
         <section class="left-nav-menu">
-            <button class="back-home" id="back-home">
-                <iconify-icon icon="line-md:arrow-left" width="34" height="34"></iconify-icon>Back Home
+            <button class="back-profile" id="back-profile">
+                <iconify-icon icon="line-md:arrow-left" width="34" height="34"></iconify-icon>Back
             </button>
         </section>
         <section class="right-side">
@@ -51,7 +51,6 @@
     <div id="footer"></div>
 
     <script>
-      // Dynamically load header and footer html into the divs
       fetch('header.html')
         .then(res => res.text())
         .then(html => document.getElementById('header').innerHTML = html)

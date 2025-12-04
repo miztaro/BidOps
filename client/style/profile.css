@@ -613,3 +613,51 @@ html {
     color: var(--primary-white);
     border: none;
 }
+
+.feedbacks-button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin: 20px 40px 20px 0;
+    padding-right: 20px;
+}
+
+.feedbacks-btn {
+    background-color: var(--primary-base);
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+    padding: 20px 30px;
+    max-width: 300px;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: var(--primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feedbacks-btn:hover {
+    transform: translateX(8px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.feedbacks-logo {
+    font-size: 2.5em;
+    background-color: rgba(7, 48, 102, 0.63);
+    padding: 10px;
+    border-radius: 50%;
+    color: var(--primary-white);
+}
+
+.feedbacks-btn h6 {
+    margin: 0;
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
+.feedbacks-btn p {
+    margin: 0;
+    font-size: 1em;
+    color: #8C8A8A;
+}

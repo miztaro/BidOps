@@ -155,6 +155,25 @@
     transform: translateY(-5px);
 }
 
+.back-profile { 
+    border-radius: 12px;
+    padding: 12px 25px;
+    font-family: 'Montserrat-Bold', sans-serif;
+    font-size: 1.2em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    margin-left: 10px;
+}
+
+.back-profile:hover {
+    transform: translateX(-5px);
+}
+
+
+
 @media (max-width: 768px) {
     .profile-section {
         flex-direction: column;

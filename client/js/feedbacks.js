@@ -2,6 +2,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const tbody = document.getElementById('feedback-tbody');
   const analyticsContainer = document.querySelector('.title-container .analytics');
 
+  // Handle back-profile button click to go to profilepage.html
+  const backProfileBtn = document.getElementById('back-profile');
+  if (backProfileBtn) {
+    backProfileBtn.addEventListener('click', () => {
+      window.location.href = 'profilepage.html';
+    });
+  }
+
   function renderStars(rating) {
     const r = parseInt(rating, 10) || 0;
     let stars = '';
