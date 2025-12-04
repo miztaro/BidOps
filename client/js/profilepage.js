@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
       <td>${swap.dateSwapped}</td>
       <td>
         <div class="actions-container">
-          <button class="swaps-view-btn">View</button>
+          <button class="swaps-view-btn" data-id="${swap.id}">View</button>
         </div>
       </td>
     `;
