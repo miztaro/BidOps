@@ -178,9 +178,9 @@ document.addEventListener('DOMContentLoaded', function () {
   ];
 
   function createSwappedRow(swap) {
-    const row = document.createElement("tr");
-    row.classList.add("swaps-body-row");
-    row.setAttribute("id", `swapped-item-row-${swap.id}`);
+  const row = document.createElement("tr");
+  row.classList.add("swaps-body-row");
+  row.setAttribute("id", `swapped-item-row-${swap.id}`);
 
     row.innerHTML = `
       <td class="item">${swap.item}</td>
@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
       <td>${swap.dateSwapped}</td>
       <td>
         <div class="actions-container">
-          <button class="swaps-view-btn" data-id="${swap.id}">View</button>
+          <button class="swaps-view-btn">View</button>
         </div>
       </td>
     `;
@@ -732,3 +732,236 @@ document.addEventListener('DOMContentLoaded', function () {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 });
+
+
+
+
+let currentSwapItemId = null;
+
+// Close swap modal
+const swapModalClose = document.getElementById('swap-modal-close');
+const swapModalOverlay = document.getElementById('swap-modal-overlay');
+
+if (swapModalClose) {
+    swapModalClose.addEventListener('click', closeSwapModal);
+}
+
+if (swapModalOverlay) {
+    swapModalOverlay.addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeSwapModal();
+        }
+    });
+}
+
+function openSwapModal(id) {
+  const modal = document.getElementById("swap-modal");
+
+  if (!modal) {
+    console.error("Swap modal not found!");
+    return;
+  }
+
+  // Store current swap item ID
+  currentSwapItemId = id;
+
+  // Show modal
+  modal.style.display = "flex";
+  document.body.style.overflow = 'hidden';
+
+  // Show loading state
+  document.getElementById("swap-modal-body").innerHTML = `
+    <div style="text-align: center; padding: 20px;">
+      <p>Loading swap details...</p>
+    </div>
+  `;
+
+  // Fetch the swap offers
+  fetchSwapOffers(id);
+}
+
+
+document.getElementById("closeSwapModal")?.addEventListener("click", () => {
+  const modal = document.getElementById("swap-modal");
+  if (modal) {
+    modal.style.display = "none";
+    document.body.style.overflow = 'auto';
+  }
+});
+
+function fetchSwapOffers(itemId) {
+    console.log('Fetching swap offers for item:', itemId);
+    
+    fetch(`../server/item/get_seller_swap_offers.php?item_id=${itemId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Swap offers data:', data);
+            
+            if (data.success) {
+                populateSwapModal(data);
+            } else {
+                alert('Error loading swap offers: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching swap offers:', error);
+            alert('Failed to load swap offers');
+        });
+}
+
+function populateSwapModal(data) {
+    const item = data.item;
+    const images = data.images;
+    const offers = data.swap_offers;
+    
+    console.log('Populating swap modal with:', { item, images, offers });
+    
+    // Set your item details
+    document.getElementById('swap-item-title').textContent = item.title;
+    document.getElementById('swap-item-category').textContent = item.category_type;
+    document.getElementById('swap-item-description').textContent = item.description || 'No description available.';
+    
+    // Set your item images
+    if (images.length > 0) {
+        const mainImage = document.getElementById('swap-main-image');
+        mainImage.src = `../server/item/${images[0].file_path}`;
+        
+        const thumbnailContainer = document.getElementById('swap-thumbnails');
+        thumbnailContainer.innerHTML = '';
+        
+        images.forEach((img, index) => {
+            const thumb = document.createElement('img');
+            thumb.src = `../server/item/${img.file_path}`;
+            thumb.classList.add(index === 0 ? 'active' : '');
+            thumb.addEventListener('click', () => {
+                mainImage.src = thumb.src;
+                thumbnailContainer.querySelectorAll('img').forEach(t => t.classList.remove('active'));
+                thumb.classList.add('active');
+            });
+            thumbnailContainer.appendChild(thumb);
+        });
+    }
+    
+    // Set swap offers
+    const offersList = document.getElementById('swap-offers-list');
+    const totalOffersEl = document.getElementById('total-swap-offers');
+    
+    totalOffersEl.textContent = `${offers.length} Offer${offers.length !== 1 ? 's' : ''}`;
+    
+    if (offers.length === 0) {
+        offersList.innerHTML = `
+            <div class="swap-empty-state">
+                <iconify-icon icon="ph:swap-bold"></iconify-icon>
+                <h4>No swap offers yet</h4>
+                <p>When users offer items to swap, they'll appear here</p>
+            </div>
+        `;
+    } else {
+        offersList.innerHTML = '';
+        offers.forEach(offer => {
+            const offerCard = createSwapOfferCard(offer);
+            offersList.appendChild(offerCard);
+        });
+    }
+}
+
+function createSwapOfferCard(offer) {
+    const card = document.createElement('div');
+    card.classList.add('swap-offer-card');
+    
+    const initials = offer.offerer_name.charAt(0).toUpperCase();
+    
+    const offerImage = offer.offered_item_images && offer.offered_item_images.length > 0
+        ? `../server/item/${offer.offered_item_images[0].file_path}`
+        : '../assets/images/placeholder.jpg';
+    
+    let actionsHTML = '';
+    if (offer.swap_status === 'pending') {
+        actionsHTML = `
+            <div class="swap-offer-actions">
+                <button class="btn-swap-accept" onclick="handleSwapAction(${offer.swap_id}, 'accept')">
+                    <iconify-icon icon="material-symbols:check-circle" width="20" height="20"></iconify-icon>
+                    Accept Swap
+                </button>
+                <button class="btn-swap-decline" onclick="handleSwapAction(${offer.swap_id}, 'decline')">
+                    <iconify-icon icon="material-symbols:cancel" width="20" height="20"></iconify-icon>
+                    Decline
+                </button>
+            </div>
+        `;
+    } else if (offer.swap_status === 'completed') {
+        actionsHTML = '<span class="swap-status-badge-small accepted">✓ Swap Accepted</span>';
+    } else if (offer.swap_status === 'cancelled') {
+        actionsHTML = '<span class="swap-status-badge-small declined">✗ Declined</span>';
+    }
+    
+    card.innerHTML = `
+        <div class="swap-offer-header">
+            <div class="offerer-info">
+                <div class="offerer-avatar">${initials}</div>
+                <div class="offerer-details">
+                    <h4>${offer.offerer_name}</h4>
+                    <p>${offer.time_ago}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="swap-offer-body">
+            <div class="offered-item-image">
+                <img src="${offerImage}" alt="${offer.offered_item_title || 'Offered Item'}">
+            </div>
+            <div class="offered-item-info">
+                <h3>${offer.offered_item_title || 'User\'s Item'}</h3>
+                <p class="offered-item-category">
+                    <iconify-icon icon="material-symbols:category" width="16" height="16"></iconify-icon>
+                    ${offer.offered_item_category || 'N/A'}
+                </p>
+                <p class="offered-item-description">${offer.offered_item_description || 'No description available'}</p>
+            </div>
+        </div>
+        
+        ${actionsHTML}
+    `;
+    
+    return card;
+}
+
+// Handle Accept/Decline Swap Actions
+window.handleSwapAction = function(swapId, action) {
+    const confirmMessage = action === 'accept' 
+        ? 'Are you sure you want to accept this swap? Your item will be marked as swapped.'
+        : 'Are you sure you want to decline this swap offer?';
+    
+    if (!confirm(confirmMessage)) return;
+    
+    fetch('../server/item/manage_swap.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            swap_id: swapId,
+            action: action
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            // Refresh the modal and listings
+            fetchSwapOffers(currentSwapItemId);
+            if (typeof fetchListings === 'function') {
+                fetchListings();
+            }
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to process swap action');
+    });
+};
+
+// Make openSwapModal available globally
+window.openSwapModal = openSwapModal;

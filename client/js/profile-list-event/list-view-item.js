@@ -1,5 +1,5 @@
 
-import { getStatusClass } from '../profilepage.js';
+// import { getStatusClass } from '../profilepage.js';
 // View Item Overlay
 document.addEventListener('DOMContentLoaded', function () {
     const viewItemOverlay = document.getElementById('list-view-overlay');
@@ -107,7 +107,7 @@ function displayItem(data) {
     const statusText = bid?.status || item.status || "No Status";
     const statusEl = document.querySelector('.view-status-field');
     statusEl.className = "view-status-field";
-    statusEl.classList.add(getStatusClass(statusText));
+    statusEl.classList.add(window.getStatusClass(statusText));
     statusEl.querySelector('p').textContent = statusText;
 
     if (isBid && statusText === "active") {
@@ -223,10 +223,10 @@ document.getElementById('bid-modal-overlay').addEventListener('click', function 
     }
 });
 
-function openSwapModal(itemId) {
-    console.log("Open Swap Modal for item:", itemId);
-    // TODO: implement your swap modal UI
-}
+// function openSwapModal(itemId) {
+//     console.log("Open Swap Modal for item:", itemId);
+//     // TODO: implement your swap modal UI
+// }
 
 function openBidModal(itemId) {
     const modal = document.getElementById('bid-modal-overlay');
