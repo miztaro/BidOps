@@ -125,7 +125,7 @@
 }
 
 .profile-feedback-content td {
-    padding: 18px 12px; /* Bigger padding */
+    padding: 18px 12px;
     vertical-align: middle;
     border-bottom: 1px solid #eee;
 }
@@ -157,20 +157,60 @@
 
 .back-profile { 
     border-radius: 12px;
-    padding: 12px 25px;
+    padding: 8px 12px;
     font-family: 'Montserrat-Bold', sans-serif;
-    font-size: 1.2em;
+    font-size: 1.1em;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 15px;
     margin-left: 10px;
+    background: none;
+    border: none;
 }
 
 .back-profile:hover {
-    transform: translateX(-5px);
+    transform: translateX(-3px);
 }
+
+.left-nav-menu .back-profile {
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    width: auto;
+    box-shadow: none;
+    transition: transform 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--primary);
+    font-family: 'Montserrat-Bold', sans-serif;
+    margin-bottom: 15px;
+}
+
+.left-nav-menu .back-profile:hover {
+    transform: translateX(5px);
+    box-shadow: none;
+}
+
+.left-nav-menu .back-profile iconify-icon {
+    font-size: 1.5em; 
+    color: var(--primary);
+    background: none;
+    border-radius: 0;
+    padding: 4px;
+    margin-bottom: 0;
+    box-shadow: none;
+}
+
+.left-nav-menu .back-profile span {
+    font-size: 0.95em;
+    color: #8C8A8A;
+}
+
+
 
 
 
