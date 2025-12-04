@@ -125,7 +125,7 @@ html {
 
 .left-nav-menu .listings-btn .listings-logo,
 .left-nav-menu .bids-btn .bids-logo,
-.left-nav-menu .swaps-btn .swaps-logox,
+.left-nav-menu .swaps-btn .swaps-logo,
 .left-nav-menu .transactions-btn .transactions-logo {
     font-size: 3em;
     color: var(--primary);
@@ -479,9 +479,9 @@ html {
     padding-left: 40px;
 }
 
-.profile-listings-content table .listings-body-row .actions-container .view-btn,
+.profile-listings-content table .listings-body-row .actions-container .lists-view-btn,
 .profile-bids-content table .bids-body-row .actions-container .bids-view-btn,
-.profile-swaps-content table .swaps-body-row .actions-container .view-btn {
+.profile-swaps-content table .swaps-body-row .actions-container .swaps-view-btn {
     padding: 5px 15px;
     border: 1px solid var(--accent-hover);
     background-color: transparent;
@@ -491,9 +491,9 @@ html {
     transition: 0.3s ease;
 }
 
-.profile-listings-content table .listings-body-row .actions-container .view-btn:hover,
+.profile-listings-content table .listings-body-row .actions-container .lists-view-btn:hover,
 .profile-bids-content table .bids-body-row .actions-container .bids-view-btn:hover,
-.profile-swaps-content table .swaps-body-row .actions-container .view-btn:hover {
+.profile-swaps-content table .swaps-body-row .actions-container .swaps-view-btn:hover {
     background-color: var(--accent);
     color: var(--primary);
     border:1px solid var(--accent);

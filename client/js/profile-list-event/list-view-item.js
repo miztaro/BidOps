@@ -1,36 +1,42 @@
 
-import { getStatusClass } from '../profilepage.js'; 
+import { getStatusClass } from '../profilepage.js';
 // View Item Overlay
 document.addEventListener('DOMContentLoaded', function () {
     const viewItemOverlay = document.getElementById('list-view-overlay');
     const closeButton = document.getElementById('close-view-btn')
 
     document.addEventListener("click", (event) => {
-        const viewItemBtn = event.target.closest('.view-btn');
+        const viewItemBtn = event.target.closest('.lists-view-btn');
         if (!viewItemBtn || !viewItemOverlay) return;
 
         const itemId = viewItemBtn.getAttribute("data-id");
+        const type = (viewItemBtn.getAttribute("data-type") || "").toLowerCase();
+        const status = (viewItemBtn.getAttribute("data-status") || "").toLowerCase();
+
         if (!itemId) {
             console.error("Item ID not found on view button.");
             return;
         }
 
+        if (type === "bid" && status === "active") {
+            currentItemId = itemId;
+            console.log("Opening Bid Modal", itemId);
+            openBidModal(itemId);
+            return;
+        }
+
+        if (type === "swap" && status === "active") {
+            currentItemId = itemId;
+             console.log("Opening Swap Modal", itemId);
+            openSwapModal(itemId);
+            return;
+        }
+
         const hiddenInput = document.getElementById('view-item-id');
         if (hiddenInput) hiddenInput.value = itemId;
-
         viewItemOverlay.classList.add('active');
 
-        fetchItem(itemId).then(data => {
-            const type = (data.item.item_type || "").toLowerCase();
-            const status = (data.item.status || "").toLowerCase();
-
-            // Open bid modal if it's an active bid
-            if (type === "bid" && status === "active") {
-                viewItemOverlay.classList.remove('active');
-                currentItemId = itemId;
-                openBidModal(itemId);
-            }
-        });
+        fetchItem(itemId);
     });
 
     if (closeButton && viewItemOverlay) {
@@ -70,8 +76,8 @@ function fetchItem(itemId) {
         xhr.onload = function () {
             if (xhr.status === 200) {
                 const data = JSON.parse(xhr.responseText);
-                displayItem(data); 
-                resolve(data); 
+                displayItem(data);
+                resolve(data);
             } else {
                 console.error("AJAX error: status", xhr.status);
                 reject(xhr.status);
@@ -100,10 +106,23 @@ function displayItem(data) {
 
     const statusText = bid?.status || item.status || "No Status";
     const statusEl = document.querySelector('.view-status-field');
-    statusEl.className = "view-status-field"; 
-    statusEl.classList.add(getStatusClass(statusText)); 
-    statusEl.querySelector('p').textContent = statusText; 
+    statusEl.className = "view-status-field";
+    statusEl.classList.add(getStatusClass(statusText));
+    statusEl.querySelector('p').textContent = statusText;
 
+    if (isBid && statusText === "active") {
+        closeNormalOverlay();
+        currentItemId = item.item_id;
+        openBidModal(item.item_id);
+        return;
+    }
+
+    if (isSwap && statusText === "active") {
+        closeNormalOverlay();
+        currentItemId = item.item_id;
+        openSwapModal(item.item_id);
+        return;
+    }
 
     document.querySelector('.name-cat-field h3').textContent = item.title;
     document.querySelector('.name-cat-field p').textContent = item.category_type;
@@ -140,6 +159,10 @@ function displayItem(data) {
     }
 }
 
+function closeNormalOverlay() {
+    const overlay = document.getElementById('list-view-overlay');
+    if (overlay) overlay.classList.remove('active');
+}
 
 function loadImages(imagePaths) {
     const mainImage = document.querySelector('.left-side .main-image img');
@@ -199,6 +222,11 @@ document.getElementById('bid-modal-overlay').addEventListener('click', function 
         closeBidModal();
     }
 });
+
+function openSwapModal(itemId) {
+    console.log("Open Swap Modal for item:", itemId);
+    // TODO: implement your swap modal UI
+}
 
 function openBidModal(itemId) {
     const modal = document.getElementById('bid-modal-overlay');

@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeButton = document.getElementById('bids-close-view-btn');
     const rateButton = document.querySelector(".rate-btn");
     const cancelRateButton = document.querySelector("#bids-rate-overlay .cancel-rate-btn");
+    const messageButton = document.querySelector(".message-btn");
 
     document.addEventListener("click", (event) => {
         const viewItemBtn = event.target.closest('.bids-view-btn');
@@ -42,6 +43,12 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
             e.stopPropagation();
             backToViewOverlay();
+        });
+    }
+    
+    if(messageButton){
+        messageButton.addEventListener("click", function (){
+            window.location.href = "../client/messages.html"
         });
     }
 });

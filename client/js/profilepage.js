@@ -20,7 +20,12 @@ export function createListingRow(listing) {
       <td><div class="status ${getStatusClass(listing.status)}">${listing.status}</div></td>
       <td>
         <div class="actions-container">
-          <button class="view-btn" data-id="${listing.id}">View</button>
+          <button class="lists-view-btn" 
+            data-id="${listing.id}"
+            data-type="${listing.mode}"
+            data-status="${listing.status.toLowerCase()}">
+            View
+          </button>
           ${listing.status.toLowerCase() === "active" ? `<iconify-icon data-id="${listing.id}" class="edit-btn" icon="flowbite:edit-outline" width="24" height="24"></iconify-icon>` : ''}
         </div>
       </td>
@@ -184,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
       <td>${swap.dateSwapped}</td>
       <td>
         <div class="actions-container">
-          <button class="view-btn">View</button>
+          <button class="swaps-view-btn">View</button>
         </div>
       </td>
     `;
