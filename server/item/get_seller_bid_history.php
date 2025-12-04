@@ -67,19 +67,20 @@ try {
 
     if ($item['item_type'] === 'bid') {
         $stmt = $db->prepare("
-            SELECT 
-                bo.bid_id,
-                bo.bid_amount,
-                bo.bid_status,
-                bo.created_at,
-                u.user_id,
-                u.username,
-                u.email
-            FROM bidoffer bo
-            INNER JOIN user u ON bo.user_id = u.user_id
-            WHERE bo.item_id = ?
-            ORDER BY bo.bid_amount DESC, bo.created_at DESC
-        ");
+             SELECT 
+             bo.bid_id,
+             bo.bid_amount,
+             bo.bid_status,
+             bo.created_at,
+              u.user_id,
+              u.username,
+              u.email
+         FROM bidoffer bo
+         INNER JOIN user u ON bo.bidder_id = u.user_id
+         WHERE bo.item_id = ?
+         ORDER BY bo.bid_amount DESC, bo.created_at DESC
+    ");
+
 
         $stmt->bind_param("i", $item_id);
         $stmt->execute();
