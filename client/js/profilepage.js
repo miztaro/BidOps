@@ -182,25 +182,19 @@ document.addEventListener('DOMContentLoaded', function () {
   row.classList.add("swaps-body-row");
   row.setAttribute("id", `swapped-item-row-${swap.id}`);
 
-  row.innerHTML = `
-    <td class="item">${swap.item}</td>
-    <td>${swap.category}</td>
-    <td>${swap.swappedItem}</td>
-    <td>${swap.dateSwapped}</td>
-    <td>
-      <div class="actions-container">
-        <button class="lists-view-btn"
-          data-id="${swap.id}"
-          data-type="swap"
-          data-status="active">
-          View
-        </button>
-      </div>
-    </td>
-  `;
-  return row;
-}
-
+    row.innerHTML = `
+      <td class="item">${swap.item}</td>
+      <td>${swap.category}</td>
+      <td>${swap.swappedItem}</td>
+      <td>${swap.dateSwapped}</td>
+      <td>
+        <div class="actions-container">
+          <button class="swaps-view-btn">View</button>
+        </div>
+      </td>
+    `;
+    return row;
+  }
 
   function calculateSwapsStats(swaps) {
     return {
