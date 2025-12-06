@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load all reports
     function loadReports() {
-        fetch('../../server/report/get_reports.php')
+        fetch('/BidOps/server/report/get_reports.php')
             .then(res => res.json())
             .then(data => {
                 console.log('Reports fetched:', data);
@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const targetId = report.reported_item_id || report.reported_user_id;
         const targetType = report.reported_item_id ? 'item' : 'user';
 
-        fetch('../../server/report/ban_target.php', {
+        fetch('/BidOps/server/report/ban_target.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleDismissReport(reportId) {
         if (!confirm('Are you sure you want to dismiss this report?')) return;
 
-        fetch('../../server/report/dismiss_report.php', {
+        fetch('/BidOps/server/report/dismiss_report.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ report_id: reportId })

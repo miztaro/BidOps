@@ -121,7 +121,7 @@
   <script src="js/manage-reports.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      fetch("../server_try/auth/getRole.php")
+      fetch("../server/auth/get_role.php")
         .then(response => response.json())
         .then(data => {
           const role = data.role; 
@@ -130,7 +130,7 @@
           if (role === "admin") {
             headerFile = "header.html";
           } else {
-            headerFile = "user_header.html";
+            headerFile = "header.html";
           }
 
           fetch(headerFile)
