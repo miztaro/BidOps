@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Reports | Swap and Bid</title>
+  <link rel="stylesheet" href="styles/manage-reports.css" />
+</head>
+<body>
+  <div id="header"></div>
+  
+  <main class="content">
+    <section class="heading">
+      <h1>User Reports Management</h1>
+      <p class="subtext">Review and manage user-submitted reports to maintain platform safety</p>
+    </section>
+
+    <section class="filter-section">
+      <div class="filter-group">
+        <label>Report Type:</label>
+        <select id="filter-type">
+          <option value="all">All Types</option>
+          <option value="item">Item Report</option>
+          <option value="user">User Report</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label>Date Submitted:</label>
+        <input type="date" id="filter-date">
+      </div>
+      
+      <div class="filter-group">
+        <label>Sort by:</label>
+        <select id="filter-sort">
+          <option value="all">All time</option>
+          <option value="today">Today</option>
+          <option value="week">Last 7 days</option>
+          <option value="month">Last 30 days</option>
+        </select>
+      </div>
+      
+      <button id="apply-filters">Apply Filters</button>
+    </section>
+
+    <section class="reports-table-container">
+      <table class="reports-table">
+        <thead>
+          <tr>
+            <th>Report ID</th>
+            <th>Report Item/User</th>
+            <th>Reporter</th>
+            <th>Description</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="reports-table-body">
+          <!-- Reports will be dynamically inserted here -->
+        </tbody>
+      </table>
+    </section>
+
+    <section id="empty-state" class="hidden">
+      <p>No reports found.</p>
+    </section>
+
+    <div class="pagination">
+      <p id="pagination-info">Showing 1-5 of 23 reports</p>
+    </div>
+  </main>
+
+  <!-- Report Details Modal -->
+  <div id="report-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="modal-close" id="modal-close">&times;</span>
+      
+      <h2>Report Details</h2>
+      
+      <div class="modal-body" id="modal-body">
+        <div class="detail-row">
+          <span class="label">Report ID:</span>
+          <span class="value" id="modal-report-id"></span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="label">Report Type:</span>
+          <span class="value" id="modal-report-type"></span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="label">Reported Item/User:</span>
+          <span class="value" id="modal-reported-target"></span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="label">Reporter:</span>
+          <span class="value" id="modal-reporter"></span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="label">Date Submitted:</span>
+          <span class="value" id="modal-date"></span>
+        </div>
+        
+        <div class="detail-row full-width">
+          <span class="label">Description:</span>
+          <p class="description-text" id="modal-description"></p>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn-view-item" id="modal-view-item">View Item/User</button>
+        <button class="btn-ban" id="modal-ban">Ban User/Item</button>
+        <button class="btn-dismiss" id="modal-dismiss">Dismiss Report</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/nav-bar.js"></script>
+  <script src="js/manage-reports.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      fetch("../server_try/auth/getRole.php")
+        .then(response => response.json())
+        .then(data => {
+          const role = data.role; 
+          let headerFile = "";
+
+          if (role === "admin") {
+            headerFile = "header.html";
+          } else {
+            headerFile = "user_header.html";
+          }
+
+          fetch(headerFile)
+            .then(response => response.text())
+            .then(header => {
+              document.getElementById("header").innerHTML = header;
+            })
+            .catch(error => console.error("Error loading header:", error));
+        })
+        .catch(error => console.error("Error determining role:", error));
+    });
+  </script>  
+</body>
+</html>
