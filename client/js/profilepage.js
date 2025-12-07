@@ -53,6 +53,11 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .catch(error => console.error("Error loading header:", error));
 
+  fetch('footer.html')
+    .then(res => res.text())
+    .then(html => document.getElementById('footer').innerHTML = html)
+    .catch(err => console.error('Error loading footer:', err));
+
   const contents = document.querySelectorAll(
     "#profile-user-info-content, #profile-listings-content, #profile-bids-content, #profile-swaps-content"
   );
@@ -178,9 +183,9 @@ document.addEventListener('DOMContentLoaded', function () {
   ];
 
   function createSwappedRow(swap) {
-  const row = document.createElement("tr");
-  row.classList.add("swaps-body-row");
-  row.setAttribute("id", `swapped-item-row-${swap.id}`);
+    const row = document.createElement("tr");
+    row.classList.add("swaps-body-row");
+    row.setAttribute("id", `swapped-item-row-${swap.id}`);
 
     row.innerHTML = `
       <td class="item">${swap.item}</td>
@@ -470,271 +475,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   });
-
-  //Edit Overlay
-  const editOverlay = document.querySelector(".edit-overlay");
-  document.addEventListener("click", (event) => {
-    const editButton = event.target.closest(".edit-btn");
-    if (editButton) {
-      const itemId = editButton.getAttribute("data-id");
-      if (!itemId) {
-        alert("Item ID not found.");
-        return;
-      }
-
-      fetchItemData(itemId);
-      editOverlay.classList.add("active");
-    }
-  });
-
-  document.querySelector(".form-container").addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    if (!this.checkValidity()) {
-      this.reportValidity();
-      return;
-    }
-
-    // Detect changes in fields
-    const fields = ['item-name', 'category', 'description', 'start-price', 'end-date'];
-    let changed = fields.some(id => {
-      const input = document.getElementById(id);
-      return input && input.value !== input.dataset.original;
-    });
-
-    // Detect changes in images
-    const originalImages = JSON.parse(document.getElementById('image-container').dataset.originalImages || '[]');
-    if (images.length !== originalImages.length || removedImages.length > 0 || newFiles.length > 0) {
-      changed = true;
-    }
-
-    if (!changed) {
-      alert("No changes detected.");
-      document.querySelector(".edit-overlay").classList.remove("active");
-      return;
-    }
-
-    const formData = new FormData(this);
-
-    // Append removed images (URLs to delete from DB)
-    formData.append('removed_images', JSON.stringify(removedImages));
-
-    // Append new files
-    newFiles.forEach((file, i) => {
-      formData.append('images[]', file, file.name);
-    });
-
-    // Append remaining existing images
-    const existingImages = images.filter(src => typeof src === 'string' && !src.startsWith('data:'));
-    formData.append('existing_images', JSON.stringify(existingImages));
-
-    fetch("../server/item/update_item.php", {
-      method: "POST",
-      body: formData
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          alert("Item updated!");
-          document.querySelector(".edit-overlay").classList.remove("active");
-          removedImages = [];
-          newFiles = [];
-        } else {
-          alert("Update failed: " + data.message);
-        }
-      })
-      .catch(err => console.error(err));
-  });
-
-  const editCancelButton = document.querySelector(".edit-cancel-btn");
-  editCancelButton.addEventListener("click", (event) => {
-    event.stopPropagation();
-
-    const inputs = document.querySelectorAll(".form-container input, .form-container textarea, .form-container select");
-    inputs.forEach(input => {
-      if (input.dataset.original !== undefined) {
-        input.value = input.dataset.original;
-      }
-    });
-
-    const imageContainer = document.getElementById('image-container');
-    if (imageContainer.dataset.originalImages) {
-      const originalImages = JSON.parse(imageContainer.dataset.originalImages);
-
-      images = [...originalImages];
-      newFiles = [];
-      removedImages = [];
-
-      renderImages();
-    }
-    editOverlay.classList.remove("active");
-  });
-
-  function fetchItemData(itemId) {
-    fetch(`../server/item/get_item_single.php?id=${itemId}`)
-      .then(response => response.json())
-      .then(data => {
-        populateForm(data);
-      })
-      .catch(error => console.error("Error fetching item data:", error));
-  }
-
-  let images = [];
-  let removedImages = [];
-  let newFiles = [];
-
-  function populateForm(data) {
-    const item = data.item;
-    const bid = data.bid;
-    const existingImages = Array.isArray(data.images) ? data.images : [];
-    const categories = data.categories || [];
-    const statusDisplayDiv = document.getElementById('status-display');
-    const statusClass = getStatusClass(item.status);
-
-    images = [
-      ...existingImages,
-      ...images.filter(img => img instanceof File)
-    ];
-
-    removedImages = [];
-    // newFiles = [];
-
-    const imageContainer = document.getElementById('image-container');
-    imageContainer.dataset.originalImages = JSON.stringify(existingImages);
-    renderImages();
-
-    // Inputs
-    const itemIdInput = document.getElementById('item-id');
-    const itemNameInput = document.getElementById('item-name');
-    const categoryInput = document.getElementById('category');
-    const descriptionInput = document.getElementById('description');
-    const statusHiddenInput = document.getElementById('status-hidden');
-    const startPriceInput = document.getElementById('start-price');
-    const startDateInput = document.getElementById('start-date');
-    const endDateInput = document.getElementById('end-date');
-    const modeFieldH3 = document.querySelector('.mode-field h3');
-    const itemTypeInput = document.getElementById('item-type');
-    itemTypeInput.value = item.item_type || '';
-
-    // Set values
-    itemIdInput.value = item.item_id;
-    itemNameInput.value = item.title;
-    categoryInput.value = item.category_type;
-    descriptionInput.value = item.description;
-    statusDisplayDiv.textContent = item.status;
-    statusDisplayDiv.className = `status-display ${statusClass}`;
-    statusHiddenInput.value = item.status;
-
-    const isSwap = item.item_type?.toLowerCase() === "swap";
-    if (modeFieldH3) {
-      modeFieldH3.textContent = isSwap ? "Swap" : "Bid";
-    }
-
-    const priceFieldSection = document.querySelector('.price-field');
-    if (priceFieldSection) {
-      if (isSwap) {
-        priceFieldSection.style.display = 'none';
-
-        startPriceInput.required = false;
-        endDateInput.required = false;
-
-        startPriceInput.disabled = true;
-        startDateInput.disabled = true;
-        endDateInput.disabled = true;
-
-      } else {
-        priceFieldSection.style.display = 'flex';
-
-        startPriceInput.required = true;
-        endDateInput.required = true;
-
-        startPriceInput.disabled = false;
-        startDateInput.disabled = false;
-        endDateInput.disabled = false;
-
-        startPriceInput.value = bid ? bid.starting_price : 0;
-        startDateInput.value = bid ? formatDateTimeLocal(bid.start_date) : formatDateTimeLocal(new Date());
-        startDateInput.readOnly = true;
-        endDateInput.value = bid ? formatDateTimeLocal(bid.end_date) : '';
-      }
-    }
-
-    categoryInput.innerHTML = '';
-    categories.forEach(cat => {
-      const option = document.createElement('option');
-      option.value = cat;
-      option.textContent = cat;
-      if (cat === item.category_type) option.selected = true;
-      categoryInput.appendChild(option);
-    });
-
-    // Store original values for reset
-    itemIdInput.dataset.original = itemIdInput.value;
-    itemNameInput.dataset.original = itemNameInput.value;
-    categoryInput.dataset.original = categoryInput.options[categoryInput.selectedIndex].value;
-    descriptionInput.dataset.original = descriptionInput.value;
-    statusDisplayDiv.dataset.original = statusDisplayDiv.textContent;
-    statusHiddenInput.dataset.original = statusHiddenInput.value;
-    startPriceInput.dataset.original = startPriceInput.value;
-    startDateInput.dataset.original = startDateInput.value;
-    endDateInput.dataset.original = endDateInput.value;
-  }
-
-  // Render images (existing + new)
-  function renderImages() {
-    const imageContainer = document.getElementById('image-container');
-    imageContainer.innerHTML = '';
-
-    images.forEach((img, index) => {
-      const div = document.createElement('div');
-      div.classList.add('image-preview');
-
-      const imgSrc = img instanceof File
-        ? URL.createObjectURL(img)
-        : `../server/item/${img}`;
-
-      div.innerHTML = `
-            <img src="${imgSrc}" alt="">
-            <button class="remove-btn">&times;</button>
-        `;
-
-      div.querySelector('.remove-btn').addEventListener('click', () => {
-        if (img instanceof File) {
-          const fileIndex = newFiles.indexOf(img);
-          if (fileIndex > -1) newFiles.splice(fileIndex, 1);
-        } else {
-          removedImages.push(img);
-        }
-        images.splice(index, 1);
-        renderImages();
-      });
-      imageContainer.appendChild(div);
-    });
-  }
-
-  document.getElementById('image-upload').addEventListener('change', (event) => {
-    const files = Array.from(event.target.files);
-
-    files.forEach(file => {
-      images.push(file);   
-      newFiles.push(file); 
-    });
-
-    renderImages();   
-    event.target.value = ''; 
-  });
-
-  function formatDateTimeLocal(dt) {
-    if (!dt) return '';
-    const d = new Date(dt);
-    if (isNaN(d)) return '';
-    const pad = n => n.toString().padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  }
 });
-
-
-
 
 let currentSwapItemId = null;
 
@@ -743,15 +484,15 @@ const swapModalClose = document.getElementById('swap-modal-close');
 const swapModalOverlay = document.getElementById('swap-modal-overlay');
 
 if (swapModalClose) {
-    swapModalClose.addEventListener('click', closeSwapModal);
+  swapModalClose.addEventListener('click', closeSwapModal);
 }
 
 if (swapModalOverlay) {
-    swapModalOverlay.addEventListener('click', function(event) {
-        if (event.target === this) {
-            closeSwapModal();
-        }
-    });
+  swapModalOverlay.addEventListener('click', function (event) {
+    if (event.target === this) {
+      closeSwapModal();
+    }
+  });
 }
 
 function openSwapModal(id) {
@@ -790,94 +531,94 @@ document.getElementById("closeSwapModal")?.addEventListener("click", () => {
 });
 
 function fetchSwapOffers(itemId) {
-    console.log('Fetching swap offers for item:', itemId);
-    
-    fetch(`../server/item/get_seller_swap_offers.php?item_id=${itemId}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Swap offers data:', data);
-            
-            if (data.success) {
-                populateSwapModal(data);
-            } else {
-                alert('Error loading swap offers: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching swap offers:', error);
-            alert('Failed to load swap offers');
-        });
+  console.log('Fetching swap offers for item:', itemId);
+
+  fetch(`../server/item/get_seller_swap_offers.php?item_id=${itemId}`)
+    .then(response => response.json())
+    .then(data => {
+      console.log('Swap offers data:', data);
+
+      if (data.success) {
+        populateSwapModal(data);
+      } else {
+        alert('Error loading swap offers: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching swap offers:', error);
+      alert('Failed to load swap offers');
+    });
 }
 
 function populateSwapModal(data) {
-    const item = data.item;
-    const images = data.images;
-    const offers = data.swap_offers;
-    
-    console.log('Populating swap modal with:', { item, images, offers });
-    
-    // Set your item details
-    document.getElementById('swap-item-title').textContent = item.title;
-    document.getElementById('swap-item-category').textContent = item.category_type;
-    document.getElementById('swap-item-description').textContent = item.description || 'No description available.';
-    
-    // Set your item images
-    if (images.length > 0) {
-        const mainImage = document.getElementById('swap-main-image');
-        mainImage.src = `../server/item/${images[0].file_path}`;
-        
-        const thumbnailContainer = document.getElementById('swap-thumbnails');
-        thumbnailContainer.innerHTML = '';
-        
-        images.forEach((img, index) => {
-            const thumb = document.createElement('img');
-            thumb.src = `../server/item/${img.file_path}`;
-            thumb.classList.add(index === 0 ? 'active' : '');
-            thumb.addEventListener('click', () => {
-                mainImage.src = thumb.src;
-                thumbnailContainer.querySelectorAll('img').forEach(t => t.classList.remove('active'));
-                thumb.classList.add('active');
-            });
-            thumbnailContainer.appendChild(thumb);
-        });
-    }
-    
-    // Set swap offers
-    const offersList = document.getElementById('swap-offers-list');
-    const totalOffersEl = document.getElementById('total-swap-offers');
-    
-    totalOffersEl.textContent = `${offers.length} Offer${offers.length !== 1 ? 's' : ''}`;
-    
-    if (offers.length === 0) {
-        offersList.innerHTML = `
+  const item = data.item;
+  const images = data.images;
+  const offers = data.swap_offers;
+
+  console.log('Populating swap modal with:', { item, images, offers });
+
+  // Set your item details
+  document.getElementById('swap-item-title').textContent = item.title;
+  document.getElementById('swap-item-category').textContent = item.category_type;
+  document.getElementById('swap-item-description').textContent = item.description || 'No description available.';
+
+  // Set your item images
+  if (images.length > 0) {
+    const mainImage = document.getElementById('swap-main-image');
+    mainImage.src = `../server/item/${images[0].file_path}`;
+
+    const thumbnailContainer = document.getElementById('swap-thumbnails');
+    thumbnailContainer.innerHTML = '';
+
+    images.forEach((img, index) => {
+      const thumb = document.createElement('img');
+      thumb.src = `../server/item/${img.file_path}`;
+      thumb.classList.add(index === 0 ? 'active' : '');
+      thumb.addEventListener('click', () => {
+        mainImage.src = thumb.src;
+        thumbnailContainer.querySelectorAll('img').forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+      });
+      thumbnailContainer.appendChild(thumb);
+    });
+  }
+
+  // Set swap offers
+  const offersList = document.getElementById('swap-offers-list');
+  const totalOffersEl = document.getElementById('total-swap-offers');
+
+  totalOffersEl.textContent = `${offers.length} Offer${offers.length !== 1 ? 's' : ''}`;
+
+  if (offers.length === 0) {
+    offersList.innerHTML = `
             <div class="swap-empty-state">
                 <iconify-icon icon="ph:swap-bold"></iconify-icon>
                 <h4>No swap offers yet</h4>
                 <p>When users offer items to swap, they'll appear here</p>
             </div>
         `;
-    } else {
-        offersList.innerHTML = '';
-        offers.forEach(offer => {
-            const offerCard = createSwapOfferCard(offer);
-            offersList.appendChild(offerCard);
-        });
-    }
+  } else {
+    offersList.innerHTML = '';
+    offers.forEach(offer => {
+      const offerCard = createSwapOfferCard(offer);
+      offersList.appendChild(offerCard);
+    });
+  }
 }
 
 function createSwapOfferCard(offer) {
-    const card = document.createElement('div');
-    card.classList.add('swap-offer-card');
-    
-    const initials = offer.offerer_name.charAt(0).toUpperCase();
-    
-    const offerImage = offer.offered_item_images && offer.offered_item_images.length > 0
-        ? `../server/item/${offer.offered_item_images[0].file_path}`
-        : '../assets/images/placeholder.jpg';
-    
-    let actionsHTML = '';
-    if (offer.swap_status === 'pending') {
-        actionsHTML = `
+  const card = document.createElement('div');
+  card.classList.add('swap-offer-card');
+
+  const initials = offer.offerer_name.charAt(0).toUpperCase();
+
+  const offerImage = offer.offered_item_images && offer.offered_item_images.length > 0
+    ? `../server/item/${offer.offered_item_images[0].file_path}`
+    : '../assets/images/placeholder.jpg';
+
+  let actionsHTML = '';
+  if (offer.swap_status === 'pending') {
+    actionsHTML = `
             <div class="swap-offer-actions">
                 <button class="btn-swap-accept" onclick="handleSwapAction(${offer.swap_id}, 'accept')">
                     <iconify-icon icon="material-symbols:check-circle" width="20" height="20"></iconify-icon>
@@ -889,13 +630,13 @@ function createSwapOfferCard(offer) {
                 </button>
             </div>
         `;
-    } else if (offer.swap_status === 'completed') {
-        actionsHTML = '<span class="swap-status-badge-small accepted">✓ Swap Accepted</span>';
-    } else if (offer.swap_status === 'cancelled') {
-        actionsHTML = '<span class="swap-status-badge-small declined">✗ Declined</span>';
-    }
-    
-    card.innerHTML = `
+  } else if (offer.swap_status === 'completed') {
+    actionsHTML = '<span class="swap-status-badge-small accepted">✓ Swap Accepted</span>';
+  } else if (offer.swap_status === 'cancelled') {
+    actionsHTML = '<span class="swap-status-badge-small declined">✗ Declined</span>';
+  }
+
+  card.innerHTML = `
         <div class="swap-offer-header">
             <div class="offerer-info">
                 <div class="offerer-avatar">${initials}</div>
@@ -922,44 +663,44 @@ function createSwapOfferCard(offer) {
         
         ${actionsHTML}
     `;
-    
-    return card;
+
+  return card;
 }
 
 // Handle Accept/Decline Swap Actions
-window.handleSwapAction = function(swapId, action) {
-    const confirmMessage = action === 'accept' 
-        ? 'Are you sure you want to accept this swap? Your item will be marked as swapped.'
-        : 'Are you sure you want to decline this swap offer?';
-    
-    if (!confirm(confirmMessage)) return;
-    
-    fetch('../server/item/manage_swap.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            swap_id: swapId,
-            action: action
-        })
+window.handleSwapAction = function (swapId, action) {
+  const confirmMessage = action === 'accept'
+    ? 'Are you sure you want to accept this swap? Your item will be marked as swapped.'
+    : 'Are you sure you want to decline this swap offer?';
+
+  if (!confirm(confirmMessage)) return;
+
+  fetch('../server/item/manage_swap.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      swap_id: swapId,
+      action: action
     })
+  })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            alert(data.message);
-            // Refresh the modal and listings
-            fetchSwapOffers(currentSwapItemId);
-            if (typeof fetchListings === 'function') {
-                fetchListings();
-            }
-        } else {
-            alert('Error: ' + data.message);
+      if (data.success) {
+        alert(data.message);
+        // Refresh the modal and listings
+        fetchSwapOffers(currentSwapItemId);
+        if (typeof fetchListings === 'function') {
+          fetchListings();
         }
+      } else {
+        alert('Error: ' + data.message);
+      }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to process swap action');
+      console.error('Error:', error);
+      alert('Failed to process swap action');
     });
 };
 

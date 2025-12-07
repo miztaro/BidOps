@@ -20,8 +20,8 @@ html {
 
 .left-nav-menu {
     display: inline-grid;
-    gap: 20px;
-    padding-left: 30px;
+    gap: 10px;
+    padding: 0 0 30px 30px;
     flex: 1;
 }
 
@@ -92,14 +92,11 @@ html {
 }
 
 
-.left-nav-menu .listings-btn,
-.left-nav-menu .bids-btn,
-.left-nav-menu .swaps-btn,
-.left-nav-menu .transactions-btn {
+.left-nav-menu  > button:not(:nth-child(1)):not(:nth-child(2)){
     background-color: var(--primary-base);
     border: 1px solid var(--primary);
     border-radius: 12px;
-    padding: 30px 20px;
+    padding: 20px 0px;
     width: 300px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -107,17 +104,11 @@ html {
     cursor: pointer;
 }
 
-.left-nav-menu .listings-btn.active,
-.left-nav-menu .bids-btn.active,
-.left-nav-menu .swaps-btn.active,
-.left-nav-menu .transactions-btn.active {
+.left-nav-menu > button:not(:nth-child(1)):not(:nth-child(2)).active{
     background-color: var(--primary-white);
 }
 
-.left-nav-menu .listings-btn:hover,
-.left-nav-menu .bids-btn:hover,
-.left-nav-menu .swaps-btn:hover,
-.left-nav-menu .transactions-btn:hover {
+.left-nav-menu > button:not(:nth-child(1)):not(:nth-child(2)):hover {
     transform: translateX(10px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
@@ -126,6 +117,8 @@ html {
 .left-nav-menu .listings-btn .listings-logo,
 .left-nav-menu .bids-btn .bids-logo,
 .left-nav-menu .swaps-btn .swaps-logo,
+.left-nav-menu .favorites-btn .favorites-logo,
+.left-nav-menu .feedbacks-btn .feedbacks-logo,
 .left-nav-menu .transactions-btn .transactions-logo {
     font-size: 3em;
     color: var(--primary);
@@ -136,19 +129,13 @@ html {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.left-nav-menu .listings-btn h6,
-.left-nav-menu .bids-btn h6,
-.left-nav-menu .swaps-btn h6,
-.left-nav-menu .transactions-btn h6 {
+.left-nav-menu > button:not(:nth-child(1)):not(:nth-child(2)) h6{
     font-size: 1em;
     font-family: 'Montserrat-Bold', sans-serif;
     color: var(--primary);
 }
 
-.left-nav-menu .listings-btn p,
-.left-nav-menu .bids-btn p,
-.left-nav-menu .swaps-btn p,
-.left-nav-menu .transactions-btn p {
+.left-nav-menu > button:not(:nth-child(1)):not(:nth-child(2)) p{
     font-size: 1em;
     color: #8C8A8A;
 }
@@ -157,7 +144,7 @@ html {
     flex: 4.5;
     display: flex;
     flex-direction: column;
-    padding-right: 30px;
+    padding: 0 30px 30px 0;
     gap: 10px;
 }
 
@@ -210,7 +197,9 @@ html {
 .right-side .profile-swaps-content {
     background-color: var(--primary-base);
     border-radius: 20px;
-    border: none;
+    max-height: 75vh;
+    height: auto;
+    border: 1px solid var(--primary);
     flex: 12;
     padding: 30px;
 }
@@ -218,7 +207,7 @@ html {
 .right-side .profile-listings-content .table-container,
 .right-side .profile-bids-content .table-container,
 .right-side .profile-swaps-content .table-container {
-    max-height: 57vh;
+    height: 100%;
     overflow-y: auto;
     display: block;
 }
@@ -332,7 +321,7 @@ html {
     border: 1px solid var(--primary);
     border-radius: 20px;
     color: var(--primary);
-    background-color:transparent;
+    background-color: transparent;
     font-size: 0.8rem;
     cursor: pointer;
     transition: 0.3s ease-in;
@@ -496,10 +485,10 @@ html {
 .profile-swaps-content table .swaps-body-row .actions-container .swaps-view-btn:hover {
     background-color: var(--accent);
     color: var(--primary);
-    border:1px solid var(--accent);
+    border: 1px solid var(--accent);
 }
 
-.profile-listings-content table .listings-body-row .actions-container .edit-btn:hover{
+.profile-listings-content table .listings-body-row .actions-container .edit-btn:hover {
     color: var(--primary-red);
     transition: 0.3s ease;
 }
@@ -613,76 +602,27 @@ html {
     color: var(--primary-white);
     border: none;
 }
+
 .swap-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
 }
 
 .swap-modal-content {
-  background: white;
-  width: 500px;
-  max-width: 90%;
-  padding: 20px;
-  border-radius: 12px;
+    background: white;
+    width: 500px;
+    max-width: 90%;
+    padding: 20px;
+    border-radius: 12px;
 }
 
 .swap-modal-close {
-  float: right;
-  font-size: 22px;
-  cursor: pointer;
-}
-
-/* Feedbacks Button Styling */
-.feedbacks-button-container {
-    display: flex;
-    justify-content: flex-end;
-    margin: 20px 40px 20px 0;
-    padding-right: 20px;
-}
-
-.right-side .feedbacks-btn {
-    background-color: var(--primary-base);
-    border: 1px solid var(--primary);
-    border-radius: 12px;
-    padding: 20px 30px;
-    max-width: 300px;
-    width: 100%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    color: var(--primary);
+    float: right;
+    font-size: 22px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    font-family: 'Montserrat-Bold', sans-serif;
-}
-
-.right-side .feedbacks-btn:hover {
-    transform: translateX(8px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-.right-side .feedbacks-logo {
-    font-size: 2.5em;
-    background-color: rgba(7, 48, 102, 0.63);
-    padding: 10px;
-    border-radius: 50%;
-    color: var(--primary-white);
-}
-
-.right-side .feedbacks-btn h6 {
-    margin: 0;
-    font-size: 1.25em;
-    font-weight: bold;
-}
-
-.right-side .feedbacks-btn p {
-    margin: 0;
-    font-size: 1em;
-    color: #8C8A8A;
 }

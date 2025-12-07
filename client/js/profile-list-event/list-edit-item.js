@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded',function () {
     ];
 
     removedImages = [];
-    // newFiles = [];
+    //newFiles = [];
 
     const imageContainer = document.getElementById('image-container');
     imageContainer.dataset.originalImages = JSON.stringify(existingImages);
