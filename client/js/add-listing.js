@@ -396,13 +396,21 @@ function showMsg(text, type) {
     }
 }
 
+
 // initialize modal
 function initAddListingModal() {
-    const addBtn = document.querySelector('.add-listing-btn');
-    if (addBtn) addBtn.onclick = e => {
-        e.preventDefault();
-        openAddListingModal();
-    };
+    // --- CHANGED SECTION START ---
+    
+    // We use document.addEventListener because the header is loaded dynamically.
+    // By checking e.target.closest('#addItemBtn'), we capture clicks on ANY element
+    // with that ID, whether it's in the header or the body.
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.closest('#addItemBtn')) {
+            e.preventDefault();
+            openAddListingModal();
+        }
+    });
+
 
     const closeBtn = el('modalClose');
     if (closeBtn) closeBtn.onclick = closeAddListingModal;

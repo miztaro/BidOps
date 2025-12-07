@@ -13,12 +13,12 @@
       });
     }
 
-    if (addListingBtn) {
-      addListingBtn.addEventListener("click", (e) => {
-        e.preventDefault?.();
-        window.location.href = "add-listing.html";
-      });
-    }
+    // if (addListingBtn) {
+    //   addListingBtn.addEventListener("click", (e) => {
+    //     e.preventDefault?.();
+    //     window.location.href = "js/add-listing.js";
+    //   });
+    // }
 
     if (profileIcon) {
       profileIcon.style.cursor = "pointer";
