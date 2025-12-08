@@ -20,6 +20,9 @@ SET time_zone = "+00:00";
 --
 -- Database: `bidops`
 --
+-- Set root password to blank and use native authentication
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';
+FLUSH PRIVILEGES;
 CREATE DATABASE IF NOT EXISTS `bidops` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `bidops`;
 
