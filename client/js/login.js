@@ -46,7 +46,7 @@ function handleFormLogin(event) {
                 localStorage.setItem('role', 'admin');
                 
                 alert(data.message || 'Admin login successful!');
-                window.location.href = '../admin/manage-listing.html';
+                window.location.href = '../admin/homepage.html';
             }
         } else {
             alert(data.message || 'Login failed, please try again!');
@@ -75,7 +75,7 @@ function checkExistingSession() {
                 admin_id: data.admin_id,
                 username: data.username
             }));
-            window.location.href = '../admin/manage-listing.html';
+            window.location.href = '../admin/homepage.html';
         } else if (data.role === 'user') {
             localStorage.setItem('role', 'user');
             localStorage.setItem('user', JSON.stringify({

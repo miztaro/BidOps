@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bid and Swap</title>
-    <link rel="stylesheet" href="style/homepage.css">
+    <link rel="stylesheet" href="styles/homepage.css">
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 </head>
 <body>
@@ -18,17 +18,13 @@
                     <h1>Trade Smart,<br>Study Smarter</h1>
                     <p>Discover the ultimate campus marketplace where SLU students bid on textbooks, swap study materials, and find essential academic resources</p>
                 </div>
-                <div class="buttons">
-                    <button class="add-listing-btn"><a href="add-listing.html">Add Item</a></button>
-                    <!-- <button class="browse-items-btn">Browse Items</button> -->
-                </div>
             </div>
             
             <div class="available-bids">
                 <div class="available-bids-title">
                     <div class="left">
-                        <h3>Available Bids</h3>
-                        <p>Join the bidding war for amazing academic resources</p>
+                        <h3>Active Bids</h3>
+                        <p>Monitor all active bidding items</p>
                     </div>
                     <button class="view-all" id="bid-view-all">View All</button>
                 </div>
@@ -51,23 +47,23 @@
             <div class="browse-category">
                 <div class="top">
                     <h3>Browse by Categories</h3>
-                    <p>Join the bid and swap war for amazing resources</p>
+                    <p>Filter items by category for better management</p>
                 </div>
 
                 <div class="category-grid">
                     <button class="category-card" browse-category="Electronics">
                         <iconify-icon icon="mdi:book-open-page-variant" id="category-logo"></iconify-icon>
-                        <a  class="category-link" href="#"><h6>Electronics</h6></a>
-                        <p>243 items</p>
+                        <h6>Electronics</h6>
+                        <p>0 items</p>
                     </button>
-                    <button class="category-card" browse-category="Sports"><iconify-icon icon="mingcute:building-2-fill" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Sports</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Collectibles"><iconify-icon icon="foundation:torso-business" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Collectibles</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Accessories"><iconify-icon icon="heroicons:cpu-chip-20-solid" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Accessories</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Fashion"><iconify-icon icon="icomoon-free:lab" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Fashion</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Gaming"><iconify-icon icon="ion:people" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Gaming</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Home"><iconify-icon icon="mdi:medicine" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Home</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Photography"><iconify-icon icon="ph:chalkboard-teacher-fill" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Photography</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Toys"><iconify-icon icon="octicon:law-16" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Toys</h6></a><p>243 items</p></button>
+                    <button class="category-card" browse-category="Sports"><iconify-icon icon="mingcute:building-2-fill" id="category-logo"></iconify-icon><h6>Sports</h6><p>0 items</p></button>
+                    <button class="category-card" browse-category="Collectibles"><iconify-icon icon="foundation:torso-business" id="category-logo"></iconify-icon><h6>Collectibles</h6><p>0 items</p></button>
+                    <button class="category-card" browse-category="Accessories"><iconify-icon icon="heroicons:cpu-chip-20-solid" id="category-logo"></iconify-icon><h6>Accessories</h6><p>0 items</p></button>
+                    <button class="category-card" browse-category="Fashion"><iconify-icon icon="icomoon-free:lab" id="category-logo"></iconify-icon><h6>Fashion</h6><p>0 items</p></button>
+                    <button class="category-card" browse-category="Gaming"><iconify-icon icon="ion:people" id="category-logo"></iconify-icon><h6>Gaming</h6><p>0 items</p></button>
+                    <button class="category-card" browse-category="Home"><iconify-icon icon="mdi:medicine" id="category-logo"></iconify-icon><h6>Home</h6><p>0 items</p></button>
+                    <button class="category-card" browse-category="Photography"><iconify-icon icon="ph:chalkboard-teacher-fill" id="category-logo"></iconify-icon><h6>Photography</h6><p>0 items</p></button>
+                    <button class="category-card" browse-category="Toys"><iconify-icon icon="octicon:law-16" id="category-logo"></iconify-icon><h6>Toys</h6><p>0 items</p></button>
                 </div>
             </div>
         </section>
@@ -121,7 +117,7 @@
             </div>
         </section>
     </main>
-    
+    <script src="js/nav-bar.js"></script>
     <script src="js/homepage.js" defer></script>
 
 </body>
