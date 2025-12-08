@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         -----------------------*/
 
         $queryUser = "SELECT user_id, username, email, password, is_banned 
-                      FROM USER 
+                      FROM user
                       WHERE username = ? AND is_deleted = 0";
 
         $stmtUser = $db->prepare($queryUser);
