@@ -1,0 +1,35 @@
+{
+  "name": "bidops",
+  "version": "1.0.0",
+  "description": "How to set up BidOps Server and Client\r PC 1: Server\r 1. Run WAMP\r 2. Configure the ff files:\r \ta. httpd.conf\r \t\t- Change 'Require local' to 'Require all granted'\r \tb. httpd-vhosts.conf\r \t\t- Change 'Require local' to 'Require all granted'\r \tc. my.ini\r \t\t- Add 'bind-address = 0.0.0.0' in the '[mysqld]' section\r 3. Configure windows firewall:\r \tOption 1: The usual turning off of firewalls through windows settings\r \tOption 2: Run cmd as admin\r \t\t- to allow Apache (http): netsh advfirewall firewall add rule name=\"Apache HTTP\" dir=in action=allow protocol=TCP localport=80\r \t\t- to allow Apache (https): netsh advfirewall firewall add rule name=\"Apache HTTPS\" dir=in action=allow protocol=TCP localport=443\r \t\t- to allow MySQL: netsh advfirewall firewall add rule name=\"MySQL\" dir=in action=allow protocol=TCP localport=3306\r 4. Restart all services in WampServer\r 5. ipconfig PC 1 to get ip address\r !! Notes !!\r \t- Make sure that bidops file is located in wamp64/www (C:/wamp64/www/bidops)\r \t- Alice is the default user so there is no need to log in\r PC 2: User\r In the browser, access http://<PC1-ip>/bidops/client/login.html, this should take the login page",
+  "main": "index.js",
+  "scripts": {
+    "tailwind": "tailwindcss -i ./client/tailwind/main.css -o ./client/tailwind/main-tailwind.css --watch",
+    "sync": "browser-sync start --proxy \"http://bidops2.local\" --files \"client/**/*.*, server/**/*.php\" --no-open",
+    "dev": "concurrently \"npm run tailwind\" \"npm run sync\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miztaro/BidOps.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/miztaro/BidOps/issues"
+  },
+  "homepage": "https://github.com/miztaro/BidOps#readme",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.17",
+    "@tailwindcss/postcss": "^4.1.17",
+    "autoprefixer": "^10.4.22",
+    "concurrently": "^9.2.1",
+    "live-server": "^1.2.2",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17"
+  },
+  "dependencies": {
+    "postcss-cli": "^11.0.1"
+  }
+}
