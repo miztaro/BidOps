@@ -1,41 +1,126 @@
-# BidOps
-How to set up BidOps Server and Client
-PC 1: Server
-1. Run WAMP
-2. Configure the ff files:
-	a. httpd.conf
-		- Change 'Require local' to 'Require all granted'
-	b. httpd-vhosts.conf
-		- Change 'Require local' to 'Require all granted'
-	c. my.ini
-		- Add 'bind-address = 0.0.0.0' in the '[mysqld]' section
-3. Configure windows firewall:
-	Option 1: The usual turning off of firewalls through windows settings
-	Option 2: Run cmd as admin
-		- to allow Apache (http): netsh advfirewall firewall add rule name="Apache HTTP" dir=in action=allow protocol=TCP localport=80
-		- to allow Apache (https): netsh advfirewall firewall add rule name="Apache HTTPS" dir=in action=allow protocol=TCP localport=443
-		- to allow MySQL: netsh advfirewall firewall add rule name="MySQL" dir=in action=allow protocol=TCP localport=3306
-4. Restart all services in WampServer
-5. ipconfig PC 1 to get ip address
-!! Notes !!
-	- Make sure that bidops file is located in wamp64/www (C:/wamp64/www/bidops)
-	- Alice is the default user so there is no need to log in
-PC 2: User
-In the browser, access http://<PC1-ip>/bidops/client/login.html, this should take the login page
+==============================================================================
+PROJECT NAME: SLU Bid and Swap
+TEAM NAME:    312Team-BidOps
+DATE:         December 2025
+==============================================================================
 
+PREREQUISITES
+- Virtual Box
+- Ubuntu Server ISO (LTS 24.04.3)
 
-Tailwind config
-1.  npm init -y
-2.  npm install -D @tailwindcss/postcss
-2. 	npm install -D tailwindcss postcss autoprefixer
-3.  npx tailwindcss init
-4. 	create tailwind.config.js
-5. 	create src/input.css
-6. 	npm install --save-dev live-server
-6. 	npm install --save-dev concurrently
-6. 	npm run dev
-6. 	npm run tailwind
+1. SYSTEM OVERVIEW
+------------------------------------------------------------------------------
+This web application is a hybrid system built for an Ubuntu Server environment 
+hosted on VirtualBox. It integrates:
+1. PHP Module (User/Client Side) - Hosted on Apache (Port 80)
+2. NodeJS Module (Admin Side)    - Hosted on Express (Port 3000)
+3. Database                      - MySQL Server
 
-Tailwind Config (New)
-1. npm install
-2. npm run dev
+2. VIRTUALBOX ENVIRONMENT SETUP
+------------------------------------------------------------------------------
+To replicate the development environment, please configure your Virtual Machine 
+as follows:
+
+A. VM Configuration
+   - OS: Ubuntu Server (LTS 24.04.3)
+   - RAM: 2048 MB (Minimum)
+   - Network Adapter: NAT (Recommended)
+
+B. Port Forwarding Rules (Crucial for Access)
+   Since the VM uses NAT, you must set up Port Forwarding to access the site 
+   from your Windows/Host browser.
+   
+   1. Go to Devices > Network > Network Settings...
+   2. Ensure "Attached to" is set to NAT.
+   3. Click Advanced > Port Forwarding.
+   4. Add the following two rules:
+
+   | Name      | Protocol | Host Port | Guest Port |
+   |-----------|----------|-----------|------------|
+   | Apache    | TCP      | 80        | 80         |
+   | NodeAdmin | TCP      | 3000      | 3000       |
+C. Account 
+	username : user
+	password : user
+3. SOFTWARE INSTALLATION (Inside Ubuntu)
+------------------------------------------------------------------------------
+Run the following commands to install Apache, MySQL, PHP, and Node.js:
+
+1. Update System:
+   $ sudo apt update
+
+2. Install the Stack:
+   $ sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql php-mysqli git -y
+
+3. Install Node.js and NPM:
+   $ sudo apt install nodejs npm -y
+
+4. $ sudo apt install git -y
+
+5. DEPLOYMENT GUIDE
+------------------------------------------------------------------------------
+Follow these steps to deploy the application code and database.
+
+STEP 1: DATABASE SETUP
+   1. Start MySQL and enable it:
+      $ sudo systemctl start mysql
+      $ sudo systemctl enable mysql
+   2. Create the Database and Import Data:
+      $ sudo mysql -u root bidops < BidOps/database/bidops.sql
+      (Note: Ensure your PHP config matches your MySQL root password).
+
+STEP 2: DEPLOY CODE TO APACHE PHP (USER MODULE)
+   1. Create the project directory:
+      $ sudo mkdir -p /var/www/html/BidOps
+	  $ git clone -b finals https://github.com/miztaro/BidOps.git
+   2. Move the project files (from your unzipped folder or git clone):
+      $ sudo cp -r BidOps/* /var/www/html/BidOps/
+   3. Set Permissions (Crucial for file uploads):
+      $ sudo chown -R www-data:www-data /var/www/html/BidOps
+      $ sudo chmod -R 755 /var/www/html/BidOps
+      $ sudo chmod -R 777 /var/www/html/BidOps/server/item/uploads
+
+STEP 3: START THE NODE.JS SERVER (ADMIN MODULE)
+   1. Navigate to the project folder:
+      $ cd /var/www/html/BidOps
+   2. Install Dependencies:
+      $ sudo npm install
+   3. Start the Server:
+      $ node app.js
+      (Keep this terminal open to keep the Admin site running).
+
+6. TESTING GUIDE
+------------------------------------------------------------------------------
+Open your browser on the Host Machine (Windows) and use the following URLs.
+
+TEST SCENARIO A: USER MODULE (PHP)
+   1. URL: http://localhost:8080/BidOps/client/login.html
+   2. Action: Log in using Standard User credentials.
+   3. Verification: Ensure you can browse items and view the profile.
+
+TEST SCENARIO B: ADMIN MODULE (NodeJS) //not yet implemented
+   1. URL: http://localhost:3000/
+   2. Action: Log in using Admin credentials.
+   3. Verification: Check that the dashboard loads and data matches the database.
+
+6. CREDENTIALS
+------------------------------------------------------------------------------
+[ STANDARD USER ]
+- Username:    John
+- Password: pass123
+
+[ ADMINISTRATOR ]
+- Username:    
+- Password: 
+
+7. TROUBLESHOOTING
+------------------------------------------------------------------------------
+- 404 Not Found: Ensure the folder is named `/var/www/html/BidOps`.
+- 500 Internal Server Error: Check `/var/log/apache2/error.log`. Usually indicates
+  a database password mismatch in `server/config/database.php`.
+- Connection Refused: Ensure Port Forwarding is set correctly (80->80) and 
+  Apache is running (`sudo systemctl restart apache2`).
+
+==============================================================================
+END OF README
+==============================================================================
