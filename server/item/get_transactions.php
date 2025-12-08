@@ -46,13 +46,26 @@ SELECT
     CASE 
         WHEN tr.buyer_id = 'u1' THEN seller.username
         ELSE buyer.username 
-    END AS partner_name
+    END AS partner_name,
+    partner.user_id AS partner_id,
+    ur.rating_id,
+    ur.rating AS existing_rating,
+    ur.comment AS existing_comment,
+    CASE 
+        WHEN ur.rating_id IS NOT NULL THEN 'edit'
+        ELSE 'new'
+    END AS rating_action
 FROM transactionreceipt tr
 LEFT JOIN item i ON tr.item_id = i.item_id
 LEFT JOIN biditem bi ON i.item_id = bi.item_id
 LEFT JOIN bidoffer bo ON tr.bid_id = bo.bid_id
 LEFT JOIN user buyer ON tr.buyer_id = buyer.user_id
 LEFT JOIN user seller ON tr.seller_id = seller.user_id
+LEFT JOIN user partner ON (
+    (tr.buyer_id = 'u1' AND tr.seller_id = partner.user_id) OR 
+    (tr.seller_id = 'u1' AND tr.buyer_id = partner.user_id)
+)
+LEFT JOIN userrating ur ON tr.transaction_id = ur.transaction_id AND ur.rater_id = 'u1'
 ORDER BY tr.transaction_id DESC
 ";
 

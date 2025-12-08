@@ -35,7 +35,7 @@
                                 <th>Status</th>
                                 <th>Amount/Price</th>
                                 <th>Completed At</th>
-                                <th>Partner</th>
+                                <th>Vendor</th>
                             </tr>
                         </thead>
                         <tbody id="transactions-tbody">
@@ -44,6 +44,41 @@
                 </div>
             </div>
         </section>
+
+        <div id="rating-modal" class="rating-modal-overlay" style="display: none;">
+            <div class="rating-modal-container">
+                <button class="rating-modal-close" id="rating-modal-close">
+                    <iconify-icon icon="material-symbols:close" width="32" height="32"></iconify-icon>
+                </button>
+                
+                <div class="rating-modal-content">
+                    <h3 id="rating-item-title">Rate Transaction</h3>
+                    <input type="hidden" id="rating-transaction-id" value="">
+                    <input type="hidden" id="rating-partner-id" value="">
+                    
+                    <div class="star-rating-container">
+                        <div class="star-rating" id="star-rating">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                        <span id="current-rating">0</span>
+                    </div>
+                    
+                    <div class="comment-section">
+                        <label for="rating-comment">Comment (Optional)</label>
+                        <textarea id="rating-comment" rows="4" placeholder="Share your experience..."></textarea>
+                    </div>
+                    
+                    <div class="rating-buttons">
+                        <button id="submit-rating" class="submit-rating-btn">Submit Rating</button>
+                        <button id="cancel-rating" class="cancel-rating-btn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
     
     <div id="footer"></div>
