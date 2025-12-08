@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Transactions - Bid and Swap</title>
+    <link rel="stylesheet" href="style/profile.css">
+    <link rel="stylesheet" href="style/transactions.css">
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+    
+    <main class="profile-section">
+        <section class="left-nav-menu">
+            <button class="back-home" id="back-home">
+                <iconify-icon icon="line-md:arrow-left" width="34" height="34"></iconify-icon>
+                Back Home
+            </button>
+        </section>
+        
+        <section class="right-side">
+            <div class="title-container">
+                <h3>My Transactions</h3>
+                <div class="analytics" id="transactions-analytics"></div>
+            </div>
+
+            <div id="profile-transactions-content" class="profile-transactions-content">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Amount/Price</th>
+                                <th>Completed At</th>
+                                <th>Partner</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <div id="footer"></div>
+
+    <script type="module" src="js/profilepage.js"></script>
+    <script type="module" src="js/transactions.js"></script>
+</body>
+</html>
