@@ -22,3 +22,20 @@ PC 1: Server
 	- Alice is the default user so there is no need to log in
 PC 2: User
 In the browser, access http://<PC1-ip>/bidops/client/login.html, this should take the login page
+
+
+Tailwind config
+1.  npm init -y
+2.  npm install -D @tailwindcss/postcss
+2. 	npm install -D tailwindcss postcss autoprefixer
+3.  npx tailwindcss init
+4. 	create tailwind.config.js
+5. 	create src/input.css
+6. 	npm install --save-dev live-server
+6. 	npm install --save-dev concurrently
+6. 	npm run dev
+6. 	npm run tailwind
+
+Tailwind Config (New)
+1. npm install
+2. npm run dev

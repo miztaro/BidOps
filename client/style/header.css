@@ -1,3 +1,5 @@
+@reference "tailwindcss";
+
 /* RESET */
 * {
   margin: 0;
@@ -11,13 +13,14 @@ body {
 
 /* ===== HEADER ===== */
 .main-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  /* Default: mobile */
+  @apply flex flex-col items-center justify-center w-full h-auto px-[20px] py-[10px];
+
+  /* Large screens */
+  @apply lg:flex-row lg:flex-wrap lg:items-center lg:justify-between lg:px-[40px] lg:py-[20px] lg:w-full lg:min-h-[130px];
+
   background: url("../../assets/images/HeaderBG.png") center/cover no-repeat;
   border-bottom: 3px solid #ffe100;
-  height: 130px;
-  padding: 0 40px;
 }
 
 /* ----- LEFT: Logo ----- */
@@ -64,7 +67,8 @@ body {
 .header-search {
   display: flex;
   align-items: center;
-  width: 450px;
+  max-width: 450px;
+  width: auto;
   height: 42px;
   border: 2px solid #153b6d;
   border-radius: 40px;

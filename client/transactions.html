@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Transactions - Bid and Swap</title>
+    <link rel="stylesheet" href="style/profile.css">
+    <link rel="stylesheet" href="style/transactions.css">
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+    
+    <main class="profile-section">
+        <section class="left-nav-menu">
+            <button class="back-home" id="back-home">
+                <iconify-icon icon="line-md:arrow-left" width="34" height="34"></iconify-icon>
+                Back Home
+            </button>
+        </section>
+        
+        <section class="right-side">
+            <div class="title-container">
+                <h3>My Transactions</h3>
+                <div class="analytics" id="transactions-analytics"></div>
+            </div>
+
+            <div id="profile-transactions-content" class="profile-transactions-content">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Amount/Price</th>
+                                <th>Completed At</th>
+                                <th>Vendor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <div id="rating-modal" class="rating-modal-overlay" style="display: none;">
+            <div class="rating-modal-container">
+                <button class="rating-modal-close" id="rating-modal-close">
+                    <iconify-icon icon="material-symbols:close" width="32" height="32"></iconify-icon>
+                </button>
+                
+                <div class="rating-modal-content">
+                    <h3 id="rating-item-title">Rate Transaction</h3>
+                    <input type="hidden" id="rating-transaction-id" value="">
+                    <input type="hidden" id="rating-partner-id" value="">
+                    
+                    <div class="star-rating-container">
+                        <div class="star-rating" id="star-rating">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                        <span id="current-rating">0</span>
+                    </div>
+                    
+                    <div class="comment-section">
+                        <label for="rating-comment">Comment (Optional)</label>
+                        <textarea id="rating-comment" rows="4" placeholder="Share your experience..."></textarea>
+                    </div>
+                    
+                    <div class="rating-buttons">
+                        <button id="submit-rating" class="submit-rating-btn">Submit Rating</button>
+                        <button id="cancel-rating" class="cancel-rating-btn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div id="footer"></div>
+
+    <script type="module" src="js/profilepage.js"></script>
+    <script type="module" src="js/transactions.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add css files here */
+@import "../style/header.css";
+@import "../style/profile.css";
+@import "../style/homepage.css";
+
+/* 
+Put this for each html file :
+<link rel="stylesheet" href="tailwind/main-tailwind.css"> 
+*/

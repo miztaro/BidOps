@@ -58,10 +58,6 @@ document.addEventListener('DOMContentLoaded', function () {
     .then(html => document.getElementById('footer').innerHTML = html)
     .catch(err => console.error('Error loading footer:', err));
 
-  const contents = document.querySelectorAll(
-    "#profile-user-info-content, #profile-listings-content, #profile-bids-content, #profile-swaps-content"
-  );
-
   fetchListings();
 
   // ---------------- TODO: USER PROFILE DATA & FUNCTIONS ----------------
@@ -194,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
       <td>${swap.dateSwapped}</td>
       <td>
         <div class="actions-container">
-          <button class="swaps-view-btn">View</button>
+          <button class="swaps-view-btn" data-id="${swap.id}">View</button>
         </div>
       </td>
     `;
@@ -265,8 +261,11 @@ document.addEventListener('DOMContentLoaded', function () {
     "profile-swaps-content": document.getElementById("profile-swaps-btn")
   };
 
+  const contents = document.querySelectorAll(
+    "#profile-user-info-content, #profile-listings-content, #profile-bids-content, #profile-swaps-content"
+  );
+  
   function showContent(id) {
-
     contents.forEach(c => {
       if (c.id === id) {
         c.style.display = (id === "profile-user-info-content") ? "flex" : "block";
@@ -282,9 +281,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   showContent("profile-listings-content");
-
   Object.entries(buttons).forEach(([sectionId, btn]) => {
-    btn.onclick = () => showContent(sectionId);
+    btn.addEventListener("click", () => showContent(sectionId));
   });
 
   // ---------------- RENDERING & FILTERING OF ITEMS ----------------
