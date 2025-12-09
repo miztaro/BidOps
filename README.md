@@ -26,7 +26,7 @@ A. VM Configuration
    - RAM: 2048 MB (Minimum)
    - Network Adapter: NAT (Recommended)
 
-B. Port Forwarding Rules (Crucial for Access)
+B. Port Forwarding Rules (Crucial for Access) --  We'll be using bridged tho so this will be modified
    Since the VM uses NAT, you must set up Port Forwarding to access the site 
    from your Windows/Host browser.
    
@@ -61,18 +61,12 @@ Run the following commands to install Apache, MySQL, PHP, and Node.js:
 ------------------------------------------------------------------------------
 Follow these steps to deploy the application code and database.
 
-STEP 1: DATABASE SETUP
-   1. Start MySQL and enable it:
-      $ sudo systemctl start mysql
-      $ sudo systemctl enable mysql
-   2. Create the Database and Import Data:
-      $ sudo mysql -u root bidops < BidOps/database/bidops.sql
-      (Note: Ensure your PHP config matches your MySQL root password).
 
-STEP 2: DEPLOY CODE TO APACHE PHP (USER MODULE)
+
+STEP 1: DEPLOY CODE TO APACHE PHP (USER MODULE)
+   clone the repo first -- $ git clone -b finals https://github.com/miztaro/BidOps.git
    1. Create the project directory:
       $ sudo mkdir -p /var/www/html/BidOps
-	  $ git clone -b finals https://github.com/miztaro/BidOps.git
    2. Move the project files (from your unzipped folder or git clone):
       $ sudo cp -r BidOps/* /var/www/html/BidOps/
    3. Set Permissions (Crucial for file uploads):
@@ -80,7 +74,7 @@ STEP 2: DEPLOY CODE TO APACHE PHP (USER MODULE)
       $ sudo chmod -R 755 /var/www/html/BidOps
       $ sudo chmod -R 777 /var/www/html/BidOps/server/item/uploads
 
-STEP 3: START THE NODE.JS SERVER (ADMIN MODULE)
+STEP 2: START THE NODE.JS SERVER (ADMIN MODULE)
    1. Navigate to the project folder:
       $ cd /var/www/html/BidOps
    2. Install Dependencies:
@@ -88,7 +82,14 @@ STEP 3: START THE NODE.JS SERVER (ADMIN MODULE)
    3. Start the Server:
       $ node app.js
       (Keep this terminal open to keep the Admin site running).
-
+      
+STEP 3: DATABASE SETUP
+   1. Start MySQL and enable it:
+      $ sudo systemctl start mysql
+      $ sudo systemctl enable mysql
+   2. Create the Database and Import Data:
+      $ sudo mysql -u root bidops < BidOps/database/bidops.sql
+      (Note: Ensure your PHP config matches your MySQL root password).
 6. TESTING GUIDE
 ------------------------------------------------------------------------------
 Open your browser on the Host Machine (Windows) and use the following URLs.
