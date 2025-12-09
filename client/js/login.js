@@ -1,60 +1,97 @@
+// 1. Google Login Callback
+function handleGoogleLoginResponse(response) {
+    console.log("Google JWT received. Redirecting...");
+    // Redirect to the PHP file
+    window.location.href = `/BidOps/server/auth/google-login.php?credential=${response.credential}`;
+}
+
+// 2. Initialize Google Sign-In (Runs when window is fully loaded)
+window.onload = function () {
+    // Check if Google Library is loaded
+    if (typeof google !== 'undefined') {
+        google.accounts.id.initialize({
+            client_id: "904457542130-klcnacmhmpes2oruc6lkh4rpi6afn1l2.apps.googleusercontent.com",
+            callback: handleGoogleLoginResponse,
+            ux_mode: "popup"
+        });
+
+        // Attach Click Event to the Button
+        const googleBtn = document.getElementById('google-login-btn');
+        if (googleBtn) {
+            googleBtn.addEventListener('click', () => {
+                google.accounts.id.prompt();
+            });
+        }
+    } else {
+        console.error("Google Identity Services script failed to load.");
+    }
+};
+
+// 3. Standard Login & Session Logic (Runs when HTML is ready)
+document.addEventListener('DOMContentLoaded', function() {
+    checkExistingSession();
+
+    // Standard Login Button Listener
+    const loginBtn = document.querySelector('.btn.primary');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', handleFormLogin);
+    }
+
+    // Allow "Enter" key to submit
+    const inputs = [document.getElementById('username'), document.getElementById('password')];
+    inputs.forEach(input => {
+        if (input) {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleFormLogin(e);
+            });
+        }
+    });
+});
+
+// Standard Login Function
 function handleFormLogin(event) {
     event.preventDefault();
-    
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
-    
+
     if (!username || !password) {
         alert('Please enter both username and password!');
         return;
     }
-    
+
     const loginBtn = document.querySelector('.btn.primary');
     const originalText = loginBtn.textContent;
     loginBtn.textContent = 'Logging in...';
     loginBtn.disabled = true;
-    
-    
+
     fetch('http://localhost/BidOps/server/auth/login.php', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            username: username,
-            password: password
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, password: password }),
         credentials: 'include'
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+        if (!response.ok) throw new Error('Network response was not ok');
         return response.json();
     })
     .then(data => {
         if (data.success) {
-            if (data.role === 'user') {
-                localStorage.setItem('user', JSON.stringify(data.user));
-                localStorage.setItem('role', 'user');
-                
-                alert(data.message || 'Login successful!');
-                window.location.href = 'homepage.html';
-                
-            } else if (data.role === 'admin') {
-                localStorage.setItem('admin', JSON.stringify(data.admin));
-                localStorage.setItem('role', 'admin');
-                
-                alert(data.message || 'Admin login successful!');
-                window.location.href = '../admin/homepage.html';
-            }
+            const role = data.role;
+            const userData = role === 'user' ? data.user : data.admin;
+            localStorage.setItem('role', role);
+            localStorage.setItem(role, JSON.stringify(userData));
+            
+            alert(data.message || 'Login successful!');
+            
+            // Redirect based on role
+            window.location.href = role === 'admin' ? '../admin/homepage.html' : 'homepage.html';
         } else {
             alert(data.message || 'Login failed, please try again!');
         }
     })
     .catch(error => {
         console.error('Login error:', error);
-        alert('Login failed. Please check your connection and try again!');
+        alert('Login failed. Please check your connection.');
     })
     .finally(() => {
         loginBtn.textContent = originalText;
@@ -62,61 +99,13 @@ function handleFormLogin(event) {
     });
 }
 
+// Session Check
 function checkExistingSession() {
-    
-    fetch('http://localhost/BidOps/server/auth/get_role.php', {
-        credentials: 'include'
-    })
+    fetch('http://localhost/BidOps/server/auth/get_role.php', { credentials: 'include' })
     .then(response => response.json())
     .then(data => {
-        if (data.role === 'admin') {
-            localStorage.setItem('role', 'admin');
-            localStorage.setItem('admin', JSON.stringify({
-                admin_id: data.admin_id,
-                username: data.username
-            }));
-            window.location.href = '../admin/homepage.html';
-        } else if (data.role === 'user') {
-            localStorage.setItem('role', 'user');
-            localStorage.setItem('user', JSON.stringify({
-                user_id: data.user_id,
-                username: data.username,
-                email: data.email
-            }));
-            window.location.href = 'homepage.html';
-        }
-        // If guest, stay on login page (no redirect)
+        if (data.role === 'admin') window.location.href = '../admin/homepage.html';
+        else if (data.role === 'user') window.location.href = 'homepage.html';
     })
-    .catch(error => {
-        // Silent fail - just stay on login page
-        console.log('No active session');
-    });
+    .catch(() => console.log('No active session')); // Silent fail is fine here
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    checkExistingSession();
-    
-    const loginBtn = document.querySelector('.btn.primary');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', handleFormLogin);
-    }
-    
-    const passwordInput = document.getElementById('password');
-    const usernameInput = document.getElementById('username');
-    
-    if (passwordInput) {
-        passwordInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                handleFormLogin(event);
-            }
-        });
-    }
-
-    if (usernameInput) {
-        usernameInput.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                handleFormLogin(event);
-            }
-        });
-    }
-});
