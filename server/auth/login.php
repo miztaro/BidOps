@@ -3,6 +3,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// 1. CORS Headers
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     $allowed_origins = ['http://localhost', 'http://localhost:8000', 'http://127.0.0.1:5500', 'http://127.0.0.1:8000'];
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -90,7 +91,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 exit();
             }
 
-            if ($data->password === $user['password']) {
+        
+            // We check:
+            // 1. Is it a Hash? (password_verify) - For your NEW account
+            // 2. Is it Plain Text? (===) - For OLD dummy accounts (u1-u15)
+            $input_password = $data->password;
+            $stored_password = $user['password'];
+
+            if (password_verify($input_password, $stored_password) || $input_password === $stored_password) {
+                
                 session_regenerate_id(true);
 
                 $_SESSION['role'] = 'user';
@@ -113,6 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 ]);
                 exit();
             }
+           
         }
 
         /* ----------------------
@@ -128,6 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($resultAdmin->num_rows > 0) {
                 $admin = $resultAdmin->fetch_assoc();
 
+                // Admin  keeps plain text 
+        
                 if ($data->password === $admin['password']) {
                     session_regenerate_id(true);
 

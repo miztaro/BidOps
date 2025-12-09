@@ -22,18 +22,19 @@
       <section class="left-card">
         <h2 class="left-title">Complete Setting Up<br>Account</h2>
 
-        <form method="POST" action="/server/auth/complete-registration.php">
+      <form method="POST" action="/BidOps/server/auth/create-account.php">
           <label for="username" class="lbl">Username</label>
-          <input id="username" class="input" name="username" type="text" placeholder="Create your username" required>
+          <input id="username" class="input" name="username" type="text" required>
 
           <label for="password" class="lbl">Password</label>
-          <input id="password" class="input" name="password" type="password" placeholder="Create your password" required>
+          <input id="password" class="input" name="password" type="password" required>
 
           <label for="confirm-password" class="lbl">Repeat your password</label>
-          <input id="confirm-password" class="input" name="confirm-password" type="password" placeholder="Repeat your password" required>
+          <input id="confirm-password" class="input" name="confirm-password" type="password" required>
 
           <button class="btn primary" type="submit">Create</button>
-        </form>
+      </form>
+
       </section>
 
       <!-- RIGHT SIDE -->
@@ -63,6 +64,6 @@
 
     </div>
   </main>
-
+  <script src="../client/js/create.js"></script>
 </body>
 </html>
