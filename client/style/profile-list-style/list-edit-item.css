@@ -1,5 +1,6 @@
 /*Edit Overlay*/
 @import "../index.css";
+@reference "tailwindcss";
 
 .edit-overlay {
     display: none;
@@ -31,6 +32,7 @@
     transform: translateY(-50px);
     opacity: 0;
     transition: transform 0.8s ease, opacity 0.8s ease;
+    box-sizing: border-box;
 }
 
 .edit-overlay.active .form-container {
@@ -51,6 +53,7 @@
     border: none;
     border-radius: 20px;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     flex-direction: row;
     justify-content: flex-start;
@@ -72,6 +75,7 @@
     color: var(--primary-white);
     font-size: 0.8em;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     max-width: 10vh;
@@ -98,14 +102,15 @@
 .form-container .item-info-field {
     display: flex;
     border: none;
+    flex-wrap: wrap;
     padding-top: 20px;
-    gap: 80px;
-    align-items: center;
+    gap: 20px;
+    align-items: flex-start;
 }
 
 
 .item-info-field .item-sec {
-    flex: 3;
+    flex: 2;
     display: flex;
     flex-direction: column;
     color: var(--dark-secondary);
@@ -118,7 +123,7 @@
 }
 
 .item-info-field .category-sec {
-    flex: 2;
+    flex: 1;
     display: flex;
     flex-direction: column;
     color: var(--dark-secondary);
@@ -152,7 +157,7 @@
 .form-container .price-field {
     display: flex;
     padding-top: 30px;
-    gap: 80px;
+    gap: 20px;
     align-items: center;
     width: 100%;
 }

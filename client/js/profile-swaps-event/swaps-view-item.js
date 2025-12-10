@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (hiddenInput) hiddenInput.value = itemId;
 
         viewItemOverlay.classList.add('active');
-        loadImages();
+        // loadImages();
     });
 
     if (closeButton && viewItemOverlay) {
@@ -134,4 +134,82 @@ function initStarRating() {
             star.classList.toggle("active", index < rating);
         });
     }
+}
+
+
+async function fetchSwappedItem(itemId) {
+    if (!itemId) {
+        console.error("Item ID is required to fetch bid details.")
+        return;
+    }
+    try {
+        const response = await fetch('../../../server/item/get_transactions.php');
+        const data = await response.json();
+
+        if (!data.success) return console.error("Failed to fetch transactions: ", data.message);
+
+        const swap = data.swaps.find(s => s.swappedItem && s.swappedItem.swap_id == itemId);
+        if (!swap) return console.error("Swapped item not found for ID:", itemId);
+
+        const swappedItem = swap.swappedItem;
+        populateSwapsOverlay(swappedItem);
+    } catch (error) {
+        console.error("Error fetching bid item: ", error);
+    }
+}
+
+function populateBidsOverlay(swappedItem) {
+    const overlayBody = document.querySelector("#swaps-view-overlay .swaps-body-sec");
+    if (!overlayBody) return;
+
+    const leftSide = overlayBody.querySelector(".left-side");
+    const rightSide = overlayBody.querySelector(".right-side");
+
+    if (!leftSide || !rightSide) return;
+
+    leftSide.innerHTML = "";
+    rightSide.innerHTML = "";
+
+    const mainImageDiv = document.createElement("div");
+    mainImageDiv.classList.add("main-image");
+
+    const mainImg = document.createElement("img");
+    mainImg.src = bidItem.main_image || "/server/item/uploads/default.jpg";
+    mainImg.alt = bidItem.item_name || "Item Image";
+    mainImageDiv.appendChild(mainImg);
+
+    const previewDiv = document.createElement("div");
+    previewDiv.classList.add("images-preview");
+
+    (bidItem.images || [bidItem.main_image || '../server/item/uploads/default.jpg']).forEach(src => {
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = "Preview";
+        img.addEventListener("click", () => mainImg.src = src);
+        previewDiv.appendChild(img);
+    });
+
+    leftSide.appendChild(mainImageDiv);
+    leftSide.appendChild(previewDiv);
+
+    rightSide.innerHTML = `
+        <div class="name-category-con">
+            <h6>${swappedItem.item_name || ''}</h6>
+            <p>${swappedItem.category || ''}</p>
+        </div>
+        <div class="description-con">
+            <p>${swappedItem.description || ''}</p>
+        </div>
+        <div class="date-con">
+            <div class="start-date">
+                <h6>Vendor</h6>
+                <p>${swappedItem.vendor|| ''}</p>
+            </div>
+            <div class="date-won">
+                <h6>Date Won</h6>
+                <p>${swappedItem.completion_date || ''}</p>
+            </div>
+        </div>
+    `;
+    document.getElementById("bids-view-overlay").classList.add("active");
 }

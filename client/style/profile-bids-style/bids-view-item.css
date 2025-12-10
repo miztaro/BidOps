@@ -165,7 +165,7 @@
     gap: 15px;
     color: var(--dark-secondary);
     font-size: 1em;
-    width: 1005;
+    width: 100%;
 }
 
 .bids-body-sec .right-side .name-category-con{

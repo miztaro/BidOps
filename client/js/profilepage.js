@@ -58,8 +58,6 @@ document.addEventListener('DOMContentLoaded', function () {
     .then(html => document.getElementById('footer').innerHTML = html)
     .catch(err => console.error('Error loading footer:', err));
 
-  fetchListings();
-
   // ---------------- TODO: USER PROFILE DATA & FUNCTIONS ----------------
 
   //Listings Data & Functions
@@ -83,7 +81,21 @@ document.addEventListener('DOMContentLoaded', function () {
           status: item.status,
         }));
         renderItems(listings, "listings");
-        document.querySelector("#profile-listings-btn p").textContent = `${listings.length} Items`;
+        const listingsBtnCounter = document.querySelector("#profile-listings-btn p");
+        if (listingsBtnCounter) listingsBtnCounter.textContent = `${listings.length} Items`;
+
+        if (data.categories) {
+          const categoryDropdown = document.getElementById("categoryDropdown");
+          categoryDropdown.innerHTML = `<p class="dropDown-item">All Categories</p>`; // reset
+
+          data.categories.forEach(cat => {
+            const p = document.createElement("p");
+            p.className = "dropDown-item";
+            p.textContent = cat;
+            categoryDropdown.appendChild(p);
+          });
+          attachDropDownItemListeners();
+        }
       })
       .catch(error => console.error("Error loading listings: ", error));
   }
@@ -105,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
     analytics.classList.add("analytics");
 
     analytics.innerHTML = `
-      <div class="total-items"><h6>${stats.total}</h6><p>Items</p></div>
+      <div class="total-items"><h6>${stats.total}</h6><p>${stats.total === 1 ? 'Item' : 'Items'}</p></div>
       <div class="active-items"><h6>${stats.active}</h6><p>Active</p></div>
       <div class="pending-items"><h6>${stats.pending}</h6><p>Pending</p></div>
       <div class="rejected-items"><h6>${stats.rejected}</h6><p>Rejected</p></div>
@@ -113,30 +125,53 @@ document.addEventListener('DOMContentLoaded', function () {
     `;
     return analytics;
   }
+  fetchListings();
   //End of Listings Data & Functions
 
   //Winning Bids Data & Functions 
-  //NOTE: THIS IS STATIC DATA , Change/Remove when manipulating backend database
-  const winningBids = [
-    { id: 1, item: "Gaming Laptop", category: "Electronics", winningBid: "P100", dateWon: "09 / 16 / 2025" },
-    { id: 2, item: "DSLR Lens", category: "Photography", winningBid: "P100", dateWon: "09 / 16 / 2025" },
-    { id: 3, item: "Board Game", category: "Toys", winningBid: "P100", dateWon: "09 / 16 / 2025" },
-    { id: 4, item: "ps5 cONTROLLER", category: "Gaming", winningBid: "P100", dateWon: "09 / 16 / 2025" },
-  ];
+  let winningBids = [];
+  function fetchWinningBids() {
+    fetch('../server/item/get_transactions.php')
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          winningBids = data.bids.map(tr => {
+            const item = tr.bidItem; // <- access the new nested object
+            return {
+              bid_id: item.bid_id,
+              item_id: item.item_id,
+              item: item.item_name,
+              category: item.category,
+              description: item.description || '',
+              winningBid: `P${parseFloat(item.winning_bid || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`,
+              dateWon: item.date_won ? new Date(item.date_won).toLocaleDateString() : '',
+              vendor: item.vendor || '-'
+            };
+          });
+          renderItems(winningBids, "bids");
+          const bidsBtnCounter = document.querySelector("#profile-bids-btn p");
+          if (bidsBtnCounter) bidsBtnCounter.textContent = `${winningBids.length} Items`;
+        } else {
+          console.error('Failed to fetch transactions:', data.message);
+        }
+      })
+      .catch(error => console.error('Fetch error:', error));
+  }
 
   function createWinningBidRow(bid) {
     const row = document.createElement("tr");
     row.classList.add("bids-body-row");
-    row.setAttribute("id", `winning-bid-row-${bid.id}`);
+    row.setAttribute("id", `winning-bid-row-${bid.item_id}`);
 
     row.innerHTML = `
       <td class="item">${bid.item}</td>
       <td>${bid.category}</td>
       <td>${bid.winningBid}</td>
+      <td>${bid.vendor}</td>
       <td>${bid.dateWon}</td>
       <td>
         <div class="actions-container">
-          <button class="bids-view-btn" data-id="${bid.id}">View</button>
+          <button class="bids-view-btn" data-id="${bid.bid_id}">View</button>
         </div>
       </td>
     `;
@@ -156,41 +191,57 @@ document.addEventListener('DOMContentLoaded', function () {
     analytics.classList.add("analytics");
 
     analytics.innerHTML = `
-      <div class="total-items"><h6>${stats.total}</h6><p>Items</p></div>
+      <div class="total-items"><h6>${stats.total}</h6><p>${stats.total === 1 ? 'Item' : 'Items'}</p></div>
     `;
     return analytics;
   }
 
-  const bidsBody = document.querySelector(".profile-bids-content tbody");
-  winningBids.forEach(bid => {
-    const bidsRow = createWinningBidRow(bid);
-    bidsBody.appendChild(bidsRow);
-  });
-  document.querySelector("#profile-bids-btn p").textContent = `${winningBids.length} Items`;
+  fetchWinningBids();
   //End of Winning Bids Data & Functions 
 
   // ---------------- SWAPPED ITEMS DATA & FUNCTIONS ----------------
 
-  //NOTE: THIS IS STATIC DATA , Change/Remove when manipulating backend database
-  const swappedItems = [
-    { id: 1, item: "Gaming Laptop", category: "Electronics", swappedItem: "Calculator", dateSwapped: "09 / 16 / 2025" },
-    { id: 2, item: "DSLR Lens", category: "Photography", swappedItem: "Mechanical KB", dateSwapped: "09 / 16 / 2025" },
-    { id: 3, item: "Board Game", category: "Toys", swappedItem: "Monitor", dateSwapped: "09 / 16 / 2025" },
-  ];
+  let swappedItems = [];
+  function fetchSwappedItems() {
+    fetch('../server/item/get_transactions.php')
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          swappedItems = data.swaps.map(tr => {
+            const item = tr.swappedItem; // <-- access nested object
+            return {
+              swap_id: item.swap_id,
+              item_id: item.item_id,
+              item: item.item_name,
+              category: item.category,
+              description: item.description || '',
+              dateSwapped: item.completion_date ? new Date(item.completion_date).toLocaleDateString() : '',
+              vendor: item.vendor || '-'
+            };
+          });
+          renderItems(swappedItems, "swaps");
+          const swapsBtnCounter = document.querySelector("#profile-swaps-btn p");
+          if (swapsBtnCounter) swapsBtnCounter.textContent = `${swappedItems.length} Items`;
+        } else {
+          console.error('Failed to fetch transactions:', data.message);
+        }
+      })
+      .catch(error => console.error('Fetch error:', error));
+  }
 
   function createSwappedRow(swap) {
     const row = document.createElement("tr");
     row.classList.add("swaps-body-row");
-    row.setAttribute("id", `swapped-item-row-${swap.id}`);
+    row.setAttribute("id", `swapped-item-row-${swap.item_id}`);
 
     row.innerHTML = `
       <td class="item">${swap.item}</td>
       <td>${swap.category}</td>
-      <td>${swap.swappedItem}</td>
       <td>${swap.dateSwapped}</td>
+      <td>${swap.vendor}</td>
       <td>
         <div class="actions-container">
-          <button class="swaps-view-btn" data-id="${swap.id}">View</button>
+          <button class="swaps-view-btn" data-id="${swap.swap_id}">View</button>
         </div>
       </td>
     `;
@@ -210,18 +261,12 @@ document.addEventListener('DOMContentLoaded', function () {
     analytics.classList.add("analytics");
 
     analytics.innerHTML = `
-      <div class="total-items"><h6>${stats.total}</h6><p>Items</p></div>
+      <div class="total-items"><h6>${stats.total}</h6><p>${stats.total === 1 ? 'Item' : 'Items'}</p></div>
     `;
     return analytics;
   }
-
-  const swapsBody = document.querySelector(".profile-swaps-content tbody");
-  swappedItems.forEach(swap => {
-    const swapsRow = createSwappedRow(swap);
-    swapsBody.appendChild(swapsRow);
-  });
-
-  document.querySelector("#profile-swaps-btn p").textContent = `${swappedItems.length} Items`;
+  fetchSwappedItems();
+  //End of Swapped Items Data & Functions 
 
   // ---------------- TITLE & SECTION HANDLING ----------------
 
@@ -264,7 +309,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const contents = document.querySelectorAll(
     "#profile-user-info-content, #profile-listings-content, #profile-bids-content, #profile-swaps-content"
   );
-  
+
   function showContent(id) {
     contents.forEach(c => {
       if (c.id === id) {
@@ -304,13 +349,13 @@ document.addEventListener('DOMContentLoaded', function () {
     if (section === "swaps") swapsBody.innerHTML = "";
 
     itemsArray.forEach(item => {
-      if (section === "listings") {
+      if (section === "listings" && listingBody) {
         const row = createListingRow(item);
         listingBody.appendChild(row);
-      } else if (section === "bids") {
+      } else if (section === "bids" && bidsBody) {
         const row = createWinningBidRow(item);
         bidsBody.appendChild(row);
-      } else if (section === "swaps") {
+      } else if (section === "swaps" && swapsBody) {
         const row = createSwappedRow(item);
         swapsBody.appendChild(row);
       }
@@ -429,28 +474,27 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  subDropDownItems.forEach(item => {
-    item.addEventListener("click", (event) => {
-      event.stopPropagation();
-      const selectedText = item.textContent.trim();
-      const filterType = item
-        .closest(".dropdown-section")
-        .querySelector(".dropDown-header")
-        .textContent.trim()
-        .toLowerCase();
+  function attachDropDownItemListeners() {
+    document.querySelectorAll(".sub-dropdown .dropDown-item").forEach(item => {
+      item.addEventListener("clcik", (event) => {
+        event.stopPropagation();
+        const selectedText = item.textContent.trim();
+        const filterType = item.closest(".dropdown-section")
+          .querySelector(".dropDown-header")
+          .textContent.trim()
+          .toLowerCase();
+        let section = "listings";
+        if (item.closest(".bids-filter-dropdown")) section = "bids";
+        else if (item.closest(".swaps-filter-dropdwon")) section = "swaps";
 
-      let section = "listings";
-      if (item.closest(".bids-filter-dropdown")) section = "bids";
-      else if (item.closest(".swaps-filter-dropdown")) section = "swaps";
-
-      applyFilter(filterType, selectedText, section);
-
-      allFilterDropdowns.forEach(dropdown => dropdown.classList.remove("active"));
-      allFilterBtns.forEach(btn => btn.classList.remove("active"));
-      document.querySelectorAll(".sub-dropdown").forEach(sd => sd.classList.remove("show"));
-      filterHeaders.forEach(h => h.classList.remove("active"));
+        applyFilter(filterType, selectedText, section);
+        allFilterDropdowns.forEach(dropdown => dropdown.classList.remove("active"));
+        allFilterBtns.forEach(btn => btn.classList.remove("active"));
+        document.querySelectorAll(".sub-dropdown").forEach(sd => sd.classList.remove("show"));
+        filterHeaders.forEach(h => h.classList.remove("active"));
+      });
     });
-  });
+  }
 
   // Handle “Show All” for each section
   showAllBtns.forEach(btn => {

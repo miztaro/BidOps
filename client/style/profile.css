@@ -1,5 +1,5 @@
 @reference "tailwindcss";
-@import "../index.css";
+@import "../style/index.css";
 
 * {
     margin: 0;
@@ -151,33 +151,48 @@ html {
   @apply lg:flex lg:flex-[4.5] lg:flex-col lg:p-0 lg:pr-[30px] lg:pb-[30px] lg:gap-[10px];
 }
 
-.right-side .title-container {
-    padding: 10px;
+.profile-section .right-side .title-container {
     width: 100%;
+    height: auto;
     flex: 1;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
 }
 
 .right-side .title-container h3 {
-    font-size: 3.5em;
+    font-size: clamp(1.5rem, 4vw, 3.5rem);
     font-family: 'Montserrat-Bold', sans-serif;
     color: var(--primary);
 }
 
 .right-side .title-container .analytics {
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-end;
     gap: 20px;
 }
 
 .right-side .title-container .analytics>div {
     text-align: center;
-    padding: 40px;
+    padding: 30px;
     border: 1px solid var(--primary);
     border-radius: 20px;
     transition: 0.2s ease;
+    background-color: var(--primary-white);
+    color: var(--primary);
+    font-family: 'Montserrat-Regular', sans-serif;
+}
+
+.right-side .title-container .analytics>div:first-child{
+    background-color: var(--primary);
+    color: var(--primary-white);
+}
+
+.right-side .title-container .analytics>div:first-child h6,
+.right-side .title-container .analytics>div:first-child p {
+    color: var(--primary-white);
 }
 
 .right-side .title-container .analytics>div:hover {
@@ -191,7 +206,7 @@ html {
 }
 
 .right-side .title-container .analytics>div p {
-    color: #8C8A8A;
+    color: var(--dark-secondary);
     font-size: 1em;
 }
 
@@ -200,7 +215,7 @@ html {
 .right-side .profile-swaps-content {
     background-color: var(--primary-base);
     border-radius: 20px;
-    max-height: 75vh;
+    max-height: 90vh;
     height: auto;
     border: 1px solid var(--primary);
     flex: 12;

@@ -130,15 +130,25 @@ try {
                      JOIN user u ON i.seller_id = u.user_id
                     ";
     $listingResult = $conn->query($listingQuery);
+
     $listings = [];
     while ($row = $listingResult->fetch_assoc()) {
         $listings[] = $row;
     }
 
+    $categories = [];
+    foreach ($listings as $item) {
+        if (!empty($item["category_type"]) && !in_array($item["category_type"], $categories)) {
+            $categories[] = $item["category_type"];
+        }
+    }
+    sort($categories);
+
     // Return JSON
     echo json_encode([
         "items" => $items,
-        "listings" => $listings
+        "listings" => $listings,
+        "categories" => $categories
     ]);
 
 } catch (Exception $e) {
