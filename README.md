@@ -74,7 +74,7 @@ STEP 1: DEPLOY CODE TO APACHE PHP (USER MODULE)
       $ sudo chmod -R 755 /var/www/html/BidOps
       $ sudo chmod -R 777 /var/www/html/BidOps/server/item/uploads
 
-STEP 2: START THE NODE.JS SERVER (ADMIN MODULE)
+STEP 2: START THE NODE.JS SERVER (ADMIN MODULE) //we dont have nodejs yet so ignore 
    1. Navigate to the project folder:
       $ cd /var/www/html/BidOps
    2. Install Dependencies:
@@ -95,7 +95,7 @@ STEP 3: DATABASE SETUP
 Open your browser on the Host Machine (Windows) and use the following URLs.
 
 TEST SCENARIO A: USER MODULE (PHP)
-   1. URL: http://localhost:8080/BidOps/client/login.html
+   1. URL: http://localhost:8080/BidOps/client/login.html or http://localhost/BidOps/client/login.html
    2. Action: Log in using Standard User credentials.
    3. Verification: Ensure you can browse items and view the profile.
 

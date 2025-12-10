@@ -6,12 +6,7 @@
     const messageIcon = document.querySelector('iconify-icon[icon="ri:message-3-line"]');
     const headerLogo = document.getElementById("header-logo");
 
-    if (headerLogo) {
-      headerLogo.style.cursor = "pointer";
-      headerLogo.addEventListener("click", () => {
-        window.location.href = "homepage.html";
-      });
-    }
+
 
     // if (addListingBtn) {
     //   addListingBtn.addEventListener("click", (e) => {
