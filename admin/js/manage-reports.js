@@ -1,315 +1,144 @@
 document.addEventListener('DOMContentLoaded', function() {
+    
+    // 1. Security Check
+    if (localStorage.getItem('role') !== 'admin') {
+        window.location.href = 'http://localhost/BidOps/client/login.html';
+        return;
+    }
+
+    // 2. Load Header
+    fetch('header.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('header').innerHTML = data;
+            const logoutBtn = document.getElementById('logoutBtn');
+            if(logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    localStorage.clear();
+                    window.location.href = 'http://localhost/BidOps/client/login.html';
+                });
+            }
+        });
+
     const tableBody = document.getElementById('reports-table-body');
     const emptyState = document.getElementById('empty-state');
     const modal = document.getElementById('report-modal');
-    const modalClose = document.getElementById('modal-close');
     
     let allReports = [];
     let currentReport = null;
 
-    // Create table row for each report
-    function createReportRow(report) {
-        const tr = document.createElement('tr');
-        tr.classList.add('report-row');
-        tr.dataset.reportId = report.report_id;
+    // --- Global Functions ---
+    window.openModal = function(id) {
+        currentReport = allReports.find(r => r.report_id == id);
+        if(!currentReport) return;
 
-        // Format date
-        const date = new Date(report.created_at);
-        const formattedDate = date.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
-        });
-
-        // Determine report type and target
-        let reportType = '';
-        let reportTarget = '';
+        document.getElementById('modal-report-id').textContent = id;
+        document.getElementById('modal-report-type').textContent = currentReport.report_type;
         
-        if (report.reported_item_id) {
-            reportType = 'Item Report';
-            reportTarget = report.item_title || `Item ID: ${report.reported_item_id}`;
-        } else if (report.reported_user_id) {
-            reportType = 'User Report';
-            reportTarget = report.reported_username || `@user_${report.reported_user_id}`;
-        }
-
-        // Truncate description
-        const description = report.description && report.description.length > 50
-            ? report.description.slice(0, 50) + '...'
-            : report.description || 'No description';
-
-        tr.innerHTML = `
-            <td class="report-id">#RPT-${String(report.report_id).padStart(3, '0')}</td>
-            <td class="report-target">
-                <strong>${reportTarget}</strong>
-                <br><small>${reportType}</small>
-            </td>
-            <td class="reporter">${report.reporter_email || 'Unknown'}</td>
-            <td class="description">${description}</td>
-            <td class="date">${formattedDate}</td>
-            <td class="actions">
-                <button class="btn-view" data-id="${report.report_id}">View</button>
-                <button class="btn-ban-small" data-id="${report.report_id}">Ban</button>
-            </td>
-        `;
-
-        return tr;
-    }
-
-    // Load all reports
-    function loadReports() {
-        fetch('/BidOps/server/report/get_reports.php')
-            .then(res => res.json())
-            .then(data => {
-                console.log('Reports fetched:', data);
-                
-                if (!data.success) {
-                    console.error('Error:', data.message);
-                    showEmptyState();
-                    return;
-                }
-
-                allReports = data.reports || [];
-                
-                if (allReports.length === 0) {
-                    showEmptyState();
-                } else {
-                    hideEmptyState();
-                    renderReports(allReports);
-                    updatePaginationInfo(allReports.length);
-                }
-            })
-            .catch(err => {
-                console.error('Error loading reports:', err);
-                showEmptyState();
-            });
-    }
-
-    // Render reports to table
-    function renderReports(reports) {
-        tableBody.innerHTML = '';
-        reports.forEach(report => {
-            const row = createReportRow(report);
-            tableBody.appendChild(row);
-        });
-
-        // Add event listeners to view buttons
-        document.querySelectorAll('.btn-view').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const reportId = this.dataset.id;
-                openReportModal(reportId);
-            });
-        });
-
-        // Add event listeners to ban buttons
-        document.querySelectorAll('.btn-ban-small').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const reportId = this.dataset.id;
-                handleBanAction(reportId);
-            });
-        });
-    }
-
-    // Show empty state
-    function showEmptyState() {
-        document.querySelector('.reports-table-container').classList.add('hidden');
-        emptyState.classList.remove('hidden');
-    }
-
-    // Hide empty state
-    function hideEmptyState() {
-        document.querySelector('.reports-table-container').classList.remove('hidden');
-        emptyState.classList.add('hidden');
-    }
-
-    // Update pagination info
-    function updatePaginationInfo(total) {
-        document.getElementById('pagination-info').textContent = `Showing 1-${total} of ${total} reports`;
-    }
-
-    // Open report details modal
-    function openReportModal(reportId) {
-        const report = allReports.find(r => r.report_id == reportId);
-        if (!report) return;
-
-        currentReport = report;
-
-        // Populate modal
-        document.getElementById('modal-report-id').textContent = `#RPT-${String(report.report_id).padStart(3, '0')}`;
+        let targetName = "Unknown";
+        if(currentReport.report_type === 'item') targetName = `Item: ${currentReport.item_title}`;
+        else if(currentReport.report_type === 'user') targetName = `User: ${currentReport.reported_username}`;
         
-        // Determine type and target
-        let reportType = '';
-        let reportTarget = '';
-        if (report.reported_item_id) {
-            reportType = 'Item Report';
-            reportTarget = report.item_title || `Item ID: ${report.reported_item_id}`;
-        } else if (report.reported_user_id) {
-            reportType = 'User Report';
-            reportTarget = report.reported_username || `@user_${report.reported_user_id}`;
-        }
+        document.getElementById('modal-reported-target').textContent = targetName;
+        document.getElementById('modal-reporter').textContent = currentReport.reporter_email || 'Unknown';
+        document.getElementById('modal-description').textContent = currentReport.description;
+        document.getElementById('modal-date').textContent = new Date(currentReport.created_at).toLocaleString();
 
-        document.getElementById('modal-report-type').textContent = reportType;
-        document.getElementById('modal-reported-target').textContent = reportTarget;
-        document.getElementById('modal-reporter').textContent = report.reporter_email || 'Unknown';
-        
-        const date = new Date(report.created_at);
-        document.getElementById('modal-date').textContent = date.toLocaleString();
-        
-        document.getElementById('modal-description').textContent = report.description || 'No description provided';
-
-        // Show modal
         modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
+    };
 
-    // Close modal
-    function closeModal() {
-        modal.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-        currentReport = null;
-    }
+    window.banTarget = function(id) {
+        const reportId = id || (currentReport ? currentReport.report_id : null);
+        if(!reportId) return;
 
-    modalClose.addEventListener('click', closeModal);
-
-    // Click outside modal to close
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeModal();
-        }
-    });
-
-    // Modal action buttons
-    document.getElementById('modal-view-item').addEventListener('click', function() {
-        if (!currentReport) return;
-        
-        if (currentReport.reported_item_id) {
-            // Redirect to item page
-            window.location.href = `view-item.html?id=${currentReport.reported_item_id}`;
-        } else if (currentReport.reported_user_id) {
-            // Redirect to user profile
-            window.location.href = `view-user.html?id=${currentReport.reported_user_id}`;
-        }
-    });
-
-    document.getElementById('modal-ban').addEventListener('click', function() {
-        if (!currentReport) return;
-        handleBanAction(currentReport.report_id);
-    });
-
-    document.getElementById('modal-dismiss').addEventListener('click', function() {
-        if (!currentReport) return;
-        handleDismissReport(currentReport.report_id);
-    });
-
-    // Handle ban action
-    function handleBanAction(reportId) {
         const report = allReports.find(r => r.report_id == reportId);
-        if (!report) return;
-
-        const confirmMsg = report.reported_item_id
-            ? 'Are you sure you want to ban this item and the user who posted it?'
-            : 'Are you sure you want to ban this user?';
-
-        if (!confirm(confirmMsg)) return;
+        if(!confirm('Ban this target?')) return;
 
         const targetId = report.reported_item_id || report.reported_user_id;
         const targetType = report.reported_item_id ? 'item' : 'user';
 
-        fetch('/BidOps/server/report/ban_target.php', {
+        fetch('/api/ban', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                report_id: reportId,
-                target_id: targetId,
-                target_type: targetType
-            })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ report_id: reportId, target_id: targetId, target_type: targetType })
         })
         .then(res => res.json())
         .then(data => {
-            if (data.success) {
-                alert('Action completed successfully');
-                closeModal();
+            alert(data.message);
+            if(data.success) {
+                modal.classList.add('hidden');
                 loadReports();
-            } else {
-                alert('Error: ' + data.message);
             }
-        })
-        .catch(err => {
-            console.error('Error:', err);
-            alert('Failed to complete action');
         });
-    }
+    };
 
-    // Handle dismiss report
-    function handleDismissReport(reportId) {
-        if (!confirm('Are you sure you want to dismiss this report?')) return;
-
-        fetch('/BidOps/server/report/dismiss_report.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ report_id: reportId })
-        })
+    function loadReports() {
+        fetch('/api/reports')
         .then(res => res.json())
         .then(data => {
-            if (data.success) {
-                alert('Report dismissed successfully');
-                closeModal();
-                loadReports();
+            if (data.success && data.reports.length > 0) {
+                allReports = data.reports;
+                if(emptyState) emptyState.classList.add('hidden');
+                if(tableBody) {
+                    tableBody.innerHTML = '';
+                    allReports.forEach(r => {
+                        const tr = document.createElement('tr');
+                        let target = r.report_type === 'item' ? r.item_title : r.reported_username;
+                        
+                        tr.innerHTML = `
+                            <td>#${r.report_id}</td>
+                            <td>${target}<br><small>${r.report_type}</small></td>
+                            <td>${r.reporter_email}</td>
+                            <td>${(r.description || '').slice(0,50)}...</td>
+                            <td>${new Date(r.created_at).toLocaleDateString()}</td>
+                            <td>
+                                <button class="btn-view" onclick="openModal('${r.report_id}')">View</button>
+                                <button class="btn-ban-small" onclick="banTarget('${r.report_id}')">Ban</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                }
             } else {
-                alert('Error: ' + data.message);
+                if(emptyState) emptyState.classList.remove('hidden');
             }
         })
-        .catch(err => {
-            console.error('Error:', err);
-            alert('Failed to dismiss report');
-        });
+        .catch(err => console.error(err));
     }
 
-    // Filters
-    document.getElementById('apply-filters').addEventListener('click', function() {
-        const filterType = document.getElementById('filter-type').value;
-        const filterDate = document.getElementById('filter-date').value;
-        const filterSort = document.getElementById('filter-sort').value;
+    // Modal Actions
+    const closeBtn = document.getElementById('modal-close');
+    if(closeBtn) closeBtn.onclick = () => modal.classList.add('hidden');
 
-        let filtered = [...allReports];
+    const banBtn = document.getElementById('modal-ban');
+    if(banBtn) banBtn.onclick = () => window.banTarget();
 
-        // Filter by type
-        if (filterType !== 'all') {
-            filtered = filtered.filter(r => {
-                if (filterType === 'item') return r.reported_item_id;
-                if (filterType === 'user') return r.reported_user_id;
-                return true;
+    const dismissBtn = document.getElementById('modal-dismiss');
+    if(dismissBtn) {
+        dismissBtn.onclick = () => {
+            if(!currentReport) return;
+            fetch('/api/dismiss-report', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ report_id: currentReport.report_id })
+            }).then(res => res.json()).then(data => {
+                alert(data.message);
+                modal.classList.add('hidden');
+                loadReports();
             });
-        }
+        };
+    }
 
-        // Filter by date
-        if (filterDate) {
-            const selectedDate = new Date(filterDate).toDateString();
-            filtered = filtered.filter(r => {
-                const reportDate = new Date(r.created_at).toDateString();
-                return reportDate === selectedDate;
-            });
-        }
+    const viewItemBtn = document.getElementById('modal-view-item');
+    if(viewItemBtn) {
+        viewItemBtn.onclick = () => {
+            if(currentReport && currentReport.reported_item_id) {
+                window.location.href = `view-biditem.html?item_id=${currentReport.reported_item_id}`;
+            } else {
+                alert("User view not implemented");
+            }
+        };
+    }
 
-        // Filter by time range
-        if (filterSort !== 'all') {
-            const now = new Date();
-            filtered = filtered.filter(r => {
-                const reportDate = new Date(r.created_at);
-                const diffTime = Math.abs(now - reportDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                if (filterSort === 'today') return diffDays <= 1;
-                if (filterSort === 'week') return diffDays <= 7;
-                if (filterSort === 'month') return diffDays <= 30;
-                return true;
-            });
-        }
-
-        renderReports(filtered);
-        updatePaginationInfo(filtered.length);
-    });
-
-    // Initial load
     loadReports();
 });

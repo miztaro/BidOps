@@ -13,7 +13,7 @@
   <main class="content">
     <section class="heading">
       <h1>User Reports Management</h1>
-      <p class="subtext">Review and manage user-submitted reports to maintain platform safety</p>
+      <p class="subtext">Review and manage user-submitted reports</p>
     </section>
 
     <section class="filter-section">
@@ -49,7 +49,7 @@
         <thead>
           <tr>
             <th>Report ID</th>
-            <th>Report Item/User</th>
+            <th>Report Target</th>
             <th>Reporter</th>
             <th>Description</th>
             <th>Date</th>
@@ -57,7 +57,7 @@
           </tr>
         </thead>
         <tbody id="reports-table-body">
-          <!-- Reports will be dynamically inserted here -->
+          <!-- Reports inserted here -->
         </tbody>
       </table>
     </section>
@@ -67,7 +67,7 @@
     </section>
 
     <div class="pagination">
-      <p id="pagination-info">Showing 1-5 of 23 reports</p>
+      <p id="pagination-info">Showing 0 reports</p>
     </div>
   </main>
 
@@ -75,74 +75,41 @@
   <div id="report-modal" class="modal hidden">
     <div class="modal-content">
       <span class="modal-close" id="modal-close">&times;</span>
-      
       <h2>Report Details</h2>
-      
-      <div class="modal-body" id="modal-body">
+      <div class="modal-body">
         <div class="detail-row">
           <span class="label">Report ID:</span>
           <span class="value" id="modal-report-id"></span>
         </div>
-        
         <div class="detail-row">
-          <span class="label">Report Type:</span>
+          <span class="label">Type:</span>
           <span class="value" id="modal-report-type"></span>
         </div>
-        
         <div class="detail-row">
-          <span class="label">Reported Item/User:</span>
+          <span class="label">Target:</span>
           <span class="value" id="modal-reported-target"></span>
         </div>
-        
         <div class="detail-row">
           <span class="label">Reporter:</span>
           <span class="value" id="modal-reporter"></span>
         </div>
-        
         <div class="detail-row">
-          <span class="label">Date Submitted:</span>
+          <span class="label">Date:</span>
           <span class="value" id="modal-date"></span>
         </div>
-        
         <div class="detail-row full-width">
           <span class="label">Description:</span>
           <p class="description-text" id="modal-description"></p>
         </div>
       </div>
-      
       <div class="modal-actions">
-        <button class="btn-view-item" id="modal-view-item">View Item/User</button>
-        <button class="btn-ban" id="modal-ban">Ban User/Item</button>
-        <button class="btn-dismiss" id="modal-dismiss">Dismiss Report</button>
+        <button class="btn-view-item" id="modal-view-item">View Target</button>
+        <button class="btn-ban" id="modal-ban">Ban Target</button>
+        <button class="btn-dismiss" id="modal-dismiss">Dismiss</button>
       </div>
     </div>
   </div>
 
-  <script src="js/nav-bar.js"></script>
   <script src="js/manage-reports.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      fetch("../server/auth/get_role.php")
-        .then(response => response.json())
-        .then(data => {
-          const role = data.role; 
-          let headerFile = "";
-
-          if (role === "admin") {
-            headerFile = "header.html";
-          } else {
-            headerFile = "header.html";
-          }
-
-          fetch(headerFile)
-            .then(response => response.text())
-            .then(header => {
-              document.getElementById("header").innerHTML = header;
-            })
-            .catch(error => console.error("Error loading header:", error));
-        })
-        .catch(error => console.error("Error determining role:", error));
-    });
-  </script>  
 </body>
 </html>

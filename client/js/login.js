@@ -64,6 +64,7 @@ function handleFormLogin(event) {
     loginBtn.textContent = 'Logging in...';
     loginBtn.disabled = true;
 
+    // NOTE: Ensure this URL matches your actual PHP server path
     fetch('http://localhost/BidOps/server/auth/login.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -78,13 +79,27 @@ function handleFormLogin(event) {
         if (data.success) {
             const role = data.role;
             const userData = role === 'user' ? data.user : data.admin;
+            
+            // Store user data in LocalStorage
             localStorage.setItem('role', role);
             localStorage.setItem(role, JSON.stringify(userData));
             
             alert(data.message || 'Login successful!');
             
-            // Redirect based on role
-            window.location.href = role === 'admin' ? '../admin/homepage.html' : 'homepage.html';
+            // --- UPDATED REDIRECT LOGIC ---
+            if (role === 'admin') {
+                // Redirect Admin to the Node.js Server (Port 3000)
+                // We pass the user ID/Username in URL parameters because LocalStorage 
+                // on Port 80 is NOT accessible on Port 3000.
+                const adminId = data.admin.admin_id || '';
+                const adminName = data.admin.username || '';
+                window.location.href = `http://localhost:3000/homepage.html?id=${adminId}&user=${adminName}`;
+            } else {
+                // Keep Users on the PHP/Apache Server (Port 80)
+                window.location.href = 'homepage.html';
+            }
+            // -----------------------------
+
         } else {
             alert(data.message || 'Login failed, please try again!');
         }
@@ -101,11 +116,19 @@ function handleFormLogin(event) {
 
 // Session Check
 function checkExistingSession() {
+    // Note: This checks the PHP session.
     fetch('http://localhost/BidOps/server/auth/get_role.php', { credentials: 'include' })
     .then(response => response.json())
     .then(data => {
-        if (data.role === 'admin') window.location.href = '../admin/homepage.html';
-        else if (data.role === 'user') window.location.href = 'homepage.html';
+        // --- UPDATED SESSION REDIRECT ---
+        if (data.role === 'admin') {
+            // If PHP session says Admin, go to Node.js
+            window.location.href = 'http://localhost:3000/homepage.html';
+        } 
+        else if (data.role === 'user') {
+            // If PHP session says User, go to User Homepage
+            window.location.href = 'homepage.html';
+        }
     })
     .catch(() => console.log('No active session')); // Silent fail is fine here
 }
