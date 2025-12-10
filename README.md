@@ -1,4 +1,4 @@
-==============================================================================
+sudo==============================================================================
 PROJECT NAME: SLU Bid and Swap
 TEAM NAME:    312Team-BidOps
 DATE:         December 2025
@@ -55,9 +55,8 @@ Run the following commands to install Apache, MySQL, PHP, and Node.js:
 3. Install Node.js and NPM:
    $ sudo apt install nodejs npm -y
 
-4. $ sudo apt install git -y
 
-5. DEPLOYMENT GUIDE
+4. DEPLOYMENT GUIDE
 ------------------------------------------------------------------------------
 Follow these steps to deploy the application code and database.
 
@@ -88,7 +87,7 @@ STEP 3: DATABASE SETUP
       $ sudo systemctl start mysql
       $ sudo systemctl enable mysql
    2. Create the Database and Import Data:
-      $ sudo mysql -u root bidops < BidOps/database/bidops.sql
+      $ sudo mysql -u root < BidOps/database/bidops.sql
       (Note: Ensure your PHP config matches your MySQL root password).
 6. TESTING GUIDE
 ------------------------------------------------------------------------------
