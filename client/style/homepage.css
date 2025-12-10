@@ -45,6 +45,7 @@ main{padding: 0;}
 }
 
 .home-cover .title p{
+    font-family:'Montserrat-Regular',sans-serif;
     font-size: clamp(0.8em,3vh,1em);
     color: #fff;
 }
@@ -60,13 +61,16 @@ main{padding: 0;}
     padding: 10px;
     border-radius: 30px;
     border: none;
-    width: 127px;
+    width: auto;
+    min-width: 100px;
+    justify-content: center;
+    display: flex;
     background-color: #FFE100;
+    font-family:'Montserrat-Regular',sans-serif;
 }
 
 .buttons .add-listing-btn a{
     color: #073066;
-    font-family:'Montserrat-SemiBold',sans-serif;
     text-decoration: none;
 }
 
