@@ -30,8 +30,8 @@ try {
                 i.seller_id,
                 u.username as seller_name,
                 u.email as seller_email
-              FROM ITEM i
-              JOIN USER u ON i.seller_id = u.user_id
+              FROM item i
+              JOIN item u ON i.seller_id = u.user_id
               WHERE i.item_id = ? AND i.item_type = 'swap'";
 
     $stmt = $db->prepare($query);
@@ -48,7 +48,7 @@ try {
     /* -----------------------------
         FETCH ITEM IMAGES
     ------------------------------*/
-    $imageQuery = "SELECT image_path FROM ITEMIMAGE WHERE item_id = ? ORDER BY image_id";
+    $imageQuery = "SELECT image_path FROM itemimage WHERE item_id = ? ORDER BY image_id";
     $imageStmt = $db->prepare($imageQuery);
     $imageStmt->bind_param("i", $item_id);
     $imageStmt->execute();

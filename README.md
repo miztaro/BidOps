@@ -94,7 +94,7 @@ STEP 3: DATABASE SETUP
 Open your browser on the Host Machine (Windows) and use the following URLs.
 
 TEST SCENARIO A: USER MODULE (PHP)
-   1. URL: http://localhost:8080/BidOps/client/login.html or http://localhost/BidOps/client/login.html
+   1. URL: http://localhost/BidOps/client/login.html
    2. Action: Log in using Standard User credentials.
    3. Verification: Ensure you can browse items and view the profile.
 

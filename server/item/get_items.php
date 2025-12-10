@@ -74,7 +74,7 @@ try {
 
         if ($row['item_type'] === 'bid') {
            
-            $bidStmt = $conn->prepare("SELECT starting_price, end_date FROM BIDITEM WHERE item_id = ?");
+            $bidStmt = $conn->prepare("SELECT starting_price, end_date FROM biditem WHERE item_id = ?");
             $bidStmt->bind_param("i", $row['item_id']);
             $bidStmt->execute();
             $bidResult = $bidStmt->get_result();
@@ -84,7 +84,7 @@ try {
             }
             $bidStmt->close();
 
-            $countStmt = $conn->prepare("SELECT COUNT(*) AS bid_count FROM BIDOFFER WHERE item_id = ? AND bid_status IN ('active','pending')");
+            $countStmt = $conn->prepare("SELECT COUNT(*) AS bid_count FROM bidoffer WHERE item_id = ? AND bid_status IN ('active','pending')");
             $countStmt->bind_param("i", $row['item_id']);
             $countStmt->execute();
             $countResult = $countStmt->get_result();
@@ -126,8 +126,8 @@ try {
     $listingQuery = "SELECT i.item_id, i.title, i.description, i.category_type, i.status, 
                             i.created_date, i.item_type, i.seller_id, 
                             u.username AS seller_name
-                     FROM ITEM i
-                     JOIN USER u ON i.seller_id = u.user_id
+                     FROM item i
+                     JOIN user u ON i.seller_id = u.user_id
                     ";
     $listingResult = $conn->query($listingQuery);
     $listings = [];
