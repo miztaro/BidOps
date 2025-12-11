@@ -36,8 +36,8 @@ try {
     $query = "SELECT i.item_id, i.title, i.description, i.category_type, i.status, 
                      i.created_date, i.item_type, i.seller_id, 
                      u.username AS seller_name
-              FROM ITEM i
-              JOIN USER u ON i.seller_id = u.user_id
+              FROM item i
+              JOIN user u ON i.seller_id = u.user_id
               WHERE i.status = 'active'";
     $types = '';
     $params = [];
