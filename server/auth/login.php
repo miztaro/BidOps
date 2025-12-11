@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             CHECK ADMIN LOGIN
         -----------------------*/
         if (!$found) {
-            $queryAdmin = "SELECT admin_id, username, password FROM ADMIN WHERE username = ?";
+            $queryAdmin = "SELECT admin_id, username, password FROM admin WHERE username = ?";
             $stmtAdmin = $db->prepare($queryAdmin);
             $stmtAdmin->bind_param("s", $data->username);
             $stmtAdmin->execute();
