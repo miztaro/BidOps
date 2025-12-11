@@ -1,9 +1,14 @@
 
-// import { getStatusClass } from '../profilepage.js';
+//import { getStatusClass } from '../profilepage.js';
 // View Item Overlay
+
+let currentItemId = null;
+let countdownInterval = null;
 document.addEventListener('DOMContentLoaded', function () {
     const viewItemOverlay = document.getElementById('list-view-overlay');
     const closeButton = document.getElementById('close-view-btn')
+
+
 
     document.addEventListener("click", (event) => {
         const viewItemBtn = event.target.closest('.lists-view-btn');
@@ -27,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (type === "swap" && status === "active") {
             currentItemId = itemId;
-             console.log("Opening Swap Modal", itemId);
+            console.log("Opening Swap Modal", itemId);
             openSwapModal(itemId);
             return;
         }
@@ -48,25 +53,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// function fetchItem(itemId) {
-//     const xhr = new XMLHttpRequest();
-//     xhr.open('GET', `../server/item/get_item_single.php?id=${itemId}`, true);
-
-//     xhr.onload = function () {
-//         if (xhr.status === 200) {
-//             const data = JSON.parse(xhr.responseText);
-//             displayItem(data);
-//         } else {
-//             console.error("AJAX error: status", xhr.status);
-//         }
-//     };
-
-//     xhr.onerror = function () {
-//         console.error("AJAX request failed");
-//     };
-
-//     xhr.send();
-// }
+function getStatusClass(status) {
+  status = status.toLowerCase();
+  if (status.includes("active")) return "active-items";
+  if (status.includes("pending")) return "pending-items";
+  if (status.includes("rejected")) return "rejected-items";
+  if (status.includes("sold")) return "sold-items";
+  return "";
+}
 
 function fetchItem(itemId) {
     return new Promise((resolve, reject) => {
@@ -107,7 +101,7 @@ function displayItem(data) {
     const statusText = bid?.status || item.status || "No Status";
     const statusEl = document.querySelector('.view-status-field');
     statusEl.className = "view-status-field";
-    statusEl.classList.add(window.getStatusClass(statusText));
+    statusEl.classList.add(getStatusClass(statusText));
     statusEl.querySelector('p').textContent = statusText;
 
     if (isBid && statusText === "active") {
@@ -195,12 +189,13 @@ function loadImages(imagePaths) {
     });
 }
 
+
 // ==========================================
 //  BIDDING HISTORY MODAL
 // ==========================================
 
-let currentItemId = null;
-let countdownInterval = null;
+// let currentItemId = null;
+// let countdownInterval = null;
 
 // // Open modal when "View" button is clicked
 // document.addEventListener('click', function(event) {
