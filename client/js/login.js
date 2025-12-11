@@ -1,13 +1,11 @@
 // 1. Google Login Callback
 function handleGoogleLoginResponse(response) {
     console.log("Google JWT received. Redirecting...");
-    // Redirect to the PHP file
     window.location.href = `/BidOps/server/auth/google-login.php?credential=${response.credential}`;
 }
 
-// 2. Initialize Google Sign-In (Runs when window is fully loaded)
+// 2. Initialize Google Sign-In
 window.onload = function () {
-    // Check if Google Library is loaded
     if (typeof google !== 'undefined') {
         google.accounts.id.initialize({
             client_id: "904457542130-klcnacmhmpes2oruc6lkh4rpi6afn1l2.apps.googleusercontent.com",
@@ -15,7 +13,6 @@ window.onload = function () {
             ux_mode: "popup"
         });
 
-        // Attach Click Event to the Button
         const googleBtn = document.getElementById('google-login-btn');
         if (googleBtn) {
             googleBtn.addEventListener('click', () => {
@@ -27,17 +24,15 @@ window.onload = function () {
     }
 };
 
-// 3. Standard Login & Session Logic (Runs when HTML is ready)
+// 3. Standard Login & Session Logic
 document.addEventListener('DOMContentLoaded', function() {
     checkExistingSession();
 
-    // Standard Login Button Listener
     const loginBtn = document.querySelector('.btn.primary');
     if (loginBtn) {
         loginBtn.addEventListener('click', handleFormLogin);
     }
 
-    // Allow "Enter" key to submit
     const inputs = [document.getElementById('username'), document.getElementById('password')];
     inputs.forEach(input => {
         if (input) {
@@ -64,8 +59,7 @@ function handleFormLogin(event) {
     loginBtn.textContent = 'Logging in...';
     loginBtn.disabled = true;
 
-    // NOTE: Ensure this URL matches your actual PHP server path
-    fetch('http://localhost/BidOps/server/auth/login.php', {
+    fetch('/BidOps/server/auth/login.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: username, password: password }),
@@ -80,25 +74,25 @@ function handleFormLogin(event) {
             const role = data.role;
             const userData = role === 'user' ? data.user : data.admin;
             
-            // Store user data in LocalStorage
             localStorage.setItem('role', role);
             localStorage.setItem(role, JSON.stringify(userData));
             
             alert(data.message || 'Login successful!');
             
-            // --- UPDATED REDIRECT LOGIC ---
             if (role === 'admin') {
-                // Redirect Admin to the Node.js Server (Port 3000)
-                // We pass the user ID/Username in URL parameters because LocalStorage 
-                // on Port 80 is NOT accessible on Port 3000.
                 const adminId = data.admin.admin_id || '';
                 const adminName = data.admin.username || '';
-                window.location.href = `http://localhost:3000/homepage.html?id=${adminId}&user=${adminName}`;
+                
+                // ✅ FIX: Dynamic Port 3000 Redirect
+                // Uses window.location.hostname to get the current IP (e.g., 192.168.x.x)
+                const currentIP = window.location.hostname; 
+                const protocol = window.location.protocol; // http: or https:
+                
+                window.location.href = `${protocol}//${currentIP}:3000/homepage.html?id=${adminId}&user=${adminName}`;
             } else {
                 // Keep Users on the PHP/Apache Server (Port 80)
                 window.location.href = 'homepage.html';
             }
-            // -----------------------------
 
         } else {
             alert(data.message || 'Login failed, please try again!');
@@ -116,19 +110,17 @@ function handleFormLogin(event) {
 
 // Session Check
 function checkExistingSession() {
-    // Note: This checks the PHP session.
-    fetch('http://localhost/BidOps/server/auth/get_role.php', { credentials: 'include' })
+    fetch('/BidOps/server/auth/get_role.php', { credentials: 'include' })
     .then(response => response.json())
     .then(data => {
-        // --- UPDATED SESSION REDIRECT ---
         if (data.role === 'admin') {
-            // If PHP session says Admin, go to Node.js
-            window.location.href = 'http://localhost:3000/homepage.html';
+            const currentIP = window.location.hostname;
+            const protocol = window.location.protocol;
+            window.location.href = `${protocol}//${currentIP}:3000/homepage.html`;
         } 
         else if (data.role === 'user') {
-            // If PHP session says User, go to User Homepage
             window.location.href = 'homepage.html';
         }
     })
-    .catch(() => console.log('No active session')); // Silent fail is fine here
+    .catch(() => console.log('No active session')); 
 }

@@ -1,4 +1,4 @@
-sudo==============================================================================
+==============================================================================
 PROJECT NAME: SLU Bid and Swap
 TEAM NAME:    312Team-BidOps
 DATE:         December 2025
@@ -24,102 +24,113 @@ as follows:
 A. VM Configuration
    - OS: Ubuntu Server (LTS 24.04.3)
    - RAM: 2048 MB (Minimum)
-   - Network Adapter: NAT (Recommended)
+   - Network Adapter: BRIDGED ADAPTER (Crucial)
+     * Select the specific network card your Host PC is using for internet (WiFi/LAN).
 
-B. Port Forwarding Rules (Crucial for Access) --  We'll be using bridged tho so this will be modified
-   Since the VM uses NAT, you must set up Port Forwarding to access the site 
-   from your Windows/Host browser.
-   
-   1. Go to Devices > Network > Network Settings...
-   2. Ensure "Attached to" is set to NAT.
-   3. Click Advanced > Port Forwarding.
-   4. Add the following two rules:
+B. Finding Your IP Address
+   Since we are using Bridged Adapter, the VM will get its own IP address.
+   1. Login to Ubuntu.
+   2. Run command: $ ip a
+   3. Look for the IP address (e.g., 192.168.1.xxx) under `enp0s3` or similar.
+   4. Note this IP. You will use it to access the site.
 
-   | Name      | Protocol | Host Port | Guest Port |
-   |-----------|----------|-----------|------------|
-   | Apache    | TCP      | 80        | 80         |
-   | NodeAdmin | TCP      | 3000      | 3000       |
-C. Account 
-	username : user
-	password : user
 3. SOFTWARE INSTALLATION (Inside Ubuntu)
 ------------------------------------------------------------------------------
-Run the following commands to install Apache, MySQL, PHP, and Node.js:
+Run the following commands to install Apache, MySQL, PHP, and Node.js.
 
 1. Update System:
    $ sudo apt update
 
-2. Install the Stack:
-   $ sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql php-mysqli git -y
+2. Install the PHP/Apache Stack:
+   $ sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql php-mysqli git unzip -y
 
 3. Install Node.js and NPM:
    $ sudo apt install nodejs npm -y
-
+   
+   *Verify installation:*
+   $ node -v
+   $ npm -v
 
 4. DEPLOYMENT GUIDE
 ------------------------------------------------------------------------------
 Follow these steps to deploy the application code and database.
 
-
-
 STEP 1: DEPLOY CODE TO APACHE PHP (USER MODULE)
-   clone the repo first -- $ git clone -b finals https://github.com/miztaro/BidOps.git
-   1. Create the project directory:
+   1. Clone the repo (or copy files):
+      $ git clone -b finals https://github.com/miztaro/BidOps.git
+      
+   2. Create the project directory:
       $ sudo mkdir -p /var/www/html/BidOps
-   2. Move the project files (from your unzipped folder or git clone):
+
+   3. Move the project files:
       $ sudo cp -r BidOps/* /var/www/html/BidOps/
-   3. Set Permissions (Crucial for file uploads):
+
+   4. Set Permissions (Crucial for file uploads):
       $ sudo chown -R www-data:www-data /var/www/html/BidOps
       $ sudo chmod -R 755 /var/www/html/BidOps
       $ sudo chmod -R 777 /var/www/html/BidOps/server/item/uploads
 
-STEP 2: START THE NODE.JS SERVER (ADMIN MODULE) //we dont have nodejs yet so ignore 
-   1. Navigate to the project folder:
-      $ cd /var/www/html/BidOps
-   2. Install Dependencies:
+STEP 2: START THE NODE.JS SERVER (ADMIN MODULE)
+   *Note: This must be done in the 'admin-server' folder where package.json exists.*
+
+   1. Navigate to the Admin Server folder:
+      $ cd /var/www/html/BidOps/admin-server
+
+   2. Install Dependencies (Installs Express, MySQL2, etc.):
       $ sudo npm install
-   3. Start the Server:
-      $ node app.js
-      (Keep this terminal open to keep the Admin site running).
+      (This might take a moment. If it hangs, ensure VM has internet).
+
+   3. Open the Firewall for Port 3000:
+      $ sudo ufw allow 3000/tcp
+      $ sudo ufw reload
+
+   4. Start the Server:
+      $ node server.js
       
+   (Keep this terminal open, or use 'nohup node server.js &' to run in background).
+
 STEP 3: DATABASE SETUP
    1. Start MySQL and enable it:
       $ sudo systemctl start mysql
       $ sudo systemctl enable mysql
+
    2. Create the Database and Import Data:
-      $ sudo mysql -u root < BidOps/database/bidops.sql
-      (Note: Ensure your PHP config matches your MySQL root password).
+      $ sudo mysql -u root < /var/www/html/BidOps/database/bidops.sql
+
+   3. Configure Database Password (If needed):
+      Ensure /var/www/html/BidOps/server/config/database.php matches your 
+      Ubuntu MySQL credentials (default is often no password or 'root').
+
 6. TESTING GUIDE
 ------------------------------------------------------------------------------
-Open your browser on the Host Machine (Windows) and use the following URLs.
+Use your Host Machine (Windows) or Phone connected to the same WiFi.
+Replace <UBUNTU_IP> with the address found using `ip a`.
 
 TEST SCENARIO A: USER MODULE (PHP)
-   1. URL: http://localhost/BidOps/client/login.html
+   1. URL: http://<UBUNTU_IP>/BidOps/client/login.html
    2. Action: Log in using Standard User credentials.
-   3. Verification: Ensure you can browse items and view the profile.
+   3. Verification: Ensure you can browse items.
 
-TEST SCENARIO B: ADMIN MODULE (NodeJS) //not yet implemented
-   1. URL: http://localhost:3000/
-   2. Action: Log in using Admin credentials.
-   3. Verification: Check that the dashboard loads and data matches the database.
+TEST SCENARIO B: ADMIN MODULE (NodeJS)
+   1. URL: http://<UBUNTU_IP>:3000/homepage.html
+   2. Action: Log in (or access directly via PHP redirect).
+   3. Verification: Check that the dashboard loads.
 
 6. CREDENTIALS
 ------------------------------------------------------------------------------
 [ STANDARD USER ]
 - Username:    John
-- Password: pass123
+- Password:    pass123
 
 [ ADMINISTRATOR ]
-- Username:    
-- Password: 
+- Username:    admin
+- Password:    admin123 (Update based on your DB)
 
 7. TROUBLESHOOTING
 ------------------------------------------------------------------------------
-- 404 Not Found: Ensure the folder is named `/var/www/html/BidOps`.
-- 500 Internal Server Error: Check `/var/log/apache2/error.log`. Usually indicates
-  a database password mismatch in `server/config/database.php`.
-- Connection Refused: Ensure Port Forwarding is set correctly (80->80) and 
-  Apache is running (`sudo systemctl restart apache2`).
+- "Cannot GET /": Check if you are accessing port 3000.
+- Node Modules Missing: Run `npm install` specifically inside the `admin-server` folder.
+- Connection Timed Out: Check Firewall ($ sudo ufw status) and ensure Ports 80 and 3000 are ALLOWED.
 
 ==============================================================================
 END OF README
