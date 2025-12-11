@@ -10,16 +10,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const viewItemBtn = event.target.closest('.bids-view-btn');
         if (!viewItemBtn || !viewItemOverlay) return;
 
-        const itemId = viewItemBtn.getAttribute("data-id");
-        if (!itemId) {
-            console.error("Item ID not found on view button.");
+        const bidId = viewItemBtn.getAttribute("data-id");
+        if (!bidId) {
+            console.error("Bid ID not found on view button.");
             return;
         }
 
-        const hiddenInput = document.getElementById('winBid-view-item-id');
-        if (hiddenInput) hiddenInput.value = itemId;
+        const hiddenInput = document.getElementById('winBid-view-bid-id');
+        if (hiddenInput) hiddenInput.value = bidId;
 
-        fetchBidItem(itemId);
+        fetchBidItem(bidId);
         // loadImages();
         viewItemOverlay.classList.add('active');
     });
@@ -137,8 +137,8 @@ function initStarRating() {
     }
 }
 
-async function fetchBidItem(itemId) {
-    if (!itemId) {
+async function fetchBidItem(bidId) {
+    if (!bidId) {
         console.error("Item ID is required to fetch bid details.")
         return;
     }
@@ -148,10 +148,25 @@ async function fetchBidItem(itemId) {
 
         if (!data.success) return console.error("Failed to fetch transactions: ", data.message);
 
-        const bid = data.bids.find(b => b.bidItem && b.bidItem.bid_id == itemId);
-        if (!bid) return console.error("Bid item not found for ID:", itemId);
+        const bid = data.bids.find(b => String(b.bid_id) === String(bidId));
+        console.log("Clicked itemId:", bidId);
+        if (!bid) return console.error("Bid item not found for ID:", bidId);
 
-        const bidItem = bid.bidItem;
+        const source = bid.bidItem || bid;
+
+        const bidItem = {
+            item_id: source.item_id,
+            item_name: source.item_name || source.item,
+            category: source.category,
+            description: source.description,
+            winning_bid: source.winning_bid || source.winningBid,
+            date_won: source.date_won || source.dateWon,
+            vendor: source.vendor,
+
+            main_image: source.main_image,
+            images: source.images || []
+        };
+
         populateBidsOverlay(bidItem);
     } catch (error) {
         console.error("Error fetching bid item: ", error);
@@ -174,18 +189,24 @@ function populateBidsOverlay(bidItem) {
     mainImageDiv.classList.add("main-image");
 
     const mainImg = document.createElement("img");
-    mainImg.src = bidItem.main_image || "/server/item/uploads/default.jpg";
+    mainImg.src = `../server/item/uploads/${bidItem.main_image || 'default.jpg'}`;
     mainImg.alt = bidItem.item_name || "Item Image";
     mainImageDiv.appendChild(mainImg);
 
     const previewDiv = document.createElement("div");
     previewDiv.classList.add("images-preview");
 
-    (bidItem.images || [bidItem.main_image || '../server/item/uploads/default.jpg']).forEach(src => {
+    const previewImages = bidItem.images && bidItem.images.length > 0
+        ? bidItem.images
+        : [bidItem.main_image || "default.jpg"];
+
+    previewImages.forEach(src => {
         const img = document.createElement("img");
-        img.src = src;
+        img.src = `../server/item/uploads/${src}`;
         img.alt = "Preview";
-        img.addEventListener("click", () => mainImg.src = src);
+        img.addEventListener("click", () => {
+            mainImg.src = `../server/item/uploads/${src}`;
+        });
         previewDiv.appendChild(img);
     });
 
@@ -207,7 +228,7 @@ function populateBidsOverlay(bidItem) {
         <div class="date-con">
             <div class="start-date">
                 <h6>Vendor</h6>
-                <p>${bidItem.vendor|| ''}</p>
+                <p>${bidItem.vendor || ''}</p>
             </div>
             <div class="date-won">
                 <h6>Date Won</h6>

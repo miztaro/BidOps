@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(data => {
         if (data.success) {
           winningBids = data.bids.map(tr => {
-            const item = tr.bidItem; // <- access the new nested object
+            const item = tr.bidItem; 
             return {
               bid_id: item.bid_id,
               item_id: item.item_id,
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(data => {
         if (data.success) {
           swappedItems = data.swaps.map(tr => {
-            const item = tr.swappedItem; // <-- access nested object
+            const item = tr.swappedItem; 
             return {
               swap_id: item.swap_id,
               item_id: item.item_id,

@@ -183,19 +183,7 @@
    margin-bottom: 20px;
 }
 
-.swaps-body-sec .right-side .swapped-con{
-    display: block;
-}
-
-.right-side .swapped-con .received-item,
-.right-side .swapped-con .swap-partner{
-    display: flex;
-    justify-content: space-between;
-    padding-top: 15px;
-}
-
-.swaps-body-sec .right-side .swapped-con h6,
-.swaps-body-sec .right-side .date-con .date-listed h6,
+.swaps-body-sec .right-side .date-con .swap-vendor h6,
 .swaps-body-sec .right-side .date-con .date-swapped h6{
     font-family: 'Montserrat-SemiBold', sans-serif;
     font-size: 1.1em;
@@ -209,7 +197,7 @@
     padding-top: 15px;
 }
 
-.swaps-body-sec .right-side .date-con .date-listed,
+.swaps-body-sec .right-side .date-con .swap-vendor,
 .swaps-body-sec .right-side .date-con .date-swapped{
     display: flex;
     justify-content: space-between;

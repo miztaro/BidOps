@@ -10,17 +10,18 @@ document.addEventListener("DOMContentLoaded", function () {
         const viewItemBtn = event.target.closest('.swaps-view-btn');
         if (!viewItemBtn || !viewItemOverlay) return;
 
-        const itemId = viewItemBtn.getAttribute("data-id");
-        if (!itemId) {
-            console.error("Item ID not found on view button.");
+        const swapId = viewItemBtn.getAttribute("data-id");
+        if (!swapId) {
+            console.error("Swap ID not found on view button.");
             return;
         }
 
-        const hiddenInput = document.getElementById('swap-view-item-id');
-        if (hiddenInput) hiddenInput.value = itemId;
+        const hiddenInput = document.getElementById('swaps-view-swap-id');
+        if (hiddenInput) hiddenInput.value = swapId;
 
-        viewItemOverlay.classList.add('active');
         // loadImages();
+        fetchSwappedItem(swapId);
+        viewItemOverlay.classList.add('active');
     });
 
     if (closeButton && viewItemOverlay) {
@@ -46,9 +47,9 @@ document.addEventListener("DOMContentLoaded", function () {
             backToViewOverlay();
         });
     }
-    
-    if(messageButton){
-        messageButton.addEventListener("click", function (){
+
+    if (messageButton) {
+        messageButton.addEventListener("click", function () {
             window.location.href = "../client/messages.html"
         });
     }
@@ -86,7 +87,7 @@ function openRateOverlay() {
     const swapsViewOverlay = document.getElementById("swaps-view-overlay");
     const swapsRateOverlay = document.getElementById("swaps-rate-overlay");
 
-    if (!swapsViewOverlay|| !swapsRateOverlay) return;
+    if (!swapsViewOverlay || !swapsRateOverlay) return;
 
     initStarRating();
 
@@ -110,7 +111,7 @@ function initStarRating() {
 
     if (!starContainer || !ratingInput) return;
 
-    starContainer.innerHTML = ""; 
+    starContainer.innerHTML = "";
 
     let currentRating = 0;
 
@@ -137,8 +138,8 @@ function initStarRating() {
 }
 
 
-async function fetchSwappedItem(itemId) {
-    if (!itemId) {
+async function fetchSwappedItem(swapId) {
+    if (!swapId) {
         console.error("Item ID is required to fetch bid details.")
         return;
     }
@@ -148,23 +149,36 @@ async function fetchSwappedItem(itemId) {
 
         if (!data.success) return console.error("Failed to fetch transactions: ", data.message);
 
-        const swap = data.swaps.find(s => s.swappedItem && s.swappedItem.swap_id == itemId);
-        if (!swap) return console.error("Swapped item not found for ID:", itemId);
+        const swap = data.swaps.find(s => String(s.swap_id) === String(swapId));
+        console.log("Clicked itemId:", swapId);
+        if (!swap) return console.error("Swapped item not found for ID:", swapId);
 
-        const swappedItem = swap.swappedItem;
+        const source = swap.swappedItem || swap;
+
+        const swappedItem = {
+            item_id: source.item_id,
+            item_name: source.item_name,
+            category: source.category,
+            description: source.description,
+            date_swapped: source.completion_date,
+            vendor: source.vendor,
+
+            main_image: source.main_image,
+            images: source.images || []
+        };
+
         populateSwapsOverlay(swappedItem);
     } catch (error) {
-        console.error("Error fetching bid item: ", error);
+        console.error("Error fetching swapped item: ", error);
     }
 }
 
-function populateBidsOverlay(swappedItem) {
+function populateSwapsOverlay(swappedItem) {
     const overlayBody = document.querySelector("#swaps-view-overlay .swaps-body-sec");
     if (!overlayBody) return;
 
     const leftSide = overlayBody.querySelector(".left-side");
     const rightSide = overlayBody.querySelector(".right-side");
-
     if (!leftSide || !rightSide) return;
 
     leftSide.innerHTML = "";
@@ -174,18 +188,24 @@ function populateBidsOverlay(swappedItem) {
     mainImageDiv.classList.add("main-image");
 
     const mainImg = document.createElement("img");
-    mainImg.src = bidItem.main_image || "/server/item/uploads/default.jpg";
-    mainImg.alt = bidItem.item_name || "Item Image";
+    mainImg.src = `../server/item/uploads/${swappedItem.main_image || 'default.jpg'}`;
+    mainImg.alt = swappedItem.item_name || "Item Image";
     mainImageDiv.appendChild(mainImg);
 
     const previewDiv = document.createElement("div");
     previewDiv.classList.add("images-preview");
 
-    (bidItem.images || [bidItem.main_image || '../server/item/uploads/default.jpg']).forEach(src => {
+    const previewImages = swappedItem.images && swappedItem.images.length > 0
+        ? swappedItem.images
+        : [swappedItem.main_image || 'default.jpg'];
+
+    previewImages.forEach(src => {
         const img = document.createElement("img");
-        img.src = src;
+        img.src = `../server/item/uploads/${src}`;
         img.alt = "Preview";
-        img.addEventListener("click", () => mainImg.src = src);
+        img.addEventListener("click", () => {
+            mainImg.src = `../server/item/uploads/${src}`;
+        });
         previewDiv.appendChild(img);
     });
 
@@ -201,15 +221,16 @@ function populateBidsOverlay(swappedItem) {
             <p>${swappedItem.description || ''}</p>
         </div>
         <div class="date-con">
-            <div class="start-date">
+            <div class="swap-vendor">
                 <h6>Vendor</h6>
-                <p>${swappedItem.vendor|| ''}</p>
+                <p>${swappedItem.vendor || ''}</p>
             </div>
-            <div class="date-won">
-                <h6>Date Won</h6>
-                <p>${swappedItem.completion_date || ''}</p>
+            <div class="date-swapped">
+                <h6>Date Swapped</h6>
+                <p>${swappedItem.date_swapped || ''}</p>
             </div>
         </div>
     `;
-    document.getElementById("bids-view-overlay").classList.add("active");
+
+    document.getElementById("swaps-view-overlay").classList.add("active");
 }

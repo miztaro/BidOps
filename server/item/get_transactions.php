@@ -55,7 +55,8 @@ try {
         CASE 
             WHEN ur.rating_id IS NOT NULL THEN 'edit'
             ELSE 'new'
-        END AS rating_action
+        END AS rating_action,
+        img.image_path
     FROM transactionreceipt tr
     LEFT JOIN item i ON tr.item_id = i.item_id
     LEFT JOIN biditem bi ON i.item_id = bi.item_id
@@ -67,6 +68,7 @@ try {
         (tr.seller_id = 'u1' AND tr.buyer_id = partner.user_id)
     )
     LEFT JOIN userrating ur ON tr.transaction_id = ur.transaction_id AND ur.rater_id = 'u1'
+    LEFT JOIN itemimage img ON img.item_id = i.item_id
     ORDER BY tr.transaction_id DESC
     ";
 
@@ -75,10 +77,16 @@ try {
     $transactions = [];
     $bids = [];
     $swaps = [];
+    $images = [];
 
     if ($result) {
         while ($row = $result->fetch_assoc()) {
+            if (!empty($row['image_path'])) { 
+                $images[$row['item_id']][] = basename($row['image_path']);
+            }
+
             $transactions[] = $row;
+            
             if (!empty($row['bid_id']) && $row['status'] === 'successful') {
                 $row['bidItem'] = [
                     'bid_id' => $row['bid_id'],
@@ -88,7 +96,9 @@ try {
                     'description' => $row['description'],
                     'winning_bid' => $row['amount'],
                     'date_won' => $row['completed_at'],
-                    'vendor' => $row['seller_username']
+                    'vendor' => $row['seller_username'],
+                    'images' => $images[$row['item_id']] ?? [],
+                    'main_image' => ($images[$row['item_id']][0] ?? null)
                 ];
                 $bids[] = $row;
             }
@@ -100,7 +110,9 @@ try {
                     'category' => $row['category_type'],
                     'description' => $row['description'],
                     'vendor' => $row['seller_username'],
-                    'completion_date' => $row['completed_at']
+                    'completion_date' => $row['completed_at'],
+                    'images' => $images[$row['item_id']] ?? [],
+                    'main_image' => ($images[$row['item_id']][0] ?? null)
                 ];
                 $swaps[] = $row;
             }
