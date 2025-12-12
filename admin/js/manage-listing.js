@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const role = localStorage.getItem('role');
     if (role !== 'admin') {
         const currentIP = window.location.hostname; 
-        window.location.href = 'http://${currentIP}/BidOps/client/login.html';
+        window.location.href = `http://${currentIP}/BidOps/client/login.html`;
         return;
     }
 
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 logoutBtn.addEventListener('click', () => {
                     localStorage.clear();
                     const currentIP = window.location.hostname; 
-                    window.location.href = 'http://${currentIP}/BidOps/client/login.html';
+                    window.location.href = `http://${currentIP}/BidOps/client/login.html`;
                 });
             }
         });
