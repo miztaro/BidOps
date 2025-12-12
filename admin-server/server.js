@@ -10,25 +10,43 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --- 1. SERVE STATIC FILES ---
-// This serves the Admin HTML files
-app.use(express.static(path.join(__dirname, '../admin')));
 
-// Serve Assets (Fonts/Images)
+
+// A. Serve ASSETS (Images/Fonts)
+// Fixes: <img src="../assets/images/..." >
 app.use('/assets', express.static(path.join(__dirname, '../assets')));
 
-// Serve Uploads (User Images)
+// B. Serve ADMIN STYLES specifically
+// Fixes: <link href="styles/header.css">
+app.use('/styles', express.static(path.join(__dirname, '../admin/styles')));
+
+// C. Serve ADMIN JS specifically
+app.use('/js', express.static(path.join(__dirname, '../admin/js')));
+
+// D. Serve the CLIENT Folder 
+// Fixes: Redirects that go to "../client/login.html"
+app.use('/client', express.static(path.join(__dirname, '../client')));
+
+// E. Serve "Legacy" paths (Fixes links that say /BidOps/client/...)
+app.use('/BidOps/client', express.static(path.join(__dirname, '../client')));
+
+// F. Serve Uploads (User Images)
 app.use('/server/item/uploads', express.static(path.join(__dirname, '../server/item/uploads')));
 
+// G. Serve the ADMIN HTML files as the ROOT
+// This must be last!
+app.use(express.static(path.join(__dirname, '../admin')));
 
+
+// ==========================================
 // --- 2. ADMIN API ROUTES ---
+// ==========================================
 
 // A. DASHBOARD / LISTINGS API
 app.get('/api/listings', async (req, res) => {
     try {
         const { category, date, sort } = req.query;
         
-        // FIX #1: Status in your DB is 'pending_approval', NOT 'pending'
         let query = `
             SELECT i.*, u.username as seller_name 
             FROM item i 
@@ -38,7 +56,6 @@ app.get('/api/listings', async (req, res) => {
         
         const params = [];
 
-        // Filters
         if (category && category !== 'all') {
             query += ` AND i.category_type = ?`;
             params.push(category);
@@ -71,7 +88,6 @@ app.post('/api/approve', async (req, res) => {
 
 app.post('/api/reject', async (req, res) => {
     try {
-        // FIX #2: Status in DB is 'approval_rejected'
         await db.query("UPDATE item SET status = 'approval_rejected' WHERE item_id = ?", [req.body.item_id]);
         res.json({ success: true });
     } catch (err) { res.status(500).json({ success: false, message: err.message }); }
@@ -89,10 +105,8 @@ app.get('/api/reports', async (req, res) => {
         `;
         const [reports] = await db.query(query);
 
-        // Get details for what was reported (User or Item)
         const detailedReports = await Promise.all(reports.map(async (report) => {
             if (report.reported_id) {
-                // Check Item
                 const [items] = await db.query("SELECT item_id, title, category_type, seller_id FROM item WHERE item_id = ?", [report.reported_id]);
                 if (items.length > 0) {
                     return { ...report, 
@@ -101,7 +115,6 @@ app.get('/api/reports', async (req, res) => {
                         report_type: 'item' 
                     };
                 }
-                // Check User
                 const [users] = await db.query("SELECT user_id, username, email FROM user WHERE user_id = ?", [report.reported_id]);
                 if (users.length > 0) {
                     return { ...report, 
@@ -126,9 +139,7 @@ app.post('/api/ban', async (req, res) => {
         await conn.beginTransaction();
 
         if (target_type === 'item') {
-            // FIX #3: 'banned' is not in your Enum. Using 'approval_rejected' instead.
             await conn.query("UPDATE item SET status = 'approval_rejected' WHERE item_id = ?", [target_id]);
-            
             const [rows] = await conn.query("SELECT seller_id FROM item WHERE item_id = ?", [target_id]);
             if(rows.length > 0) await conn.query("UPDATE user SET is_banned = 1 WHERE user_id = ?", [rows[0].seller_id]);
         } 
@@ -167,10 +178,8 @@ app.get('/api/item/:id', async (req, res) => {
         
         if (items.length === 0) return res.status(404).json({ success: false, message: 'Item not found' });
 
-        // FIX #4: Table name is 'itemimage'
         const [images] = await db.query("SELECT * FROM itemimage WHERE item_id = ?", [req.params.id]);
         
-        // FIX #5: Table name is 'bidoffer'
         const [bids] = await db.query(`
             SELECT b.*, u.username as bidder_name 
             FROM bidoffer b 
