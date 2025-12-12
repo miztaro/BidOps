@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    if (localStorage.getItem('role') !== 'admin') window.location.href = 'http://localhost/BidOps/client/login.html';
+    if (localStorage.getItem('role') !== 'admin') window.location.href = '/BidOps/client/login.html';
     fetch('header.html').then(r => r.text()).then(h => document.getElementById('header').innerHTML = h);
 
     const urlParams = new URLSearchParams(window.location.search);

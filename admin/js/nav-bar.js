@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  fetch('../admin/header.html')
+  fetch('BidOps/admin/header.html')
     .then(res => res.ok ? res.text() : Promise.reject('Failed to load'))
     .then(html => {
       document.getElementById('header').innerHTML = html;

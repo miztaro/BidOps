@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 1. Security Check (Node.js Logic)
     const role = localStorage.getItem('role');
     if (role !== 'admin') {
-        window.location.href = 'http://localhost/BidOps/client/login.html';
+        window.location.href = '/BidOps/client/login.html';
         return;
     }
 
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(logoutBtn) {
                 logoutBtn.addEventListener('click', () => {
                     localStorage.clear();
-                    window.location.href = 'http://localhost/BidOps/client/login.html';
+                    window.location.href = '/localhost/BidOps/client/login.html';
                 });
             }
         });

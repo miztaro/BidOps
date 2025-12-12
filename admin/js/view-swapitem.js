@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    if (localStorage.getItem('role') !== 'admin') window.location.href = 'http://localhost/BidOps/client/login.html';
+    if (localStorage.getItem('role') !== 'admin') window.location.href = '/BidOps/client/login.html';
     fetch('header.html').then(r => r.text()).then(h => document.getElementById('header').innerHTML = h);
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -26,8 +26,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if(data.images.length > 0) {
                  // Remove relative path if exists in DB to use Node static route
-                const imgPath = data.images[0].image_path.replace('../server/item/uploads/', '');
-                document.getElementById('mainImage').src = `/server/item/uploads/${imgPath}`;
+                const imgPath = data.images[0].image_path.replace('BidOps/server/item/uploads/', '');
+                document.getElementById('mainImage').src = `BidOps/server/item/uploads/${imgPath}`;
             }
         });
     }
