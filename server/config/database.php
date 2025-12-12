@@ -11,7 +11,8 @@ class Database {
         $this->conn = new mysqli($this->host, $this->username, $this->password, $this->db_name);
 
         if ($this->conn->connect_error) {
-            die("Connection failed: " . $this->conn->connect_error);
+            // FIX: Throw an exception instead of using die()
+            throw new Exception("Database connection failed: " . $this->conn->connect_error);
         }
 
         $this->conn->set_charset("utf8");
@@ -19,4 +20,3 @@ class Database {
         return $this->conn;
     }
 }
-

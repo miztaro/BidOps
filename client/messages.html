@@ -4,73 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Messages</title>
-    <link rel="stylesheet" href="style/messages.css">
+    <link rel="stylesheet" href="style/messages.css"> 
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     <script src="js/client-guard.js"></script>
 </head>
 <body>
-    <div id="header"></div> <!-- Your header loader -->
     
+    <header class="app-header">
+        <div class="header-content">
+            <a href="homepage.html" class="back-link">
+                <iconify-icon icon="ion:arrow-back" width="24" height="24"></iconify-icon>
+                <span>Back to Home</span>
+            </a>
+            </div>
+    </header>
+
     <main class="messages-container">
 
-        <!-- LEFT: CHAT LIST -->
         <div class="chat-list">
             <div class="search-box">
                 <input type="text" placeholder="Search Message">
             </div>
+            
             <div id="chatListContainer">
-                <!-- Javascript loads chat items here -->
+                <p style="text-align: center; padding: 10px;">Loading chats...</p>
             </div>
-
-            <!-- Static examples (will be replaced by JS if fetch works) -->
-            <div class="chat-item active">
-                <img src="https://ui-avatars.com/api/?name=Lebron+James&background=random" alt="User">
-                <div class="chat-info">
-                    <h4>Lebron James</h4>
-                    <p class="sub-text">Yes, it's still available · 10:33 AM</p>
-                </div>
-            </div>
-
-            <div class="chat-item">
-                <img src="https://ui-avatars.com/api/?name=Diwata+Pares&background=random" alt="User">
-                <div class="chat-info">
-                    <h4>Diwata Pares</h4>
-                    <p class="sub-text">Hi! I can swap it for... · 9:00 AM</p>
-                </div>
-            </div>
+            
         </div>
 
-        <!-- CENTER: CHAT WINDOW -->
         <div class="chat-window">
             
-            <!-- 1. MESSAGES AREA (Scrollable) -->
+            <div class="chat-window-header" id="chatWindowHeader">
+                <p style="text-align: center; padding-top: 20px;">Select a chat to begin.</p>
+            </div>
+            
             <div class="messages-content" id="messagesContent">
-                
-                <div class="message received">
-                    <img src="https://ui-avatars.com/api/?name=Lebron+James&background=random" class="avatar">
-                    <div class="message-stack">
-                        <div class="bubble">
-                            Hi! I'm interested in your basketball. Is it still available for swaps?
-                        </div>
-                        <span class="time">10:30 AM</span>
-                    </div>
-                </div>
-
-                <div class="message sent">
-                    <div class="message-stack">
-                        <div class="bubble">
-                            Yes, it's still available!! What are you looking to swap for it?
-                        </div>
-                        <span class="time">10:33 AM</span>
-                    </div>
-                </div>
-
             </div>
 
-            <!-- 2. INPUT AREA (Fixed at bottom) -->
             <div class="chat-input-wrapper">
                 
-                <!-- Image Preview Area -->
                 <div id="imagePreview" class="image-preview"></div>
 
                 <div class="chat-input-bar">
@@ -84,25 +56,15 @@
                     </div>
                     <input type="hidden" id="currentChatId">
 
-                    <button class="icon-btn send-btn">
+                    <button class="icon-btn send-btn" id="sendMessageBtn">
                         <iconify-icon icon="ion:paper-plane" width="24" height="24"></iconify-icon>
                     </button>
                 </div>
             </div>
-
         </div>
 
-        <!-- RIGHT: USER INFO -->
-        <div class="user-info">
-            <div class="user-profile-header">
-                <img src="https://ui-avatars.com/api/?name=Lebron+James&background=random" class="big-profile-pic">
-                <h2 class="name">Lebron James</h2>
-                <p class="email">2244768@slu.edu.ph</p>
-            </div>
-            
-            <div class="user-actions">
-                <button>Profile</button>
-            </div>
+        <div class="user-info" id="recipientProfileInfo">
+            <p style="text-align: center; padding-top: 20px;">Profile will load here.</p>
         </div>
 
     </main>

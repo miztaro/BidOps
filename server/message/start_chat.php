@@ -1,4 +1,7 @@
 <?php
+
+error_reporting(0); // <-- FIX 1: Suppress HTML errors
+
 session_start();
 header('Content-Type: application/json');
 
@@ -38,6 +41,7 @@ $db = $database->getConnection();
 
 try {
 
+    // --- 1. Check for Existing Chat Query ---
     $query = "
         SELECT chat_id 
         FROM chat 
@@ -46,9 +50,9 @@ try {
         LIMIT 1";
 
     $stmt = $db->prepare($query);
-    // Bind parameters: item_id, buyer_id, seller_id, seller_id, buyer_id
-    // This allows for flexible roles in the chat table without bugs.
-    $stmt->bind_param("iiiii", $item_id, $buyer_id, $seller_id, $seller_id, $buyer_id);
+    // FIX 2a: Format string must be 'issss' 
+    // item_id (i), buyer_id (s), seller_id (s), seller_id (s), buyer_id (s)
+    $stmt->bind_param("issss", $item_id, $buyer_id, $seller_id, $seller_id, $buyer_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -57,21 +61,25 @@ try {
         $chat = $result->fetch_assoc();
         echo json_encode(['success' => true, 'chat_id' => $chat['chat_id'], 'message' => 'Existing chat found.']);
     } else {
-        // 4. Chat not found: create a new one
+        // --- 2. Create New Chat Query ---
         $insert_query = "
             INSERT INTO chat (item_id, buyer_id, seller_id, created_at) 
             VALUES (?, ?, ?, NOW())";
         
         $insert_stmt = $db->prepare($insert_query);
-        // We set buyer_id to the person clicking the button (the current user) and seller_id to the item owner
-        $insert_stmt->bind_param("iii", $item_id, $buyer_id, $seller_id);
+        
+        // FIX 2b: Format string must be 'iss' 
+        // item_id (i), buyer_id (s), seller_id (s)
+        $insert_stmt->bind_param("iss", $item_id, $buyer_id, $seller_id);
         
         if ($insert_stmt->execute()) {
-            $new_chat_id = $db->insert_id;
+            // Note: chat_id is INT AUTO_INCREMENT, so insert_id is correct
+            $new_chat_id = $db->insert_id; 
             echo json_encode(['success' => true, 'chat_id' => $new_chat_id, 'message' => 'New chat created successfully.']);
         } else {
             http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Failed to create new chat.']);
+            // Added error display for local debugging
+            echo json_encode(['success' => false, 'message' => 'Failed to create new chat. DB Error: ' . $insert_stmt->error]);
         }
     }
 
