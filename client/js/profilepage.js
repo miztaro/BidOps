@@ -57,7 +57,18 @@ document.addEventListener('DOMContentLoaded', function () {
     .then(res => res.text())
     .then(html => document.getElementById('footer').innerHTML = html)
     .catch(err => console.error('Error loading footer:', err));
-
+  const signOutBtn = document.getElementById("sign-out-btn");
+  
+signOutBtn.addEventListener("click", function() {
+    if (confirm("Sign out?")) {
+        // Notify PHP to destroy session
+        fetch('../server/auth/logout.php'); 
+        
+        // Clear JS Session
+        localStorage.clear();
+        window.location.href = 'login.html';
+    }
+});
   // ---------------- TODO: USER PROFILE DATA & FUNCTIONS ----------------
 
   //Listings Data & Functions

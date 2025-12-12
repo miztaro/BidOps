@@ -10,10 +10,31 @@
   <!-- RIGHT -->
   <div class="header-right">
     <!-- Admin links row -->
-    <div class="admin-links">
-      <a href="manage-listing.html" class="admin-link">Review Listings</a>
-      <a href="manage-reports.html" class="admin-link">Manage Reports</a>
-      <iconify-icon icon="gg:profile" width="38" height="38"></iconify-icon>
+<div class="admin-links">
+  <a href="manage-listing.html" class="admin-link">Review Listings</a>
+  <a href="manage-reports.html" class="admin-link">Manage Reports</a>
+  
+  <!-- Profile Menu Container -->
+      <div class="profile-menu-container">
+    <!-- The Icon (Click Trigger) -->
+        <iconify-icon 
+          id="profileIcon" 
+          icon="gg:profile" 
+          width="38" 
+          height="38">
+        </iconify-icon>
+
+    <!-- The Dropdown (Hidden by default) -->
+        <div id="profileDropdown" class="profile-dropdown">
+          <div class="dropdown-user-info">
+            <span id="adminNameDisplay">Admin</span>
+          </div>
+          <button id="logoutBtn" class="logout-btn" type="button" onclick="window.adminLogout(event)">
+            <iconify-icon icon="material-symbols:logout" width="18"></iconify-icon>
+            Logout
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Search + button -->
