@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 // Show all errors (for debugging)
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -15,6 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Origin: http://localhost");
+header("Access-Control-Allow-Credentials: true");
 
 // Include database connection
 include_once '../config/database.php';
@@ -123,26 +127,34 @@ try {
 
     $stmt->close();
 
-    $listingQuery = "SELECT i.item_id, i.title, i.description, i.category_type, i.status, 
-                            i.created_date, i.item_type, i.seller_id, 
-                            u.username AS seller_name
-                     FROM item i
-                     JOIN user u ON i.seller_id = u.user_id
-                    ";
-    $listingResult = $conn->query($listingQuery);
-
     $listings = [];
-    while ($row = $listingResult->fetch_assoc()) {
-        $listings[] = $row;
-    }
-
     $categories = [];
-    foreach ($listings as $item) {
-        if (!empty($item["category_type"]) && !in_array($item["category_type"], $categories)) {
-            $categories[] = $item["category_type"];
+    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+    if($user_id){
+        $listingQuery = "SELECT i.item_id, i.title, i.description, i.category_type, i.status, 
+                                i.created_date, i.item_type, i.seller_id, 
+                                u.username AS seller_name
+                            FROM item i
+                            JOIN user u ON i.seller_id = u.user_id
+                            WHERE i.seller_id = ?;
+                        ";
+        $stmt2 = $conn->prepare($listingQuery);
+        $stmt2->bind_param("s", $user_id);
+        $stmt2->execute();
+        $listingResult =$stmt2->get_result();
+
+        while ($row = $listingResult->fetch_assoc()) {
+            $listings[] = $row;
         }
+
+        foreach ($listings as $item) {
+            if (!empty($item["category_type"]) && !in_array($item["category_type"], $categories)) {
+                $categories[] = $item["category_type"];
+            }
+        }
+        sort($categories);
+        $stmt2->close();
     }
-    sort($categories);
 
     // Return JSON
     echo json_encode([

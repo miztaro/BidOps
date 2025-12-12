@@ -63,7 +63,10 @@ document.addEventListener('DOMContentLoaded', function () {
   //Listings Data & Functions
   let listings = [];
   function fetchListings() {
-    fetch('../server/item/get_items.php')
+    fetch('/bidops/server/item/get_items.php',{
+      method: 'GET',
+      credentials: 'include'
+    })
       .then(response => response.json())
       .then(data => {
 
@@ -131,7 +134,10 @@ document.addEventListener('DOMContentLoaded', function () {
   //Winning Bids Data & Functions 
   let winningBids = [];
   function fetchWinningBids() {
-    fetch('../server/item/get_transactions.php')
+    fetch('/bidops/server/item/get_transactions.php',{
+      method: 'GET',
+      credentials: 'include'
+    })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -203,7 +209,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   let swappedItems = [];
   function fetchSwappedItems() {
-    fetch('../server/item/get_transactions.php')
+    fetch('/bidops/server/item/get_transactions.php',{
+      method: 'GET',
+      credentials: 'include'
+    })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -476,7 +485,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function attachDropDownItemListeners() {
     document.querySelectorAll(".sub-dropdown .dropDown-item").forEach(item => {
-      item.addEventListener("clcik", (event) => {
+      item.addEventListener("click", (event) => {
         event.stopPropagation();
         const selectedText = item.textContent.trim();
         const filterType = item.closest(".dropdown-section")
@@ -485,7 +494,7 @@ document.addEventListener('DOMContentLoaded', function () {
           .toLowerCase();
         let section = "listings";
         if (item.closest(".bids-filter-dropdown")) section = "bids";
-        else if (item.closest(".swaps-filter-dropdwon")) section = "swaps";
+        else if (item.closest(".swaps-filter-dropdown")) section = "swaps";
 
         applyFilter(filterType, selectedText, section);
         allFilterDropdowns.forEach(dropdown => dropdown.classList.remove("active"));

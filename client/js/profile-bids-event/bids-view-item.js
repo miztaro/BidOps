@@ -143,7 +143,13 @@ async function fetchBidItem(bidId) {
         return;
     }
     try {
-        const response = await fetch('../../../server/item/get_transactions.php');
+        const response = await fetch('/bidops/server/item/get_transactions.php', {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!response.ok) return console.error("Network response not ok:", response.statusText);
+        
         const data = await response.json();
 
         if (!data.success) return console.error("Failed to fetch transactions: ", data.message);

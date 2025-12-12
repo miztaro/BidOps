@@ -205,29 +205,29 @@ body {
 }
 @font-face {
   font-family: 'Montserrat-Regular';
-  src: url('/assets/fonts/Montserrat/static/Montserrat-Regular.ttf') format('truetype');
+  src: url('../../assets/fonts/Montserrat/static/Montserrat-Regular.ttf') format('truetype');
   font-weight: 400;
 }
 @font-face {
   font-family: 'Montserrat-Medium';
-  src: url('/assets/fonts/Montserrat/static/Montserrat-Medium.ttf') format('truetype');
+  src: url('../../assets/fonts/Montserrat/static/Montserrat-Medium.ttf') format('truetype');
   font-weight: 500;
 }
 @font-face {
   font-family: 'Montserrat-SemiBold';
-  src: url('/assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf') format('truetype');
+  src: url('../../assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf') format('truetype');
   font-weight: 600;
 }
 @font-face {
   font-family: 'Montserrat-Bold';
-  src: url('/assets/fonts/Montserrat/static/Montserrat-Bold.ttf') format('truetype');
+  src: url('../../assets/fonts/Montserrat/static/Montserrat-Bold.ttf') format('truetype');
   font-weight: 700;
 }
 body {
   font-family: "Montserrat-Regular", sans-serif;
 }
 label {
-  font-family: "Montserrat", sans-serif;
+  font-family: "Montserrat-Regular", sans-serif;
 }
 :root {
   --primary: #073066;
@@ -803,29 +803,29 @@ html {
 }
 @font-face {
   font-family: 'Montserrat-Regular';
-  src: url('/assets/fonts/Montserrat/static/Montserrat-Regular.ttf') format('truetype');
+  src: url('../../assets/fonts/Montserrat/static/Montserrat-Regular.ttf') format('truetype');
   font-weight: 400;
 }
 @font-face {
   font-family: 'Montserrat-Medium';
-  src: url('/assets/fonts/Montserrat/static/Montserrat-Medium.ttf') format('truetype');
+  src: url('../../assets/fonts/Montserrat/static/Montserrat-Medium.ttf') format('truetype');
   font-weight: 500;
 }
 @font-face {
   font-family: 'Montserrat-SemiBold';
-  src: url('/assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf') format('truetype');
+  src: url('../../assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf') format('truetype');
   font-weight: 600;
 }
 @font-face {
   font-family: 'Montserrat-Bold';
-  src: url('/assets/fonts/Montserrat/static/Montserrat-Bold.ttf') format('truetype');
+  src: url('../../assets/fonts/Montserrat/static/Montserrat-Bold.ttf') format('truetype');
   font-weight: 700;
 }
 body {
   font-family: "Montserrat-Regular", sans-serif;
 }
 label {
-  font-family: "Montserrat", sans-serif;
+  font-family: "Montserrat-Regular", sans-serif;
 }
 :root {
   --primary: #073066;

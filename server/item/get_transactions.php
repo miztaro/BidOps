@@ -1,11 +1,23 @@
 <?php
+session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 header('Content-Type: application/json');
 
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'User not logged in'
+    ]);
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+
 include_once '../config/database.php';
+
 /*
   Show all transactions for now. Complete this when user login is implemented!!!
   
@@ -19,10 +31,12 @@ include_once '../config/database.php';
 try {
     $database = new Database();
     $conn = $database->getConnection();
+
     if ($conn->connect_error) {
         throw new Exception("Database connection failed: " . $conn->connect_error);
     }
 
+    // Fetch only transactions where logged-in user is buyer or seller
     $sql = "
     SELECT 
         tr.transaction_id,
@@ -44,18 +58,6 @@ try {
         END AS amount,
         buyer.username AS buyer_username,
         seller.username AS seller_username,
-        CASE 
-            WHEN tr.buyer_id = 'u1' THEN seller.username
-            ELSE buyer.username 
-        END AS partner_name,
-        partner.user_id AS partner_id,
-        ur.rating_id,
-        ur.rating AS existing_rating,
-        ur.comment AS existing_comment,
-        CASE 
-            WHEN ur.rating_id IS NOT NULL THEN 'edit'
-            ELSE 'new'
-        END AS rating_action,
         img.image_path
     FROM transactionreceipt tr
     LEFT JOIN item i ON tr.item_id = i.item_id
@@ -63,61 +65,65 @@ try {
     LEFT JOIN bidoffer bo ON tr.bid_id = bo.bid_id
     LEFT JOIN user buyer ON tr.buyer_id = buyer.user_id
     LEFT JOIN user seller ON tr.seller_id = seller.user_id
-    LEFT JOIN user partner ON (
-        (tr.buyer_id = 'u1' AND tr.seller_id = partner.user_id) OR 
-        (tr.seller_id = 'u1' AND tr.buyer_id = partner.user_id)
-    )
-    LEFT JOIN userrating ur ON tr.transaction_id = ur.transaction_id AND ur.rater_id = 'u1'
     LEFT JOIN itemimage img ON img.item_id = i.item_id
+    WHERE tr.buyer_id = ? OR tr.seller_id = ?
     ORDER BY tr.transaction_id DESC
     ";
 
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $user_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     $transactions = [];
     $bids = [];
     $swaps = [];
     $images = [];
 
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            if (!empty($row['image_path'])) { 
-                $images[$row['item_id']][] = basename($row['image_path']);
-            }
+    while ($row = $result->fetch_assoc()) {
+        if (!empty($row['image_path'])) {
+            $images[$row['item_id']][] = basename($row['image_path']);
+        }
 
-            $transactions[] = $row;
-            
-            if (!empty($row['bid_id']) && $row['status'] === 'successful') {
-                $row['bidItem'] = [
-                    'bid_id' => $row['bid_id'],
-                    'item_id' => $row['item_id'],            
-                    'item_name' => $row['item_title'],
-                    'category' => $row['category_type'],
-                    'description' => $row['description'],
-                    'winning_bid' => $row['amount'],
-                    'date_won' => $row['completed_at'],
-                    'vendor' => $row['seller_username'],
-                    'images' => $images[$row['item_id']] ?? [],
-                    'main_image' => ($images[$row['item_id']][0] ?? null)
-                ];
-                $bids[] = $row;
-            }
-            if (!empty($row['swap_id']) && $row['status'] === 'successful') {
-                $row['swappedItem'] = [
-                    'swap_id' => $row['swap_id'],
-                    'item_id' => $row['item_id'],
-                    'item_name' => $row['item_title'],
-                    'category' => $row['category_type'],
-                    'description' => $row['description'],
-                    'vendor' => $row['seller_username'],
-                    'completion_date' => $row['completed_at'],
-                    'images' => $images[$row['item_id']] ?? [],
-                    'main_image' => ($images[$row['item_id']][0] ?? null)
-                ];
-                $swaps[] = $row;
-            }
+        $row['images'] = $images[$row['item_id']] ?? [];
+        $row['main_image'] = $images[$row['item_id']][0] ?? null;
+
+        $transactions[] = $row;
+
+        if (!empty($row['bid_id']) && $row['status'] === 'successful') {
+            $row['bidItem'] = [
+                'bid_id' => $row['bid_id'],
+                'item_id' => $row['item_id'],
+                'item_name' => $row['item_title'],
+                'category' => $row['category_type'],
+                'description' => $row['description'],
+                'winning_bid' => $row['amount'],
+                'date_won' => $row['completed_at'],
+                'vendor' => $row['seller_username'],
+                'images' => $row['images'],
+                'main_image' => $row['main_image']
+            ];
+            $bids[] = $row;
+        }
+
+        if (!empty($row['swap_id']) && $row['status'] === 'successful') {
+            $row['swappedItem'] = [
+                'swap_id' => $row['swap_id'],
+                'item_id' => $row['item_id'],
+                'item_name' => $row['item_title'],
+                'category' => $row['category_type'],
+                'description' => $row['description'],
+                'vendor' => $row['seller_username'],
+                'completion_date' => $row['completed_at'],
+                'images' => $row['images'],
+                'main_image' => $row['main_image']
+            ];
+            $swaps[] = $row;
         }
     }
+
+    $stmt->close();
+    $conn->close();
 
     echo json_encode([
         'success' => true,
@@ -126,10 +132,12 @@ try {
         'transactions' => $transactions
     ]);
 
-    $conn->close();
-}catch(Exception $e){
+} catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'DB connection failed']);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error fetching transactions: ' . $e->getMessage()
+    ]);
     exit;
 }
 ?>
