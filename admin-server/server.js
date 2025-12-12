@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const db = require('./database');
+const db = require('./database'); // Uses the database.js we created
 
 const app = express();
 const PORT = 3000;
@@ -11,14 +11,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // --- 1. SERVE STATIC FILES ---
-// This makes "admin" folder accessible at localhost:3000
+// This serves the Admin HTML files
 app.use(express.static(path.join(__dirname, '../admin')));
 
-// Serve "assets" (Images, fonts)
+// Serve Assets (Fonts/Images)
 app.use('/assets', express.static(path.join(__dirname, '../assets')));
 
-// Serve "uploads" (Where user images are stored)
-// This maps http://localhost:3000/server/item/uploads/... to actual folder
+// Serve Uploads (User Images)
 app.use('/server/item/uploads', express.static(path.join(__dirname, '../server/item/uploads')));
 
 
@@ -28,11 +27,13 @@ app.use('/server/item/uploads', express.static(path.join(__dirname, '../server/i
 app.get('/api/listings', async (req, res) => {
     try {
         const { category, date, sort } = req.query;
+        
+        // FIX #1: Status in your DB is 'pending_approval', NOT 'pending'
         let query = `
             SELECT i.*, u.username as seller_name 
             FROM item i 
             JOIN user u ON i.seller_id = u.user_id 
-            WHERE i.status = 'pending'
+            WHERE i.status = 'pending_approval'
         `;
         
         const params = [];
@@ -70,7 +71,8 @@ app.post('/api/approve', async (req, res) => {
 
 app.post('/api/reject', async (req, res) => {
     try {
-        await db.query("UPDATE item SET status = 'rejected' WHERE item_id = ?", [req.body.item_id]);
+        // FIX #2: Status in DB is 'approval_rejected'
+        await db.query("UPDATE item SET status = 'approval_rejected' WHERE item_id = ?", [req.body.item_id]);
         res.json({ success: true });
     } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
@@ -124,14 +126,14 @@ app.post('/api/ban', async (req, res) => {
         await conn.beginTransaction();
 
         if (target_type === 'item') {
-            await conn.query("UPDATE item SET status = 'banned' WHERE item_id = ?", [target_id]);
-            // Ban the seller too
+            // FIX #3: 'banned' is not in your Enum. Using 'approval_rejected' instead.
+            await conn.query("UPDATE item SET status = 'approval_rejected' WHERE item_id = ?", [target_id]);
+            
             const [rows] = await conn.query("SELECT seller_id FROM item WHERE item_id = ?", [target_id]);
             if(rows.length > 0) await conn.query("UPDATE user SET is_banned = 1 WHERE user_id = ?", [rows[0].seller_id]);
         } 
         else if (target_type === 'user') {
             await conn.query("UPDATE user SET is_banned = 1 WHERE user_id = ?", [target_id]);
-            await conn.query("UPDATE item SET status = 'banned' WHERE seller_id = ?", [target_id]);
         }
 
         if(report_id) await conn.query("UPDATE report SET status = 'resolved' WHERE report_id = ?", [report_id]);
@@ -165,10 +167,13 @@ app.get('/api/item/:id', async (req, res) => {
         
         if (items.length === 0) return res.status(404).json({ success: false, message: 'Item not found' });
 
-        const [images] = await db.query("SELECT * FROM item_images WHERE item_id = ?", [req.params.id]);
+        // FIX #4: Table name is 'itemimage'
+        const [images] = await db.query("SELECT * FROM itemimage WHERE item_id = ?", [req.params.id]);
+        
+        // FIX #5: Table name is 'bidoffer'
         const [bids] = await db.query(`
             SELECT b.*, u.username as bidder_name 
-            FROM bid b 
+            FROM bidoffer b 
             LEFT JOIN user u ON b.bidder_id = u.user_id 
             WHERE b.item_id = ? ORDER BY b.bid_amount DESC`, [req.params.id]);
 
@@ -184,7 +189,7 @@ app.delete('/api/item/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
-// START SERVER
-app.listen(PORT, () => {
-    console.log(`Node Admin Server running at http://localhost:${PORT}`);
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Node Admin Server running at http://0.0.0.0:${PORT}`);
 });
