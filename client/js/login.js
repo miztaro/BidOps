@@ -3,7 +3,27 @@ function handleGoogleLoginResponse(response) {
     console.log("Google JWT received. Redirecting...");
     window.location.href = `/BidOps/server/auth/google-login.php?credential=${response.credential}`;
 }
+(function() {
+    const role = localStorage.getItem('role');
+    const user = localStorage.getItem('username');
+    const id = localStorage.getItem('user_id');
+    const currentIP = window.location.hostname;
+    const protocol = window.location.protocol;
 
+    if (role) {
+        // User is already logged in! Redirect them immediately.
+        
+        if (role === 'admin') {
+            // Redirect to Admin Server (Port 3000)
+            console.log("Already logged in as Admin. Redirecting...");
+            window.location.href = `${protocol}//${currentIP}:3000/homepage.html?role=${role}&user=${user}&id=${id}`;
+        } else {
+            // Redirect to Client Homepage (Port 80)
+            console.log("Already logged in as User. Redirecting...");
+            window.location.href = 'homepage.html';
+        }
+    }
+})();
 // 2. Initialize Google Sign-In
 window.onload = function () {
     if (typeof google !== 'undefined') {
@@ -44,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Standard Login Function
+// Standard Login Function
 function handleFormLogin(event) {
     event.preventDefault();
     const username = document.getElementById('username').value.trim();
@@ -72,25 +93,33 @@ function handleFormLogin(event) {
     .then(data => {
         if (data.success) {
             const role = data.role;
-            const userData = role === 'user' ? data.user : data.admin;
             
+            // 1. STANDARDIZE DATA SAVING
+            // We save these as simple strings so both Client and Admin guards can read them
             localStorage.setItem('role', role);
-            localStorage.setItem(role, JSON.stringify(userData));
-            
-            alert(data.message || 'Login successful!');
             
             if (role === 'admin') {
-                const adminId = data.admin.admin_id || '';
-                const adminName = data.admin.username || '';
-                
-                // ✅ FIX: Dynamic Port 3000 Redirect
-                // Uses window.location.hostname to get the current IP (e.g., 192.168.x.x)
+                localStorage.setItem('user_id', data.admin.admin_id);
+                localStorage.setItem('username', data.admin.username);
+
+                alert(data.message || 'Admin Login successful!');
+
+                // 2. REDIRECT TO NODE.JS (PORT 3000)
+                // We pass the data in the URL (Handshake)
                 const currentIP = window.location.hostname; 
-                const protocol = window.location.protocol; // http: or https:
+                const protocol = window.location.protocol;
                 
-                window.location.href = `${protocol}//${currentIP}:3000/homepage.html?id=${adminId}&user=${adminName}`;
+                window.location.href = `${protocol}//${currentIP}:3000/homepage.html?role=${role}&user=${data.admin.username}&id=${data.admin.admin_id}`;
+
             } else {
-                // Keep Users on the PHP/Apache Server (Port 80)
+                // User Logic
+                localStorage.setItem('user_id', data.user.user_id);
+                localStorage.setItem('username', data.user.username);
+                localStorage.setItem('email', data.user.email);
+
+                alert(data.message || 'Login successful!');
+
+                // Keep Users on Port 80
                 window.location.href = 'homepage.html';
             }
 

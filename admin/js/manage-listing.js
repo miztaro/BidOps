@@ -1,12 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // 1. Security Check (Node.js Logic)
-    const role = localStorage.getItem('role');
-    if (role !== 'admin') {
-        const currentIP = window.location.hostname; 
-        window.location.href = `http://${currentIP}/BidOps/client/login.html`;
-        return;
-    }
+
 
     // 2. Load Header
     fetch('header.html')
