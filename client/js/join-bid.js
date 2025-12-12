@@ -5,63 +5,205 @@ const itemId = urlParams.get('item_id');
 
 let itemData = null;
 let currentHighestBid = 0;
-let minimumIncrement = 0.00;
+let bidIncrementPercent = 0.00;
+let currentUserId = '0'; 
 
-window.addEventListener('load', () => {
-    if (!itemId) {
-        alert('No item specified');
-        window.location.href = 'homepage.html';
-        return;
-    }
+function disableAndUnbind(selector, title, defaultText, elementId = null) {
+    const originalElement = elementId ? document.getElementById(elementId) : document.querySelector(selector);
     
-    loadHeader();
-    disableAllButtons();
-    loadItemDetails();
-});
+    if (originalElement) {
+        // Clone and replace to remove all previous event listeners
+        const newElement = originalElement.cloneNode(true); 
+        
+        newElement.disabled = true;
+        newElement.style.opacity = '0.6';
+        newElement.style.cursor = 'not-allowed';
+        newElement.title = title;
+        
+        // Ensure the inner HTML is preserved for icons/text, but the button is disabled
+        if (defaultText) {
+             // Retain the current inner HTML if it already contains icons, otherwise use defaultText
+             newElement.innerHTML = newElement.innerHTML.includes('iconify-icon') ? newElement.innerHTML : defaultText;
+        }
+        
+        originalElement.replaceWith(newElement);
+        return newElement;
+    }
+    return null;
+}
 
-function disableAllButtons() {
-    if (placeBidBtn) {
-        placeBidBtn.disabled = true;
-        placeBidBtn.style.opacity = '0.6';
-        placeBidBtn.style.cursor = 'not-allowed';
-        placeBidBtn.title = 'Bidding feature is currently disabled';
-        placeBidBtn.innerHTML = '<iconify-icon icon="mdi:gavel"></iconify-icon> Place Bid';
-        
-        placeBidBtn.replaceWith(placeBidBtn.cloneNode(true));
-    }
-    
-    const favoritesBtn = document.querySelector('.favorites-btn');
-    if (favoritesBtn) {
-        favoritesBtn.disabled = true;
-        favoritesBtn.style.opacity = '0.6';
-        favoritesBtn.style.cursor = 'not-allowed';
-        favoritesBtn.title = 'Favorites feature is currently disabled';
-        favoritesBtn.innerHTML = '<iconify-icon icon="mdi:heart"></iconify-icon> Add to Favorites';
-        
-        favoritesBtn.replaceWith(favoritesBtn.cloneNode(true));
-    }
-    
-    const chatBtn = document.querySelector('.chat-btn');
-    if (chatBtn) {
-        chatBtn.disabled = true;
-        chatBtn.style.opacity = '0.6';
-        chatBtn.style.cursor = 'not-allowed';
-        chatBtn.title = 'Chat feature is currently disabled';
-        chatBtn.innerHTML = '<iconify-icon icon="mdi:message"></iconify-icon> Chat Seller';
-        
-        chatBtn.replaceWith(chatBtn.cloneNode(true));
+function disableAllButtons(reason) {
+    disableAndUnbind('#placeBidBtn', reason, '<iconify-icon icon="mdi:gavel"></iconify-icon> Place Bid', 'placeBidBtn');
+    disableAndUnbind('.favorites-btn', reason, '<iconify-icon icon="mdi:heart"></iconify-icon> Add to Favorites');
+    disableAndUnbind('.chat-btn', reason, '<iconify-icon icon="mdi:message"></iconify-icon> Chat with Seller');
+    setupReportButton();
+}
+
+function enableFeatures() {
+    const isLoggedIn = currentUserId !== '0';
+    // Ensure itemData is loaded before checking seller_id
+    const isSeller = itemData && itemData.seller_id === currentUserId && isLoggedIn; 
+    const isEnded = isAuctionEnded();
+
+    if (isEnded) {
+        disableAllButtons('Auction has ended.');
+    } else if (isSeller) {
+        disableAllButtons('You are the seller of this item. Cannot bid or chat.');
+    } else if (!isLoggedIn) {
+        disableAllButtons('Please log in to bid or chat.');
+    } else {
+        // User is logged in, is not the seller, and auction is active. ENABLE features.
+        setupPlaceBidButton();
+        setupFavoritesButton(); 
+        setupChatButton();
     }
 }
 
-function setupBackButton() {
-    if (backToPreviousBtn) {
-        backToPreviousBtn.addEventListener('click', () => {
-            window.history.back();
+// FIX: Simplified button enabling to avoid complex title checks.
+function setupChatButton() {
+    let chatBtn = document.querySelector('.chat-btn');
+    
+    if (chatBtn) {
+        // 1. Remove disabled state and styling applied by disableAllButtons
+        chatBtn.disabled = false;
+        chatBtn.style.opacity = '1';
+        chatBtn.style.cursor = 'pointer';
+        chatBtn.title = 'Start a conversation with the seller';
+        
+        // 2. Clone and replace to remove all previous event listeners
+        const newChatBtn = chatBtn.cloneNode(true);
+        chatBtn.replaceWith(newChatBtn);
+        chatBtn = newChatBtn;
+        
+        // 3. Attach the new listener
+        chatBtn.addEventListener('click', () => {
+            if (!itemData || !itemData.seller_id) {
+                alert("Cannot start chat: Seller details missing.");
+                return;
+            }
+
+            fetch('../server/message/start_chat.php', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    item_id: itemId,
+                    seller_id: itemData.seller_id
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => { throw new Error(data.message || `HTTP error! status: ${response.status}`); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success && data.chat_id) {
+                    window.location.href = `messages.html?chat_id=${data.chat_id}`;
+                } else {
+                    alert(data.message || 'Failed to start chat.');
+                }
+            })
+            .catch(error => {
+                console.error('Error starting chat:', error);
+                alert('Error starting chat: ' + error.message);
+            });
         });
     }
 }
 
+// FIX: Simplified button enabling
+function setupFavoritesButton() {
+    let favoritesBtn = document.querySelector('.favorites-btn');
+
+    if (favoritesBtn) {
+        // 1. Remove disabled state and styling applied by disableAllButtons
+        favoritesBtn.disabled = false;
+        favoritesBtn.style.opacity = '1';
+        favoritesBtn.style.cursor = 'pointer';
+        favoritesBtn.title = 'Add this item to your favorites';
+        
+        // 2. Clone and replace to remove all previous event listeners
+        const newFavoritesBtn = favoritesBtn.cloneNode(true);
+        favoritesBtn.replaceWith(newFavoritesBtn);
+        favoritesBtn = newFavoritesBtn;
+        
+        // 3. Attach the new listener
+        favoritesBtn.addEventListener('click', () => {
+            alert('Favorites function is now enabled and ready to be implemented!');
+        });
+    }
+}
+
+// FIX: Simplified button enabling
+function setupPlaceBidButton() {
+    let placeBidBtn = document.getElementById('placeBidBtn');
+    const bidAmountInput = document.getElementById('bidAmount');
+    
+    if (!placeBidBtn || !bidAmountInput) {
+        console.error('Bid button or input not found.');
+        return;
+    }
+    
+    // 1. Remove disabled state and styling applied by disableAllButtons
+    placeBidBtn.disabled = false;
+    placeBidBtn.style.opacity = '1';
+    placeBidBtn.style.cursor = 'pointer';
+    placeBidBtn.title = 'Place your bid now';
+
+    // 2. Clone and replace to remove all previous event listeners
+    const newPlaceBidBtn = placeBidBtn.cloneNode(true);
+    placeBidBtn.replaceWith(newPlaceBidBtn);
+    placeBidBtn = newPlaceBidBtn;
+    
+    // 3. Attach the new listener
+    placeBidBtn.addEventListener('click', function(event) {
+        event.preventDefault();
+        
+        const bidAmount = parseFloat(bidAmountInput.value);
+        if (isNaN(bidAmount) || bidAmount <= 0) {
+            alert('Please enter a valid bid amount.');
+            return;
+        }
+
+        const minimumBid = parseFloat(bidAmountInput.min);
+        if (bidAmount < minimumBid) {
+            alert(`Bid must be at least ₱${minimumBid.toFixed(2)}`);
+            return;
+        }
+
+        fetch('../server/item/place_bid.php', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                item_id: itemId,
+                bid_amount: bidAmount
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Bid placed successfully!');
+                loadItemDetails(); 
+                bidAmountInput.value = '';
+            } else {
+                alert(data.message || 'Failed to place bid');
+            }
+        })
+        .catch(error => {
+            console.error('Error placing bid:', error);
+            alert('Error placing bid. Please try again.');
+        });
+    });
+}
+
 function loadHeader() {
+    // Original logic for dynamic header loading
     fetch("header.html")
         .then(response => response.text())
         .then(header => {
@@ -102,10 +244,16 @@ function loadItemDetails() {
                 alert('No item data found');
                 return;
             }
+
+            currentUserId = data.current_user_id || '0'; 
+            console.log('User ID from API (String):', currentUserId);
             
             console.log('Successfully loaded item:', data.item.title);
             itemData = data.item;
-            bidIncrementPercent = parseFloat(itemData.bid_increment_percent);
+            bidIncrementPercent = parseFloat(itemData.bid_increment_percent || 0);
+            
+            enableFeatures(); 
+
             populateItemDetails(data);
             updateMinimumBid();
             startCountdown(itemData.end_date);
@@ -117,6 +265,14 @@ function loadItemDetails() {
             console.error('Error loading item:', error);
             alert('Failed to load item details: ' + error.message);
         });
+}
+
+function setupBackButton() {
+    if (backToPreviousBtn) {
+        backToPreviousBtn.addEventListener('click', () => {
+            window.history.back();
+        });
+    }
 }
 
 function populateItemDetails(data) {
@@ -136,11 +292,12 @@ function populateItemDetails(data) {
         viewProfileBtn.href = `profile.html?user_id=${item.seller_id}`;
     }
 
-    const bidIncrementPercent = parseFloat(item.bid_increment_percent || 0);
     const startingPrice = parseFloat(item.starting_price || 0);
     const currentHighest = parseFloat(item.current_highest_bid || startingPrice);
+    
     const incrementAmount = currentHighest * (bidIncrementPercent / 100);
     const minimumBid = currentHighest + incrementAmount;
+    
     const startingPriceElem = document.querySelector('.bid-pricing .price-item:first-child .price-value');
     const currentBidElem = document.querySelector('.bid-pricing .price-item.current-bid .price-value');
     
@@ -164,6 +321,62 @@ function populateItemDetails(data) {
     const countElement = document.querySelector('.bid-time-and-count .count span');
     if (countElement) {
         countElement.textContent = totalBids;
+    }
+}
+
+function updateMinimumBid() {
+    const incrementAmount = currentHighestBid * (bidIncrementPercent / 100);
+    const minimumBid = currentHighestBid + incrementAmount;
+
+    const minBidTextElem = document.querySelector('.minimum-bid-text');
+    if (minBidTextElem) {
+        minBidTextElem.textContent = 
+            `Minimum bid increment: ₱${incrementAmount.toFixed(2)} (Next minimum: ₱${minimumBid.toFixed(2)})`;
+    }
+    
+    const bidAmountInput = document.getElementById('bidAmount');
+    if (bidAmountInput) {
+        bidAmountInput.min = minimumBid;
+        bidAmountInput.placeholder = minimumBid.toFixed(2);
+        bidAmountInput.step = "1";
+    }
+}
+
+function setupReportButton() {
+    const reportBtn = document.getElementById('reportBtn');
+
+    if (reportBtn) {
+        const newReportBtn = reportBtn.cloneNode(true);
+        reportBtn.replaceWith(newReportBtn);
+        
+        newReportBtn.addEventListener('click', () => {
+            const reportReason = prompt('Please enter the reason for reporting this item:');
+            
+            if (reportReason && reportReason.trim() !== '') {
+                fetch('../server/item/report_item.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        item_id: itemId,
+                        reason: reportReason
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Thank you for your report. We will review this item shortly.');
+                    } else {
+                        alert(data.message || 'Failed to submit report');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting report:', error);
+                    alert('Failed to submit report. Please try again.');
+                });
+            }
+        });
     }
 }
 
@@ -265,7 +478,7 @@ function displayBiddingHistory(history) {
         historyItem.innerHTML = `
             <img src="../assets/images/profile-placeholder.png" alt="Bidder" class="bidder-avatar">
             <div class="bidder-info">
-                <h4>${bid.bidder_name}</h4>
+                <h4>${bid.bidder_name || 'Anonymous Bidder'}</h4>
                 <span class="bid-time">${bid.time_ago || 'Recently'}</span>
             </div>
             <div class="bid-amount-container">
@@ -309,7 +522,8 @@ function startCountdown(endDate) {
             updateTimerDisplay('00', '00', '00', '00');
             updateTimerLabel('Auction Ended');
             
-            loadItemDetails();
+            // Re-call loadItemDetails to disable buttons after auction ends
+            loadItemDetails(); 
             return;
         }
 
@@ -346,133 +560,6 @@ function updateTimerLabel(text) {
     }
 }
 
-// buttons r disabled, keeping functions below for future ref
-
-function submitBid(bidAmount) {
-    console.log('Bidding feature is disabled');
-}
-
-const reportBtn = document.getElementById('reportBtn');
-
-if (reportBtn) {
-    reportBtn.addEventListener('click', () => {
-        const reportReason = prompt('Please enter the reason for reporting this item:');
-        
-        if (reportReason && reportReason.trim() !== '') {
-            fetch('../server/item/report_item.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    item_id: itemId,
-                    reason: reportReason
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Thank you for your report. We will review this item shortly.');
-                } else {
-                    alert(data.message || 'Failed to submit report');
-                }
-            })
-            .catch(error => {
-                console.error('Error submitting report:', error);
-                alert('Failed to submit report. Please try again.');
-            });
-        }
-    });
-}
-
-const bidAmountInput = document.getElementById('bidAmount');
-
-if (bidAmountInput) {
-    bidAmountInput.addEventListener('blur', () => {
-        if (bidAmountInput.value) {
-            const value = parseFloat(bidAmountInput.value);
-            if (!isNaN(value)) {
-                bidAmountInput.value = value.toFixed(2);
-            }
-        }
-    });
-
-    bidAmountInput.addEventListener('input', () => {
-        if (bidAmountInput.value < 0) {
-            bidAmountInput.value = 0;
-        }
-    });
-}
-function updateMinimumBid() {
-    // Calculate the increment
-    const incrementAmount = currentHighestBid * (bidIncrementPercent / 100);
-    const minimumBid = currentHighestBid + incrementAmount;
-
-    // Update the minimum bid text and input
-    const minBidTextElem = document.querySelector('.minimum-bid-text');
-    if (minBidTextElem) {
-        minBidTextElem.textContent = 
-            `Minimum bid increment: ₱${incrementAmount.toFixed(2)} (Next minimum: ₱${minimumBid.toFixed(2)})`;
-    }
-    
-    const bidAmountInput = document.getElementById('bidAmount');
-    if (bidAmountInput) {
-        bidAmountInput.min = minimumBid;
-        bidAmountInput.placeholder = minimumBid.toFixed(2);
-        bidAmountInput.step = "1";
-    }
-}
-
-// placing a bid functionalitiess
-function setupPlaceBidButton() {
-    if (!placeBidBtn || !bidAmountInput) {
-        console.error('Bid button or input not found.');
-        return;
-    }
-
-    placeBidBtn.addEventListener('click', function(event) {
-        event.preventDefault();
-        
-        const bidAmount = parseFloat(bidAmountInput.value);
-        if (isNaN(bidAmount) || bidAmount <= 0) {
-            alert('Please enter a valid bid amount.');
-            return;
-        }
-
-        const minimumBid = parseFloat(bidAmountInput.min);
-        if (bidAmount < minimumBid) {
-            alert(`Bid must be at least ₱${minimumBid.toFixed(2)}`);
-            return;
-        }
-
-        fetch('../server/item/place_bid.php', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                item_id: itemId,
-                bid_amount: bidAmount
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Bid placed successfully!');
-                loadItemDetails(); 
-                bidAmountInput.value = '';
-            } else {
-                alert(data.message || 'Failed to place bid');
-            }
-        })
-        .catch(error => {
-            console.error('Error placing bid:', error);
-            alert('Error placing bid. Please try again.');
-        });
-    });
-}
-
 window.addEventListener('load', () => {
     if (!itemId) {
         alert('No item specified');
@@ -480,7 +567,9 @@ window.addEventListener('load', () => {
         return;
     }
     
+    // Disable buttons initially while loading
+    disableAllButtons('Loading item details...'); 
+
     loadHeader();
     loadItemDetails();
-    setupPlaceBidButton(); 
 });
