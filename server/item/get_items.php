@@ -19,11 +19,7 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: http://localhost");
 header("Access-Control-Allow-Credentials: true");
 
-// --- RESTORED AND ROBUST INCLUDE PATH ---
-// The path must be correct: __DIR__ is the directory of the current file (server/item), 
-// so /../ goes up to server/, and then config/database.php
-include_once __DIR__ . '/../config/database.php'; 
-// Note: If the path below fails, try just: include_once '../config/database.php'; 
+include_once '../config/database.php';
 
 
 // Create mysqli connection

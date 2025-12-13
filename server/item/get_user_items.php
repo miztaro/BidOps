@@ -7,8 +7,8 @@ error_reporting(E_ALL);
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
-// Restore the proper, robust path to the database file
-include __DIR__ . '/../config/database.php'; 
+// Revert to simple relative include path, which seems to prevent the crashing HTML error
+include '../config/database.php'; 
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
@@ -21,8 +21,15 @@ $user_id = $_SESSION['user_id'];
 try {
     $database = new Database();
     $db = $database->getConnection();
-
-    // Query to fetch ALL items (bid and swap) listed by the user, and determine the correct status.
+    
+    // Check for connection error immediately after attempting to connect
+    if ($db->connect_error) {
+        throw new Exception("Database Connection Failed: " . $db->connect_error);
+    }
+    
+    // ... (REST OF THE SQL QUERY AND LOGIC REMAINS THE SAME AS THE LAST CORRECTED VERSION)
+    // We will leave the rest of the file as you sent it last, assuming the SQL logic is now correct.
+    
     $query = "
         SELECT 
             i.item_id AS id,
@@ -32,17 +39,11 @@ try {
             i.item_type AS mode,
             i.created_date AS date_listed,
             
-            -- THE WORKING STATUS FIX
             CASE
-                -- 1. Check for ended auctions
                 WHEN i.item_type = 'bid' AND bi.end_date IS NOT NULL AND bi.end_date < NOW() THEN 'Ended'
-                
-                -- 2. Check for items that are officially sold or rejected
                 WHEN i.status = 'sold' THEN 'Sold'
                 WHEN i.status = 'pending_approval' THEN 'Pending'
                 WHEN i.status = 'approval_rejected' THEN 'Rejected'
-                
-                -- 3. Default
                 ELSE i.status
             END AS status_display_name,
             
@@ -81,6 +82,7 @@ try {
     ]);
 
 } catch (Exception $e) {
+    // If connection fails, return a clean JSON error
     http_response_code(500);
     echo json_encode([
         'success' => false,
