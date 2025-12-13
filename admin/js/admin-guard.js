@@ -42,7 +42,7 @@
     }
 
 
-    // 3. UI LOGIC (Dropdown Menu)
+// 3. UI LOGIC (Dropdown Menu)
 
     document.addEventListener('click', function(e) {
         const dropdown = document.getElementById('profileDropdown');
@@ -52,7 +52,16 @@
             if(dropdown) {
                 dropdown.classList.toggle('show');
                 const nameDisplay = document.getElementById('adminNameDisplay');
-                if(nameDisplay) nameDisplay.textContent = name;
+                
+              
+                // 1. Retrieve the username from Local Storage
+                const storedName = localStorage.getItem('username');
+                
+                // 2. Update the text if the element and name exist
+                if(nameDisplay && storedName) {
+                    nameDisplay.textContent = storedName;
+                }
+                // --- FIX ENDS HERE ---
             }
         } 
         // Close Menu on Outside Click
@@ -60,7 +69,6 @@
             dropdown.classList.remove('show');
         }
     });
-
 
     // 4. LOGOUT LOGIC (The Fix)
 
