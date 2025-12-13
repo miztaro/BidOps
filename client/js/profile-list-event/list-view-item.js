@@ -170,22 +170,18 @@ function loadImages(imagePaths) {
     if (!mainImage || !previewContainer) return;
 
     previewContainer.innerHTML = '';
-    
-    // Check if the images array has the correct path property (file_path)
-    const processedPaths = imagePaths.map(img => img.image_path || img.file_path || 'uploads/default.jpg');
-    
-    if (processedPaths.length === 0 || processedPaths[0] === 'uploads/default.jpg') {
-        mainImage.src = `${IMAGE_BASE_URL}uploads/default.jpg`;
+
+    if (!imagePaths || imagePaths.length === 0) {
+        mainImage.src = '';
         return;
     }
 
-    // Set main image - Use the IMAGE_BASE_URL defined at the top
-    mainImage.src = `${IMAGE_BASE_URL}${processedPaths[0]}`;
+    // Set main image
+    mainImage.src = `../server/item/${imagePaths[0]}`;
 
-    processedPaths.forEach((imgPath, index) => {
+    imagePaths.forEach((imgPath, index) => {
         const img = document.createElement('img');
-        // Use the IMAGE_BASE_URL for all thumbnails
-        img.src = `${IMAGE_BASE_URL}${imgPath}`;
+        img.src = `../server/item/${imgPath}`;
         if (index === 0) img.classList.add('active');
 
         img.addEventListener('click', () => {
@@ -197,6 +193,41 @@ function loadImages(imagePaths) {
         previewContainer.appendChild(img);
     });
 }
+
+// function loadImages(imagePaths) {
+//     const mainImage = document.querySelector('.left-side .main-image img');
+//     const previewContainer = document.querySelector('.left-side .images-preview');
+
+//     if (!mainImage || !previewContainer) return;
+
+//     previewContainer.innerHTML = '';
+    
+//     // Check if the images array has the correct path property (file_path)
+//     const processedPaths = imagePaths.map(img => img.image_path || img.file_path || 'uploads/default.jpg');
+    
+//     if (processedPaths.length === 0 || processedPaths[0] === 'uploads/default.jpg') {
+//         mainImage.src = `${IMAGE_BASE_URL}uploads/default.jpg`;
+//         return;
+//     }
+
+//     // Set main image - Use the IMAGE_BASE_URL defined at the top
+//     mainImage.src = `${IMAGE_BASE_URL}${processedPaths[0]}`;
+
+//     processedPaths.forEach((imgPath, index) => {
+//         const img = document.createElement('img');
+//         // Use the IMAGE_BASE_URL for all thumbnails
+//         img.src = `${IMAGE_BASE_URL}${imgPath}`;
+//         if (index === 0) img.classList.add('active');
+
+//         img.addEventListener('click', () => {
+//             mainImage.src = img.src;
+//             previewContainer.querySelectorAll('img').forEach(i => i.classList.remove('active'));
+//             img.classList.add('active');
+//         });
+
+//         previewContainer.appendChild(img);
+//     });
+// }
 
 
 // ==========================================
