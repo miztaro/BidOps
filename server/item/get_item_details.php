@@ -1,8 +1,5 @@
 <?php
 
-error_reporting(E_ALL & ~E_NOTICE); 
-ini_set('display_errors', 0);
-
 if (session_status() == PHP_SESSION_NONE) {
     if (!headers_sent()) {
         session_start();
@@ -11,6 +8,27 @@ if (session_status() == PHP_SESSION_NONE) {
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
+
+// --- FUNCTION DEFINITION ---
+function getTimeAgo($datetime) {
+    $now = new DateTime();
+    $ago = new DateTime($datetime);
+    $diff = $now->diff($ago);
+    
+    if ($diff->y > 0) {
+        return $diff->y . ' year' . ($diff->y > 1 ? 's' : '') . ' ago';
+    } elseif ($diff->m > 0) {
+        return $diff->m . ' month' . ($diff->m > 1 ? 's' : '') . ' ago';
+    } elseif ($diff->d > 0) {
+        return $diff->d . ' day' . ($diff->d > 1 ? 's' : '') . ' ago';
+    } elseif ($diff->h > 0) {
+        return $diff->h . ' hour' . ($diff->h > 1 ? 's' : '') . ' ago';
+    } elseif ($diff->i > 0) {
+        return $diff->i . ' minute' . ($diff->i > 1 ? 's' : '') . ' ago';
+    } else {
+        return 'Just now';
+    }
+}
 
 $database_path = __DIR__ . '/../config/database.php';
 if (!file_exists($database_path)) {
@@ -66,10 +84,25 @@ try {
         exit;
     }
 
-    $stmt = $db->prepare("SELECT * FROM itemimage WHERE item_id = ? ORDER BY image_id");
+    // --- START: FIX FOR IMAGE PATH RETRIEVAL ---
+    $stmt = $db->prepare("SELECT image_path FROM itemimage WHERE item_id = ? ORDER BY image_id");
     $stmt->bind_param("i", $item_id);
     $stmt->execute();
-    $images = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $raw_images = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    
+    // FIX: Point to the folder where images actually live, relative to the public HTML file
+    $base_path = '../server/item/uploads/'; 
+
+    $images = array_map(function($img) use ($base_path) {
+        // Strip any existing path junk from the DB value so we just get 'filename.jpg'
+        $filename = basename($img['image_path']);
+        
+        return [
+            // Combine our correct base path with the clean filename
+            'image_path' => $base_path . $filename
+        ];
+    }, $raw_images);
+    // --- END: FIX FOR IMAGE PATH RETRIEVAL ---
 
     $bidding_history = [];
 
@@ -96,14 +129,13 @@ try {
             $in = str_repeat('?,', count($bidder_ids) - 1) . '?';
             
             $stmt_users = $db->prepare("SELECT user_id, username FROM user WHERE user_id IN ($in)");
+            // We use 's' for simplicity and safety across user ID types.
             $stmt_users->bind_param(str_repeat('s', count($bidder_ids)), ...$bidder_ids);
             $stmt_users->execute();
             $user_results = $stmt_users->get_result()->fetch_all(MYSQLI_ASSOC);
             $user_names = array_column($user_results, 'username', 'user_id');
         }
 
-        // --- START OF ANONYMITY LOGIC ---
-        
         if (!empty($raw_history)) {
             $counter = 1;
             foreach ($raw_history as $bid) {
@@ -112,8 +144,7 @@ try {
                 $bidder_name = $user_names[$bid['bidder_id']] ?? "Bidder #" . $counter;
                 
                 // ANONYMITY CHECK: Compare the bidder's ID to the current user's ID
-                // Note: The comparison uses the $current_user_id defined at the top of the script
-                if ($bid['bidder_id'] !== $current_user_id) {
+                if (strval($bid['bidder_id']) !== $current_user_id) { 
                     $bidder_name = "Anonymous Bidder"; 
                 }
 
@@ -126,7 +157,6 @@ try {
                 $counter++;
             }
         }
-        // --- END OF ANONYMITY LOGIC ---
     }
 
 
@@ -146,18 +176,4 @@ try {
     ]);
 }
 
-function getTimeAgo($datetime) {
-    $now = new DateTime();
-    $ago = new DateTime($datetime);
-    $diff = $now->diff($ago);
-    
-    if ($diff->d > 0) {
-        return $diff->d . ' day' . ($diff->d > 1 ? 's' : '') . ' ago';
-    } elseif ($diff->h > 0) {
-        return $diff->h . ' hour' . ($diff->h > 1 ? 's' : '') . ' ago';
-    } elseif ($diff->i > 0) {
-        return $diff->i . ' minute' . ($diff->i > 1 ? 's' : '') . ' ago';
-    } else {
-        return 'Just now';
-    }
-}
+?>

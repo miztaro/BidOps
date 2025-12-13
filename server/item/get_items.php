@@ -1,12 +1,11 @@
 <?php
 session_start();
 
-// Show all errors (for debugging)
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-
+// Add headers for CORS if needed, though often better handled by web server config
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Methods: GET, OPTIONS");
@@ -20,7 +19,6 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: http://localhost");
 header("Access-Control-Allow-Credentials: true");
 
-// Include database connection
 include_once '../config/database.php';
 
 // Create mysqli connection
@@ -37,12 +35,32 @@ try {
     $category = isset($_GET['category']) ? $_GET['category'] : '';
     $item_type = isset($_GET['item_type']) ? $_GET['item_type'] : '';
 
-    $query = "SELECT i.item_id, i.title, i.description, i.category_type, i.status, 
-                     i.created_date, i.item_type, i.seller_id, 
-                     u.username AS seller_name
-              FROM item i
-              JOIN user u ON i.seller_id = u.user_id
-              WHERE i.status = 'active'";
+    // --- OPTIMIZED MAIN QUERY: IMPLEMENTING THE AUCTION END DATE FILTER ---
+    $query = "SELECT 
+                i.item_id, i.title, i.description, i.category_type, i.status, 
+                i.created_date, i.item_type, i.seller_id, 
+                u.username AS seller_name,
+                bi.starting_price,
+                bi.end_date,
+                COUNT(DISTINCT bo.bid_id) AS bid_count,
+                GROUP_CONCAT(ii.image_path ORDER BY ii.image_id) AS image_paths
+            FROM item i
+            JOIN user u ON i.seller_id = u.user_id
+            LEFT JOIN biditem bi ON i.item_id = bi.item_id 
+            LEFT JOIN bidoffer bo ON i.item_id = bo.item_id AND bo.bid_status IN ('active','pending')
+            LEFT JOIN itemimage ii ON i.item_id = ii.item_id
+            WHERE i.status = 'active' 
+              AND (
+                i.item_type = 'swap' 
+                OR 
+                (
+                    i.item_type = 'bid' 
+                    -- CRITICAL FIX: Only show bid items where end_date is NOT NULL and is in the FUTURE
+                    AND bi.end_date IS NOT NULL 
+                    AND bi.end_date > NOW()
+                )
+              )";
+    
     $types = '';
     $params = [];
 
@@ -58,8 +76,7 @@ try {
         $params[] = $item_type;
     }
 
-    $query .= " ORDER BY i.created_date DESC";
-
+    $query .= " GROUP BY i.item_id ORDER BY i.created_date DESC";
  
     $stmt = $conn->prepare($query);
     if ($params) {
@@ -69,44 +86,22 @@ try {
     $result = $stmt->get_result();
 
     $items = [];
+    $category_counts = []; // New array to hold counts
 
     while ($row = $result->fetch_assoc()) {
-       
-        $starting_price = 0;
-        $end_date = null;
-        $bid_count = 0;
-
-        if ($row['item_type'] === 'bid') {
-           
-            $bidStmt = $conn->prepare("SELECT starting_price, end_date FROM biditem WHERE item_id = ?");
-            $bidStmt->bind_param("i", $row['item_id']);
-            $bidStmt->execute();
-            $bidResult = $bidStmt->get_result();
-            if ($bidData = $bidResult->fetch_assoc()) {
-                $starting_price = $bidData['starting_price'];
-                $end_date = $bidData['end_date'];
-            }
-            $bidStmt->close();
-
-            $countStmt = $conn->prepare("SELECT COUNT(*) AS bid_count FROM bidoffer WHERE item_id = ? AND bid_status IN ('active','pending')");
-            $countStmt->bind_param("i", $row['item_id']);
-            $countStmt->execute();
-            $countResult = $countStmt->get_result();
-            if ($countData = $countResult->fetch_assoc()) {
-                $bid_count = $countData['bid_count'];
-            }
-            $countStmt->close();
-        }
-
-        $imageStmt = $conn->prepare("SELECT image_path FROM itemimage WHERE item_id = ?");
-        $imageStmt->bind_param("i", $row['item_id']);
-        $imageStmt->execute();
-        $imageResult = $imageStmt->get_result();
+        
+        // Process images from GROUP_CONCAT
         $images = [];
-        while($img = $imageResult->fetch_assoc()){
-            $images[] = $img['image_path'];
+        if (!empty($row['image_paths'])) {
+            // Split the comma-separated string into an array of image paths
+            $images = explode(',', $row['image_paths']);
         }
-        $imageStmt->close();
+        
+        // --- ADD CATEGORY COUNT LOGIC ---
+        if (!isset($category_counts[$row['category_type']])) {
+            $category_counts[$row['category_type']] = 0;
+        }
+        $category_counts[$row['category_type']]++;
 
         $items[] = [
             "item_id" => $row['item_id'],
@@ -118,26 +113,35 @@ try {
             "item_type" => $row['item_type'],
             "seller_id" => $row['seller_id'],
             "seller_name" => $row['seller_name'],
-            "starting_price" => $starting_price,
-            "images" => $images,
-            "end_date" => $end_date,
-            "bid_count" => $bid_count
+            "starting_price" => $row['starting_price'] ?? 0, 
+            "end_date" => $row['end_date'],
+            "bid_count" => $row['bid_count'],
+            "images" => $images
         ];
     }
 
     $stmt->close();
-
-    $listings = [];
+    
+    // --- POPULATE CATEGORIES ARRAY FOR FRONTEND ---
     $categories = [];
+    foreach ($category_counts as $name => $count) {
+        $categories[] = [
+            'name' => $name,
+            'count' => $count
+        ];
+    }
+    
+    // --- RE-INTRODUCE LISTINGS LOGIC (For My Listings tab) ---
+    $listings = [];
     $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
     if($user_id){
         $listingQuery = "SELECT i.item_id, i.title, i.description, i.category_type, i.status, 
-                                i.created_date, i.item_type, i.seller_id, 
-                                u.username AS seller_name
-                            FROM item i
-                            JOIN user u ON i.seller_id = u.user_id
-                            WHERE i.seller_id = ?;
-                        ";
+                              i.created_date, i.item_type, i.seller_id, 
+                              u.username AS seller_name
+                             FROM item i
+                             JOIN user u ON i.seller_id = u.user_id
+                             WHERE i.seller_id = ?
+                             ORDER BY i.created_date DESC"; 
         $stmt2 = $conn->prepare($listingQuery);
         $stmt2->bind_param("s", $user_id);
         $stmt2->execute();
@@ -146,13 +150,6 @@ try {
         while ($row = $listingResult->fetch_assoc()) {
             $listings[] = $row;
         }
-
-        foreach ($listings as $item) {
-            if (!empty($item["category_type"]) && !in_array($item["category_type"], $categories)) {
-                $categories[] = $item["category_type"];
-            }
-        }
-        sort($categories);
         $stmt2->close();
     }
 

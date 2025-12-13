@@ -4,9 +4,35 @@ const placeBidBtn = document.getElementById('placeBidBtn');
 const itemId = urlParams.get('item_id');
 
 let itemData = null;
-let currentHighestBid = 0;
+let currentHighestBid = 0; // Will be set accurately in loadItemDetails
 let bidIncrementPercent = 0.00;
 let currentUserId = '0'; 
+
+// --- NEW HELPER FUNCTION FOR MINIMUM BID CALCULATION ---
+/**
+ * Calculates the required minimum bid amount based on the current highest bid and the increment percentage.
+ * @param {number} currentHighest - The current highest bid (or starting price if no bids).
+ * @param {number} incrementPercent - The bid increment percentage (e.g., 5 for 5%).
+ * @returns {{minimumBid: number, incrementAmount: number}} The calculated minimum bid and increment amount.
+ */
+function calculateMinimumBid(currentHighest, incrementPercent) {
+    const safeHighest = parseFloat(currentHighest || 0);
+    const safeIncrement = parseFloat(incrementPercent || 0) / 100;
+    
+    // Calculate the increment amount
+    const incrementAmount = safeHighest * safeIncrement;
+    
+    // The next minimum bid is Current Highest + Increment Amount
+    const minimumBid = safeHighest + incrementAmount;
+    
+
+    return { 
+        minimumBid: minimumBid, 
+        incrementAmount: incrementAmount 
+    };
+}
+
+
 
 function disableAndUnbind(selector, title, defaultText, elementId = null) {
     const originalElement = elementId ? document.getElementById(elementId) : document.querySelector(selector);
@@ -20,9 +46,8 @@ function disableAndUnbind(selector, title, defaultText, elementId = null) {
         newElement.style.cursor = 'not-allowed';
         newElement.title = title;
         
-        // Ensure the inner HTML is preserved for icons/text, but the button is disabled
+        // Ensure the inner HTML is preserved for icons/text, otherwise use defaultText
         if (defaultText) {
-             // Retain the current inner HTML if it already contains icons, otherwise use defaultText
              newElement.innerHTML = newElement.innerHTML.includes('iconify-icon') ? newElement.innerHTML : defaultText;
         }
         
@@ -36,7 +61,7 @@ function disableAllButtons(reason) {
     disableAndUnbind('#placeBidBtn', reason, '<iconify-icon icon="mdi:gavel"></iconify-icon> Place Bid', 'placeBidBtn');
     disableAndUnbind('.favorites-btn', reason, '<iconify-icon icon="mdi:heart"></iconify-icon> Add to Favorites');
     disableAndUnbind('.chat-btn', reason, '<iconify-icon icon="mdi:message"></iconify-icon> Chat with Seller');
-    setupReportButton();
+    setupReportButton(); // Report button is generally always enabled, but setup is called here.
 }
 
 function enableFeatures() {
@@ -76,7 +101,7 @@ function setupChatButton() {
         chatBtn = newChatBtn;
         
         // 3. Attach the new listener
-        chatBtn.addEventListener('click', () => {
+        newChatBtn.addEventListener('click', () => {
             if (!itemData || !itemData.seller_id) {
                 alert("Cannot start chat: Seller details missing.");
                 return;
@@ -131,13 +156,13 @@ function setupFavoritesButton() {
         favoritesBtn = newFavoritesBtn;
         
         // 3. Attach the new listener
-        favoritesBtn.addEventListener('click', () => {
+        newFavoritesBtn.addEventListener('click', () => {
             alert('Favorites function is now enabled and ready to be implemented!');
         });
     }
 }
 
-// FIX: Simplified button enabling
+// FIX: Simplified button enabling and IMPROVED bid handling
 function setupPlaceBidButton() {
     let placeBidBtn = document.getElementById('placeBidBtn');
     const bidAmountInput = document.getElementById('bidAmount');
@@ -159,7 +184,7 @@ function setupPlaceBidButton() {
     placeBidBtn = newPlaceBidBtn;
     
     // 3. Attach the new listener
-    placeBidBtn.addEventListener('click', function(event) {
+    newPlaceBidBtn.addEventListener('click', function(event) {
         event.preventDefault();
         
         const bidAmount = parseFloat(bidAmountInput.value);
@@ -169,6 +194,8 @@ function setupPlaceBidButton() {
         }
 
         const minimumBid = parseFloat(bidAmountInput.min);
+        // Note: The minimum bid validation is duplicated here and on the server (place_bid.php).
+        // This is good practice for immediate UX feedback.
         if (bidAmount < minimumBid) {
             alert(`Bid must be at least ₱${minimumBid.toFixed(2)}`);
             return;
@@ -189,8 +216,17 @@ function setupPlaceBidButton() {
         .then(data => {
             if (data.success) {
                 alert('Bid placed successfully!');
-                loadItemDetails(); 
+                
+                // CRITICAL FIX: Update the global variable and minimum bid display instantly
+                // before or during loadItemDetails(). 
+                // The API should return the new highest bid for instant update. 
+                // Since the PHP doesn't return the new bid, we rely on loadItemDetails, 
+                // but we clear the input now.
+                
                 bidAmountInput.value = '';
+                
+                // Reload data to get the new current highest bid and bidding history
+                loadItemDetails(); 
             } else {
                 alert(data.message || 'Failed to place bid');
             }
@@ -252,14 +288,21 @@ function loadItemDetails() {
             itemData = data.item;
             bidIncrementPercent = parseFloat(itemData.bid_increment_percent || 0);
             
+            // CRITICAL FIX 1: Set currentHighestBid immediately before UI updates
+            const startingPrice = parseFloat(itemData.starting_price || 0);
+            currentHighestBid = parseFloat(data.item.current_highest_bid || startingPrice);
+            
             enableFeatures(); 
 
+            // CRITICAL FIX 2: Call functions in the correct order, 
+            // relying on the globally updated `currentHighestBid`.
             populateItemDetails(data);
-            updateMinimumBid();
+            updateMinimumBid(); // Uses the newly set currentHighestBid
             startCountdown(itemData.end_date);
             setupImageGallery(data.images);
             displayBiddingHistory(data.bidding_history);
-            currentHighestBid = parseFloat(data.item.current_highest_bid || data.item.starting_price);
+            
+            // REMOVED: Redundant setting of currentHighestBid here.
         })
         .catch(error => {
             console.error('Error loading item:', error);
@@ -293,15 +336,17 @@ function populateItemDetails(data) {
     }
 
     const startingPrice = parseFloat(item.starting_price || 0);
-    const currentHighest = parseFloat(item.current_highest_bid || startingPrice);
+    // Use the global currentHighestBid variable, which was set in loadItemDetails
+    const currentHighest = currentHighestBid; 
     
-    const incrementAmount = currentHighest * (bidIncrementPercent / 100);
-    const minimumBid = currentHighest + incrementAmount;
+    // Use the new helper function for calculation
+    const { minimumBid, incrementAmount } = calculateMinimumBid(currentHighest, bidIncrementPercent);
     
     const startingPriceElem = document.querySelector('.bid-pricing .price-item:first-child .price-value');
     const currentBidElem = document.querySelector('.bid-pricing .price-item.current-bid .price-value');
     
     if (startingPriceElem) startingPriceElem.textContent = `₱${startingPrice.toFixed(2)}`;
+    // Update the current bid display using the currentHighestBid
     if (currentBidElem) currentBidElem.textContent = `₱${currentHighest.toFixed(2)}`;
     
     const minBidTextElem = document.querySelector('.minimum-bid-text');
@@ -313,7 +358,12 @@ function populateItemDetails(data) {
     const bidAmountInput = document.getElementById('bidAmount');
     if (bidAmountInput) {
         bidAmountInput.min = minimumBid;
-        bidAmountInput.placeholder = minimumBid.toFixed(2);
+        // Adjust placeholder for better UX when the minimum bid is 0 (first bid scenario)
+        if (minimumBid > 0) {
+            bidAmountInput.placeholder = minimumBid.toFixed(2);
+        } else {
+             bidAmountInput.placeholder = startingPrice.toFixed(2);
+        }
         bidAmountInput.step = "1";
     }
     
@@ -324,9 +374,11 @@ function populateItemDetails(data) {
     }
 }
 
+// MODIFIED: updateMinimumBid now relies on the global currentHighestBid variable 
+// which is updated in loadItemDetails (or should be updated on successful bid response)
 function updateMinimumBid() {
-    const incrementAmount = currentHighestBid * (bidIncrementPercent / 100);
-    const minimumBid = currentHighestBid + incrementAmount;
+    // Recalculate based on current state variables
+    const { minimumBid, incrementAmount } = calculateMinimumBid(currentHighestBid, bidIncrementPercent);
 
     const minBidTextElem = document.querySelector('.minimum-bid-text');
     if (minBidTextElem) {
@@ -337,7 +389,12 @@ function updateMinimumBid() {
     const bidAmountInput = document.getElementById('bidAmount');
     if (bidAmountInput) {
         bidAmountInput.min = minimumBid;
-        bidAmountInput.placeholder = minimumBid.toFixed(2);
+        if (minimumBid > 0) {
+            bidAmountInput.placeholder = minimumBid.toFixed(2);
+        } else if (itemData) {
+             // Fallback to starting price if the calculated minimum is 0 (first bid)
+             bidAmountInput.placeholder = parseFloat(itemData.starting_price || 0).toFixed(2);
+        }
         bidAmountInput.step = "1";
     }
 }
@@ -396,7 +453,7 @@ function setupImageGallery(images) {
     }
     
     const firstImage = images[0];
-    const imagePath = `../server/item/${firstImage.image_path}`;
+    const imagePath = firstImage.image_path;
     console.log('Setting main image:', imagePath);
     mainImage.src = imagePath;
     
@@ -409,7 +466,7 @@ function setupImageGallery(images) {
         thumbnailContainer.innerHTML = '';
         images.forEach((img, index) => {
             const thumbnail = document.createElement('img');
-            const thumbPath = `../server/item/${img.image_path}`;
+            const thumbPath = img.image_path;
             thumbnail.src = thumbPath;
             thumbnail.alt = `Thumbnail ${index + 1}`;
             thumbnail.className = 'thumbnail' + (index === 0 ? ' active' : '');
@@ -466,6 +523,7 @@ function displayBiddingHistory(history) {
         const historyItem = document.createElement('div');
         historyItem.classList.add('history-item');
         
+        // Use history index to identify the current highest bid (which is always the first one returned by API)
         if (index === 0) {
             historyItem.classList.add('current-high');
         }
@@ -522,8 +580,8 @@ function startCountdown(endDate) {
             updateTimerDisplay('00', '00', '00', '00');
             updateTimerLabel('Auction Ended');
             
-            // Re-call loadItemDetails to disable buttons after auction ends
-            loadItemDetails(); 
+            // Re-run enableFeatures to disable the bid button and chat button
+            enableFeatures(); 
             return;
         }
 
