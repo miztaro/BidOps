@@ -19,7 +19,12 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: http://localhost");
 header("Access-Control-Allow-Credentials: true");
 
-include_once '../config/database.php';
+// --- RESTORED AND ROBUST INCLUDE PATH ---
+// The path must be correct: __DIR__ is the directory of the current file (server/item), 
+// so /../ goes up to server/, and then config/database.php
+include_once __DIR__ . '/../config/database.php'; 
+// Note: If the path below fails, try just: include_once '../config/database.php'; 
+
 
 // Create mysqli connection
 $database = new Database();
@@ -35,7 +40,7 @@ try {
     $category = isset($_GET['category']) ? $_GET['category'] : '';
     $item_type = isset($_GET['item_type']) ? $_GET['item_type'] : '';
 
-    // --- OPTIMIZED MAIN QUERY: IMPLEMENTING THE AUCTION END DATE FILTER ---
+    // --- MAIN QUERY (For Homepage/Available Items) ---
     $query = "SELECT 
                 i.item_id, i.title, i.description, i.category_type, i.status, 
                 i.created_date, i.item_type, i.seller_id, 
@@ -55,7 +60,6 @@ try {
                 OR 
                 (
                     i.item_type = 'bid' 
-                    -- CRITICAL FIX: Only show bid items where end_date is NOT NULL and is in the FUTURE
                     AND bi.end_date IS NOT NULL 
                     AND bi.end_date > NOW()
                 )
@@ -86,18 +90,12 @@ try {
     $result = $stmt->get_result();
 
     $items = [];
-    $category_counts = []; // New array to hold counts
+    $category_counts = [];
 
     while ($row = $result->fetch_assoc()) {
         
-        // Process images from GROUP_CONCAT
-        $images = [];
-        if (!empty($row['image_paths'])) {
-            // Split the comma-separated string into an array of image paths
-            $images = explode(',', $row['image_paths']);
-        }
+        $images = !empty($row['image_paths']) ? explode(',', $row['image_paths']) : [];
         
-        // --- ADD CATEGORY COUNT LOGIC ---
         if (!isset($category_counts[$row['category_type']])) {
             $category_counts[$row['category_type']] = 0;
         }
@@ -122,7 +120,7 @@ try {
 
     $stmt->close();
     
-    // --- POPULATE CATEGORIES ARRAY FOR FRONTEND ---
+    // POPULATE CATEGORIES ARRAY
     $categories = [];
     foreach ($category_counts as $name => $count) {
         $categories[] = [
@@ -131,27 +129,80 @@ try {
         ];
     }
     
-    // --- RE-INTRODUCE LISTINGS LOGIC (For My Listings tab) ---
+    // --- START: CORRECTED LISTINGS LOGIC (For My Listings tab) ---
     $listings = [];
     $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+    
     if($user_id){
-        $listingQuery = "SELECT i.item_id, i.title, i.description, i.category_type, i.status, 
-                              i.created_date, i.item_type, i.seller_id, 
-                              u.username AS seller_name
-                             FROM item i
-                             JOIN user u ON i.seller_id = u.user_id
-                             WHERE i.seller_id = ?
-                             ORDER BY i.created_date DESC"; 
+        $listingQuery = "
+            SELECT 
+                i.item_id, 
+                i.title, 
+                i.description, 
+                i.category_type, 
+                i.created_date, 
+                i.item_type, 
+                i.seller_id, 
+                u.username AS seller_name,
+                
+                -- VITAL FIX: Calculate the display status
+                CASE
+                    -- 1. Check for ended auctions
+                    WHEN i.item_type = 'bid' AND bi.end_date IS NOT NULL AND bi.end_date < NOW() THEN 'Ended'
+                    
+                    -- 2. Check for items that are officially sold or rejected
+                    WHEN i.status = 'sold' THEN 'Sold'
+                    WHEN i.status = 'pending_approval' THEN 'Pending'
+                    WHEN i.status = 'approval_rejected' THEN 'Rejected'
+                    
+                    -- 3. Default (item.status is 'active' here)
+                    ELSE i.status
+                END AS display_status,
+                
+                GROUP_CONCAT(ii.image_path ORDER BY ii.image_id) AS image_paths
+
+            FROM item i
+            JOIN user u ON i.seller_id = u.user_id
+            LEFT JOIN biditem bi ON i.item_id = bi.item_id 
+            LEFT JOIN itemimage ii ON i.item_id = ii.item_id 
+            WHERE i.seller_id = ?
+            GROUP BY i.item_id 
+            ORDER BY i.created_date DESC
+        "; 
+        
         $stmt2 = $conn->prepare($listingQuery);
+        
+        if (!$stmt2) {
+             throw new Exception("Listing Query Prepare Error: " . $conn->error);
+        }
+        
         $stmt2->bind_param("s", $user_id);
         $stmt2->execute();
         $listingResult =$stmt2->get_result();
 
         while ($row = $listingResult->fetch_assoc()) {
-            $listings[] = $row;
+            
+            $images = !empty($row['image_paths']) ? explode(',', $row['image_paths']) : [];
+            $main_image = !empty($images[0]) ? $images[0] : null;
+
+            $listings[] = [
+                'item_id' => $row['item_id'],
+                'title' => $row['title'],
+                'description' => $row['description'],
+                'category_type' => $row['category_type'],
+                // Use the calculated status
+                'status' => $row['display_status'], 
+                'created_date' => $row['created_date'],
+                'item_type' => $row['item_type'],
+                'seller_id' => $row['seller_id'],
+                'seller_name' => $row['seller_name'],
+                'images' => $images,
+                'main_image' => $main_image
+            ];
         }
         $stmt2->close();
     }
+    // --- END: CORRECTED LISTINGS LOGIC ---
 
     // Return JSON
     echo json_encode([
