@@ -63,10 +63,10 @@ html {
 }
 
 .left-nav-menu .user-profile-btn .img-container {
-    flex: 1;
     border-radius: 50%;
     width: 86px;
-    height: 86px;
+    max-height: 86px;
+    height: auto;
     background-color: var(--primary-base);
     overflow: hidden;
 }
@@ -75,6 +75,7 @@ html {
     object-fit: cover;
     width: 100%;
     height: 100%;
+    display: block;
 }
 
 .left-nav-menu .user-profile-btn .user-info {
@@ -155,7 +156,7 @@ html {
     width: 100%;
     height: auto;
     flex: 1;
-    display: flex;
+    display: none;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
@@ -532,7 +533,7 @@ html {
     border: 2px solid var(--primary);
 }
 
-.profile-user-info-content .user-img-container img {
+.profile-user-info-content .user-img-container .profile-avatar{
     object-fit: cover;
     height: 100%;
     width: 100%;
@@ -545,15 +546,14 @@ html {
 
 .user-info-container #user-name-container,
 .user-info-container #user-id-container,
-.user-info-container #user-email-container,
-.user-info-container #user-pass-container,
-.user-info-container #change-pass-btn {
+.user-info-container #user-email-container{
     display: flex;
     justify-content: space-between;
     width: 450px;
     padding-bottom: 10px;
     align-items: center;
 }
+
 
 .user-info-container #user-name-container h6 {
     font-size: 2.8em;
@@ -573,25 +573,29 @@ html {
 }
 
 .user-info-container #user-id-container #user-id,
-.user-info-container #user-email-container #user-email,
-.user-info-container #user-pass-container #user-id,
-.user-info-container #user-pass-container #user-pass {
+.user-info-container #user-email-container #user-email{
     font-family: 'Montserrat-SemiBold', sans-serif;
     font-size: 1em;
 }
 
 .user-info-container #change-pass-btn {
-    max-width: 150px;
+    max-width: 250px;
+    width: auto;
     justify-content: center;
     align-items: center;
     padding: 5px 8px;
     border-radius: 20px;
-    border: none;
-    background-color: var(--primary);
-    color: var(--primary-white);
+    border: 1px solid var(--primary);
+    background-color: transparent;
+    color: var(--primary);
     font-family: 'Montserrat-SemiBold', sans-serif;
     font-size: 0.7em;
     transition: 0.5s ease-in-out;
+}
+
+.user-info-container #change-pass-btn:hover{
+    background-color: var(--primary);
+    color: var(--primary-white);
 }
 
 .profile-user-info-content .profile-buttons-container {
@@ -603,7 +607,7 @@ html {
 }
 
 .profile-buttons-container #sign-out-btn,
-.profile-buttons-container #delete-btn {
+.profile-buttons-container #delete-btn{
     padding: 10px 15px;
     border-radius: 20px;
     border: 1px solid var(--primary);
@@ -614,11 +618,10 @@ html {
 }
 
 .user-info-container #change-pass-btn:hover,
-.profile-buttons-container #sign-out-btn:hover,
-.profile-buttons-container #delete-btn:hover {
+.profile-buttons-container #delete-btn:hover,
+.profile-buttons-container #sign-out-btn:hover{
     background-color: var(--primary);
     color: var(--primary-white);
-    border: none;
 }
 
 .swap-modal-overlay {

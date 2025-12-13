@@ -1,38 +1,3 @@
-export function getStatusClass(status) {
-  status = status.toLowerCase();
-  if (status.includes("active")) return "active-items";
-  if (status.includes("pending")) return "pending-items";
-  if (status.includes("rejected")) return "rejected-items";
-  if (status.includes("sold")) return "sold-items";
-  return "";
-}
-
-export function createListingRow(listing) {
-  const row = document.createElement("tr");
-  row.classList.add("listings-body-row");
-  row.setAttribute("id", `listing-row-${listing.id}`);
-
-  row.innerHTML = `
-      <td class="item">${listing.item}</td>
-      <td>${listing.category}</td>
-      <td>${listing.mode}</td>
-      <td>${listing.dateListed}</td>
-      <td><div class="status ${getStatusClass(listing.status)}">${listing.status}</div></td>
-      <td>
-        <div class="actions-container">
-          <button class="lists-view-btn" 
-            data-id="${listing.id}"
-            data-type="${listing.mode}"
-            data-status="${listing.status.toLowerCase()}">
-            View
-          </button>
-          ${listing.status.toLowerCase() === "active" ? `<iconify-icon data-id="${listing.id}" class="edit-btn" icon="flowbite:edit-outline" width="24" height="24"></iconify-icon>` : ''}
-        </div>
-      </td>
-    `;
-  return row;
-}
-
 document.addEventListener('DOMContentLoaded', function () {
   fetch("header.html")
     .then(response => response.text())
@@ -57,24 +22,241 @@ document.addEventListener('DOMContentLoaded', function () {
     .then(res => res.text())
     .then(html => document.getElementById('footer').innerHTML = html)
     .catch(err => console.error('Error loading footer:', err));
-  const signOutBtn = document.getElementById("sign-out-btn");
-  
-signOutBtn.addEventListener("click", function() {
-    if (confirm("Sign out?")) {
-        // Notify PHP to destroy session
-        fetch('../server/auth/logout.php'); 
-        
-        // Clear JS Session
-        localStorage.clear();
-        window.location.href = 'login.html';
+
+  //User Profile Data & Functions
+  async function fetchUserInfo() {
+    try {
+      const response = await fetch("/bidops/server/user/get_user_info.php", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        console.error("Failed to fetch user info:", data.message);
+        return data;
+      }
+
+      const userInfo = {
+        user_id: data.user.user_id,
+        username: data.user.username,
+        email: data.user.email
+      };
+
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
+      localStorage.setItem("role", "user");
+
+      displayUserInfo(userInfo);
+      displayUserProfileButton(userInfo);
+      applyUserAvatar(userInfo.username);
+
+    } catch (error) {
+      console.error("Error fetching user info:", error);
     }
-});
-  // ---------------- TODO: USER PROFILE DATA & FUNCTIONS ----------------
+  }
+
+  function displayUserInfo() {
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+    if (!userInfo) {
+      console.log("No logged-in user found.");
+      return;
+    }
+
+    document.getElementById("user-name").textContent = userInfo.username;
+    document.getElementById("user-id-placeHolder").textContent = userInfo.user_id;
+    document.getElementById("user-email-placeHolder").textContent = userInfo.email;
+  }
+
+  function displayUserProfileButton(user) {
+    const profileBtn = document.getElementById("profile-user-info-btn");
+    if (!profileBtn) return;
+
+    const h6 = profileBtn.querySelector(".user-info h6");
+    const p = profileBtn.querySelector(".user-info p");
+
+    if (h6) h6.textContent = user.username;
+    if (p) p.textContent = user.user_id;
+  }
+
+  function generateProfilePicture(username, size = 300) {
+    if (!username) return null;
+
+    const letter = username.charAt(0).toUpperCase();
+
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = stringToColor(username);
+    ctx.fillRect(0, 0, size, size);
+
+    const fontSize = size * 0.5; 
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `bold ${fontSize}px Arial`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const yOffset = fontSize * 0.08;
+    ctx.fillText(letter, size / 2, size / 2 + yOffset);
+
+    return canvas.toDataURL("image/png");
+  }
+
+  function applyUserAvatar(username) {
+    const avatar = generateProfilePicture(username);
+
+    if (!avatar) return;
+
+    const mainImg = document.getElementById("profilePicture");
+    if (mainImg) mainImg.src = avatar;
+
+    const thumbImg = document.querySelector("#profile-user-info-btn .profile-avatar");
+    if (thumbImg) thumbImg.src = avatar;
+  }
+
+  function stringToColor(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return `hsl(${hash % 360}, 65%, 45%)`;
+  }
+
+  async function changeUsername() {
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    if (!userInfo) return alert("No logged-in user found.");
+
+    const newUsername = prompt("Enter your new username:", userInfo.username);
+    if (!newUsername) return alert("Username cannot be empty.");
+
+    try {
+      const response = await fetch("/bidops/server/user/update_user_info.php", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "change_username",
+          new_username: newUsername
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert("Username updated successfully!");
+        userInfo.username = newUsername;
+        localStorage.setItem("userInfo", JSON.stringify(userInfo));
+        displayUserInfo();
+        displayUserProfileButton(userInfo);
+      } else {
+        alert("Failed to update username: " + data.message);
+      }
+    } catch (error) {
+      console.error("Error updating username: ", error);
+      alert("Error updating username. See console for details.");
+    }
+  }
+
+  async function changePassword() {
+    const newPassword = prompt("Enter your new password: ");
+    if (!newPassword) return alert("Password cannot be empty.");
+
+    try {
+      const response = await fetch("/bidops/server/user/update_user_info.php", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "change_password",
+          new_password: newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert("Password updated successfully!");
+      } else {
+        alert("Failed to update password: " + data.message);
+      }
+    } catch (error) {
+      console.error("Error updating password: ", error);
+      alert("Error updating password. See console for details.");
+    }
+  }
+
+  async function deleteAccount() {
+    const confirmed = confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch("/bidops/server/user/update_user_info.php", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "delete_account",
+        }),
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        alert("Account deleted successfully!");
+        localStorage.removeItem("userInfo");
+        localStorage.removeItem("role");
+        window.location.href = 'login.html';
+      } else {
+        alert("Failed to delete account: " + data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting account: " + data.message);
+      alert("Error deleting account.See console for details");
+    }
+  }
+
+  async function signOutUser() {
+    const confirmed = confirm("Sign Out?");
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch('../server/auth/logout.php', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error(`Logout request failed: ${response.status}`);
+      }
+
+      localStorage.clear();
+      window.location.href = 'login.html';
+    } catch (error) {
+      console.error("Logout failed:", error);
+      alert("Failed to log out. See console for details.");
+    }
+  }
+
+  document.querySelector("#user-name-container .edit-icon")?.addEventListener("click", changeUsername);
+  document.getElementById("change-pass-btn")?.addEventListener("click", changePassword);
+  document.getElementById("delete-btn")?.addEventListener("click", deleteAccount);
+  document.getElementById("sign-out-btn")?.addEventListener("click", signOutUser);
+  fetchUserInfo();
+  //End of User Info Data & Functions
 
   //Listings Data & Functions
   let listings = [];
   function fetchListings() {
-    fetch('/bidops/server/item/get_items.php',{
+    fetch('/bidops/server/item/get_items.php', {
       method: 'GET',
       credentials: 'include'
     })
@@ -114,6 +296,41 @@ signOutBtn.addEventListener("click", function() {
       .catch(error => console.error("Error loading listings: ", error));
   }
 
+  function createListingRow(listing) {
+    const row = document.createElement("tr");
+    row.classList.add("listings-body-row");
+    row.setAttribute("id", `listing-row-${listing.id}`);
+
+    row.innerHTML = `
+      <td class="item">${listing.item}</td>
+      <td>${listing.category}</td>
+      <td>${listing.mode}</td>
+      <td>${listing.dateListed}</td>
+      <td><div class="status ${getStatusClass(listing.status)}">${listing.status}</div></td>
+      <td>
+        <div class="actions-container">
+          <button class="lists-view-btn" 
+            data-id="${listing.id}"
+            data-type="${listing.mode}"
+            data-status="${listing.status.toLowerCase()}">
+            View
+          </button>
+          ${listing.status.toLowerCase() === "active" ? `<iconify-icon data-id="${listing.id}" class="edit-btn" icon="flowbite:edit-outline" width="24" height="24"></iconify-icon>` : ''}
+        </div>
+      </td>
+    `;
+    return row;
+  }
+
+  function getStatusClass(status) {
+    status = status.toLowerCase();
+    if (status.includes("active")) return "active-items";
+    if (status.includes("pending")) return "pending-items";
+    if (status.includes("rejected")) return "rejected-items";
+    if (status.includes("sold")) return "sold-items";
+    return "";
+  }
+
   function calculateListingStats(listings) {
     return {
       total: listings.length,
@@ -145,7 +362,7 @@ signOutBtn.addEventListener("click", function() {
   //Winning Bids Data & Functions 
   let winningBids = [];
   function fetchWinningBids() {
-    fetch('/bidops/server/item/get_transactions.php',{
+    fetch('/bidops/server/item/get_transactions.php', {
       method: 'GET',
       credentials: 'include'
     })
@@ -153,7 +370,7 @@ signOutBtn.addEventListener("click", function() {
       .then(data => {
         if (data.success) {
           winningBids = data.bids.map(tr => {
-            const item = tr.bidItem; 
+            const item = tr.bidItem;
             return {
               bid_id: item.bid_id,
               item_id: item.item_id,
@@ -220,7 +437,7 @@ signOutBtn.addEventListener("click", function() {
 
   let swappedItems = [];
   function fetchSwappedItems() {
-    fetch('/bidops/server/item/get_transactions.php',{
+    fetch('/bidops/server/item/get_transactions.php', {
       method: 'GET',
       credentials: 'include'
     })
@@ -228,7 +445,7 @@ signOutBtn.addEventListener("click", function() {
       .then(data => {
         if (data.success) {
           swappedItems = data.swaps.map(tr => {
-            const item = tr.swappedItem; 
+            const item = tr.swappedItem;
             return {
               swap_id: item.swap_id,
               item_id: item.item_id,
@@ -292,6 +509,7 @@ signOutBtn.addEventListener("click", function() {
 
   function updateTitleForSection(sectionId) {
     const titleContainer = document.querySelector(".title-container");
+     if (!titleContainer) return;
     const titleHeading = document.querySelector(".title-container h3");
     const currentAnalytics = document.querySelector(".title-container .analytics");
 
@@ -345,7 +563,7 @@ signOutBtn.addEventListener("click", function() {
     buttons[id].classList.add("active");
   }
 
-  showContent("profile-listings-content");
+  showContent("profile-user-info-content");
   Object.entries(buttons).forEach(([sectionId, btn]) => {
     btn.addEventListener("click", () => showContent(sectionId));
   });
@@ -381,9 +599,9 @@ signOutBtn.addEventListener("click", function() {
       }
     });
 
-    if (section === "listings") {
-      updateTitleForSection("profile-listings-content");
-    }
+    // if (section === "listings") {
+    //   updateTitleForSection("profile-listings-content");
+    // }
   }
 
   function applyFilter(type, value, section) {

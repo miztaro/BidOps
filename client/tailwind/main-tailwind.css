@@ -1,5 +1,11 @@
 /*! tailwindcss v4.1.17 | MIT License | https://tailwindcss.com */
 @layer properties;
+.visible {
+  visibility: visible;
+}
+.absolute {
+  position: absolute;
+}
 .fixed {
   position: fixed;
 }
@@ -45,9 +51,14 @@
 .table {
   display: table;
 }
-.blur {
-  --tw-blur: blur(8px);
-  filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+.p-3 {
+  padding: calc(var(--spacing, 0.25rem) * 3);
+}
+.p-5 {
+  padding: calc(var(--spacing, 0.25rem) * 5);
+}
+.text-center {
+  text-align: center;
 }
 .filter {
   filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
@@ -345,10 +356,10 @@ html {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 .left-nav-menu .user-profile-btn .img-container {
-  flex: 1;
   border-radius: 50%;
   width: 86px;
-  height: 86px;
+  max-height: 86px;
+  height: auto;
   background-color: var(--primary-base);
   overflow: hidden;
 }
@@ -356,6 +367,7 @@ html {
   object-fit: cover;
   width: 100%;
   height: 100%;
+  display: block;
 }
 .left-nav-menu .user-profile-btn .user-info {
   text-align: left;
@@ -434,7 +446,7 @@ html {
   width: 100%;
   height: auto;
   flex: 1;
-  display: flex;
+  display: none;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
@@ -712,7 +724,7 @@ html {
   background-color: var(--primary);
   border: 2px solid var(--primary);
 }
-.profile-user-info-content .user-img-container img {
+.profile-user-info-content .user-img-container .profile-avatar {
   object-fit: cover;
   height: 100%;
   width: 100%;
@@ -721,7 +733,7 @@ html {
   flex: 2;
   display: inline-block;
 }
-.user-info-container #user-name-container, .user-info-container #user-id-container, .user-info-container #user-email-container, .user-info-container #user-pass-container, .user-info-container #change-pass-btn {
+.user-info-container #user-name-container, .user-info-container #user-id-container, .user-info-container #user-email-container {
   display: flex;
   justify-content: space-between;
   width: 450px;
@@ -742,22 +754,27 @@ html {
 .user-info-container #user-name-container .edit-icon:hover {
   color: var(--primary-red);
 }
-.user-info-container #user-id-container #user-id, .user-info-container #user-email-container #user-email, .user-info-container #user-pass-container #user-id, .user-info-container #user-pass-container #user-pass {
+.user-info-container #user-id-container #user-id, .user-info-container #user-email-container #user-email {
   font-family: 'Montserrat-SemiBold', sans-serif;
   font-size: 1em;
 }
 .user-info-container #change-pass-btn {
-  max-width: 150px;
+  max-width: 250px;
+  width: auto;
   justify-content: center;
   align-items: center;
   padding: 5px 8px;
   border-radius: 20px;
-  border: none;
-  background-color: var(--primary);
-  color: var(--primary-white);
+  border: 1px solid var(--primary);
+  background-color: transparent;
+  color: var(--primary);
   font-family: 'Montserrat-SemiBold', sans-serif;
   font-size: 0.7em;
   transition: 0.5s ease-in-out;
+}
+.user-info-container #change-pass-btn:hover {
+  background-color: var(--primary);
+  color: var(--primary-white);
 }
 .profile-user-info-content .profile-buttons-container {
   display: flex;
@@ -775,10 +792,9 @@ html {
   font-family: 'Montserrat-SemiBold', sans-serif;
   transition: 0.5s ease-in-out;
 }
-.user-info-container #change-pass-btn:hover, .profile-buttons-container #sign-out-btn:hover, .profile-buttons-container #delete-btn:hover {
+.user-info-container #change-pass-btn:hover, .profile-buttons-container #delete-btn:hover, .profile-buttons-container #sign-out-btn:hover {
   background-color: var(--primary);
   color: var(--primary-white);
-  border: none;
 }
 .swap-modal-overlay {
   position: fixed;

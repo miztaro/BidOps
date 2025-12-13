@@ -36,11 +36,11 @@
                     height="34"></iconify-icon>Back Home</button>
             <button id="profile-user-info-btn" class="user-profile-btn">
                 <div class="img-container">
-                    <img src="../assets/images/profilePicture.jpg" alt="">
+                    <img class="profile-avatar" alt="Profile Avatar">
                 </div>
                 <div class="user-info">
-                    <h6>Lander Fugeh</h6>
-                    <p>2244560</p>
+                    <h6>Username</h6>
+                    <p>user Id</p>
                 </div>
                 <iconify-icon class="user-profile-arrow" icon="iconamoon:arrow-right-2-light" width="34"
                     height="34"></iconify-icon>
@@ -82,33 +82,29 @@
         <section class="right-side">
             <div id="profile-user-info-content" class="profile-user-info-content">
                 <div class="user-img-container">
-                    <img id="profilePicture" src="../assets/images/profilePicture.jpg" alt="">
+                    <img id="profilePicture" class="profile-avatar"  src="../server/item/uploads/placeholder-profile.jpg" alt="">
                 </div>
 
                 <div class="user-info-container">
                     <div id="user-name-container">
-                        <h6 id="user-name">Lander Fugeh</h6>
+                        <h6 id="user-name">User Name</h6>
                         <iconify-icon class="edit-icon" icon="flowbite:edit-outline" width="24"
                             height="24"></iconify-icon>
                     </div>
                     <div id="user-id-container">
                         <p id="user-id">User ID</p>
-                        <p id="user-id-placeHolder">2244560</p>
+                        <p id="user-id-placeHolder">user ID</p>
                     </div>
                     <div id="user-email-container">
                         <p id="user-email">Email</p>
-                        <p id="user-email-placeHolder">2244560@slu.edu.ph</p>
-                    </div>
-                    <div id="user-pass-container">
-                        <p id="user-pass">Password</p>
-                        <p id="user-pass-placeHolder">**********</p>
+                        <p id="user-email-placeHolder">user email</p>
                     </div>
                     <button id="change-pass-btn">Change password</button>
                 </div>
 
                 <div class="profile-buttons-container">
+                    <button id="delete-btn" class="button-delete">Delete Account</button>                
                     <button id="sign-out-btn" class="button-sign-out">Sign Out</button>
-                    <button id="delete-btn" class="button-delete">Delete Account</button>
                 </div>
             </div>
 

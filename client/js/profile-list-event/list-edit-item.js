@@ -1,7 +1,7 @@
 //Edit Overlay
-import { getStatusClass } from '../profilepage.js'; 
+//import { getStatusClass } from '../profilepage.js';
 
-document.addEventListener('DOMContentLoaded',function () {
+document.addEventListener('DOMContentLoaded', function () {
   const editOverlay = document.querySelector(".edit-overlay");
   document.addEventListener("click", (event) => {
     const editButton = event.target.closest(".edit-btn");
@@ -107,6 +107,15 @@ document.addEventListener('DOMContentLoaded',function () {
         populateForm(data);
       })
       .catch(error => console.error("Error fetching item data:", error));
+  }
+
+  function getStatusClass(status) {
+    status = status.toLowerCase();
+    if (status.includes("active")) return "active-items";
+    if (status.includes("pending")) return "pending-items";
+    if (status.includes("rejected")) return "rejected-items";
+    if (status.includes("sold")) return "sold-items";
+    return "";
   }
 
   let images = [];

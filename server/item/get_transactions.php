@@ -5,10 +5,8 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *'); // Added for safety
 
 if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
     echo json_encode([
         'success' => false,
         'message' => 'User not logged in'
@@ -28,6 +26,7 @@ try {
         throw new Exception("Database connection failed: " . $conn->connect_error);
     }
 
+    // Fetch only transactions where logged-in user is buyer or seller
     $sql = "
     SELECT 
         tr.transaction_id,
@@ -39,6 +38,7 @@ try {
         tr.bid_id,
         tr.swap_id,
         i.title AS item_title,
+        i.item_type,
         i.category_type,
         i.description,
         bi.starting_price,
@@ -48,7 +48,7 @@ try {
         END AS amount,
         buyer.username AS buyer_username,
         seller.username AS seller_username,
-        GROUP_CONCAT(img.image_path) AS image_paths 
+        img.image_path
     FROM transactionreceipt tr
     LEFT JOIN item i ON tr.item_id = i.item_id
     LEFT JOIN biditem bi ON i.item_id = bi.item_id
@@ -67,29 +67,25 @@ try {
     ORDER BY tr.transaction_id DESC
     ";
 
+    
+
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sss", $user_id, $user_id, $user_id); 
-    
-    if (!$stmt) {
-        throw new Exception("SQL Prepare Error: " . $conn->error);
-    }
-    
+    $stmt->bind_param("sss", $user_id, $user_id, $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
+    $transactions = [];
     $bids = [];
     $swaps = [];
 
     while ($row = $result->fetch_assoc()) {
-        
-        $row_item_type = !empty($row['bid_id']) ? 'bid' : (!empty($row['swap_id']) ? 'swap' : 'unknown');
-
-        $image_paths = !empty($row['image_paths']) ? explode(',', $row['image_paths']) : [];
-        $row['images'] = $image_paths; 
+        $image_paths = !empty($row['image_path']) ? explode(',', $row['image_path']) : [];
+        $row['images'] = array_map('basename', $image_paths);
         $row['main_image'] = $row['images'][0] ?? null;
+        $transactions[] = $row;
 
-        if ($row_item_type === 'bid' && $row['status'] === 'successful') {
-            $bids[] = [
+        if (!empty($row['bid_id']) && $row['status'] === 'successful') {
+            $row['bidItem'] = [
                 'bid_id' => $row['bid_id'],
                 'item_id' => $row['item_id'],
                 'item_name' => $row['item_title'],
@@ -101,10 +97,11 @@ try {
                 'images' => $row['images'],
                 'main_image' => $row['main_image']
             ];
+            $bids[] = $row;
         }
-        
-        if ($row_item_type === 'swap' && $row['status'] === 'successful') {
-             $swaps[] = [
+
+        if (!empty($row['swap_id']) && $row['status'] === 'successful') {
+            $row['swappedItem'] = [
                 'swap_id' => $row['swap_id'],
                 'item_id' => $row['item_id'],
                 'item_name' => $row['item_title'],
@@ -115,8 +112,10 @@ try {
                 'images' => $row['images'],
                 'main_image' => $row['main_image']
             ];
+            $swaps[] = $row;
         }
     }
+
 
     $stmt->close();
     $conn->close();
@@ -124,7 +123,8 @@ try {
     echo json_encode([
         'success' => true,
         'bids' => $bids,
-        'swaps' => $swaps
+        'swaps' => $swaps,
+        'transactions' => $transactions
     ]);
 
 } catch (Exception $e) {
