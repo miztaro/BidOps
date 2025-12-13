@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
     const viewItemOverlay = document.getElementById('bids-view-overlay');
     const closeButton = document.getElementById('bids-close-view-btn');
@@ -10,6 +9,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const viewItemBtn = event.target.closest('.bids-view-btn');
         if (!viewItemBtn || !viewItemOverlay) return;
 
+        // Reset display to hide any previously loaded data
+        const overlayBody = document.querySelector("#bids-view-overlay .bids-body-sec");
+        if (overlayBody) {
+            overlayBody.querySelector(".left-side").innerHTML = '<div style="text-align: center; padding: 20px;">Loading images...</div>';
+            overlayBody.querySelector(".right-side").innerHTML = '<div style="text-align: center; padding: 20px;">Loading details...</div>';
+        }
+        
         const bidId = viewItemBtn.getAttribute("data-id");
         if (!bidId) {
             console.error("Bid ID not found on view button.");
@@ -20,7 +26,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (hiddenInput) hiddenInput.value = bidId;
 
         fetchBidItem(bidId);
-        // loadImages();
         viewItemOverlay.classList.add('active');
     });
 
@@ -55,33 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-function loadImages() {
-    //Hardcoded data (not from db)
-    const hardcodedImages = [
-        "../server/item/uploads/boardgame.jpg",
-        "../server/item/uploads/camera.jpg",
-        "../server/item/uploads/desklamp.jpg"
-    ];
-
-    const mainImage = document.querySelector(".bids-body-sec .main-image img");
-    const previewContainer = document.querySelector(".bids-body-sec .images-preview");
-
-    if (!mainImage || !previewContainer) return;
-
-    mainImage.src = hardcodedImages[0];
-    previewContainer.innerHTML = "";
-
-    hardcodedImages.forEach(src => {
-        const img = document.createElement("img");
-        img.src = src;
-        img.alt = "Preview";
-
-        img.addEventListener("click", () => {
-            mainImage.src = src;
-        });
-        previewContainer.appendChild(img);
-    });
-}
+// Removed loadImages() as it used hardcoded data and is no longer needed.
 
 function openRateOverlay() {
     const bidsViewOverlay = document.getElementById("bids-view-overlay");
@@ -139,45 +118,74 @@ function initStarRating() {
 
 async function fetchBidItem(bidId) {
     if (!bidId) {
-        console.error("Item ID is required to fetch bid details.")
+        console.error("Bid ID is required to fetch bid details.");
         return;
     }
+    
+    // NOTE: This fetch call should ideally be changed to fetch by 'bid_id' 
+    // or 'transaction_id' to be more efficient, but we will keep it the same 
+    // as profilepage.js for now.
+
     try {
         const response = await fetch('/bidops/server/item/get_transactions.php', {
             method: 'GET',
             credentials: 'include'
         });
 
-        if (!response.ok) return console.error("Network response not ok:", response.statusText);
+        if (!response.ok) {
+            console.error("Network response not ok:", response.statusText);
+            return;
+        }
         
         const data = await response.json();
 
-        if (!data.success) return console.error("Failed to fetch transactions: ", data.message);
+        if (!data.success) {
+            console.error("Failed to fetch transactions: ", data.message);
+            return;
+        }
 
+        // Find the specific bid using the bid_id
         const bid = data.bids.find(b => String(b.bid_id) === String(bidId));
-        console.log("Clicked itemId:", bidId);
-        if (!bid) return console.error("Bid item not found for ID:", bidId);
-
-        const source = bid.bidItem || bid;
-
+        
+        if (!bid) {
+            console.error("Winning Bid item not found for ID:", bidId);
+            // Optionally, show an error message in the modal here
+            document.querySelector("#bids-view-overlay .bids-body-sec").innerHTML = `
+                <div style="text-align: center; padding: 40px; color: red;">
+                    Error: Item details not found for this bid.
+                </div>
+            `;
+            return;
+        }
+        
+        // Map the fields from the successful PHP response
         const bidItem = {
-            item_id: source.item_id,
-            item_name: source.item_name || source.item,
-            category: source.category,
-            description: source.description,
-            winning_bid: source.winning_bid || source.winningBid,
-            date_won: source.date_won || source.dateWon,
-            vendor: source.vendor,
-
-            main_image: source.main_image,
-            images: source.images || []
+            item_id: bid.item_id,
+            item_name: bid.item_name,
+            category: bid.category,
+            description: bid.description,
+            // Format to 2 decimal places and include 'P' symbol
+            winning_bid: parseFloat(bid.winning_bid).toLocaleString('en-PH', { minimumFractionDigits: 2 }),
+            date_won: new Date(bid.date_won).toLocaleDateString(),
+            vendor: bid.vendor,
+            // Image data from the new PHP structure
+            main_image: bid.main_image,
+            images: bid.images || []
         };
 
         populateBidsOverlay(bidItem);
     } catch (error) {
         console.error("Error fetching bid item: ", error);
+        document.querySelector("#bids-view-overlay .bids-body-sec").innerHTML = `
+            <div style="text-align: center; padding: 40px; color: red;">
+                A network or parsing error occurred.
+            </div>
+        `;
     }
 }
+
+// ** IMPORTANT: The path is corrected here to use the image_paths from the database **
+const IMAGE_BASE_URL = '../server/item/';
 
 function populateBidsOverlay(bidItem) {
     const overlayBody = document.querySelector("#bids-view-overlay .bids-body-sec");
@@ -195,29 +203,51 @@ function populateBidsOverlay(bidItem) {
     mainImageDiv.classList.add("main-image");
 
     const mainImg = document.createElement("img");
-    mainImg.src = `../server/item/uploads/${bidItem.main_image || 'default.jpg'}`;
+    
+    // 1. Use the full path from the PHP response
+    const defaultImgPath = 'uploads/default.jpg';
+    const mainImgSrc = bidItem.main_image ? `${IMAGE_BASE_URL}${bidItem.main_image}` : `${IMAGE_BASE_URL}${defaultImgPath}`;
+
+    mainImg.src = mainImgSrc;
     mainImg.alt = bidItem.item_name || "Item Image";
     mainImageDiv.appendChild(mainImg);
-
+    
     const previewDiv = document.createElement("div");
     previewDiv.classList.add("images-preview");
 
+    // Use the images array from the fetched data
     const previewImages = bidItem.images && bidItem.images.length > 0
         ? bidItem.images
-        : [bidItem.main_image || "default.jpg"];
+        : [defaultImgPath];
 
-    previewImages.forEach(src => {
+    // Check if the main image is in the list of images, if not, add it for consistency
+    const uniquePreviewImages = Array.from(new Set(previewImages));
+
+    uniquePreviewImages.forEach(src => {
         const img = document.createElement("img");
-        img.src = `../server/item/uploads/${src}`;
+        // 2. Corrected path for thumbnails
+        img.src = `${IMAGE_BASE_URL}${src}`; 
         img.alt = "Preview";
+        
+        // Add active class if it's the main image
+        if (img.src === mainImgSrc) {
+            img.classList.add('active');
+        }
+
         img.addEventListener("click", () => {
-            mainImg.src = `../server/item/uploads/${src}`;
+            mainImg.src = img.src;
+            // Highlight active thumbnail
+            previewDiv.querySelectorAll('img').forEach(t => t.classList.remove('active'));
+            img.classList.add('active');
         });
         previewDiv.appendChild(img);
     });
 
     leftSide.appendChild(mainImageDiv);
     leftSide.appendChild(previewDiv);
+    
+    // Ensure winning_bid is formatted (P150.00)
+    const formattedWinningBid = `P${bidItem.winning_bid}`;
 
     rightSide.innerHTML = `
         <div class="name-category-con">
@@ -229,7 +259,7 @@ function populateBidsOverlay(bidItem) {
         </div>
         <div class="price-con">
             <h6>Winning Price</h6>
-            <p>P${bidItem.winning_bid || 0}</p>
+            <p class="winning-price-amount">${formattedWinningBid}</p>
         </div>
         <div class="date-con">
             <div class="start-date">
@@ -242,5 +272,5 @@ function populateBidsOverlay(bidItem) {
             </div>
         </div>
     `;
-    document.getElementById("bids-view-overlay").classList.add("active");
+   
 }

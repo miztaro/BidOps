@@ -1,14 +1,19 @@
-
 //import { getStatusClass } from '../profilepage.js';
 // View Item Overlay
 
 let currentItemId = null;
 let countdownInterval = null;
+let auctionEndTime = null; // Variable to store the auction end timestamp (in seconds)
+
+// --- CRITICAL FIX 1: Define Image Base URL ---
+// Using the absolute path to fix the 404 error based on your project structure: /BidOps/server/item/
+const IMAGE_BASE_URL = '/BidOps/server/item/';
+// ---------------------------------------------
+
+
 document.addEventListener('DOMContentLoaded', function () {
     const viewItemOverlay = document.getElementById('list-view-overlay');
     const closeButton = document.getElementById('close-view-btn')
-
-
 
     document.addEventListener("click", (event) => {
         const viewItemBtn = event.target.closest('.lists-view-btn');
@@ -54,12 +59,12 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function getStatusClass(status) {
-  status = status.toLowerCase();
-  if (status.includes("active")) return "active-items";
-  if (status.includes("pending")) return "pending-items";
-  if (status.includes("rejected")) return "rejected-items";
-  if (status.includes("sold")) return "sold-items";
-  return "";
+    status = status.toLowerCase();
+    if (status.includes("active")) return "active-items";
+    if (status.includes("pending")) return "pending-items";
+    if (status.includes("rejected")) return "rejected-items";
+    if (status.includes("sold")) return "sold-items";
+    return "";
 }
 
 function fetchItem(itemId) {
@@ -135,8 +140,8 @@ function displayItem(data) {
         dateField.style.display = "flex";
         swapField.style.display = "none";
 
-        document.querySelector('.start-price p').textContent = `P ${bid?.starting_price || 0}`;
-        document.querySelector('.win-price p').textContent = bid?.winning_price ? `P ${bid.winning_price}` : 'N/A';
+        document.querySelector('.start-price p').textContent = `P ${parseFloat(bid?.starting_price || 0).toFixed(2)}`;
+        document.querySelector('.win-price p').textContent = bid?.winning_price ? `P ${parseFloat(bid.winning_price).toFixed(2)}` : 'N/A';
         document.querySelector('.start-date p').textContent = bid?.start_date || item.start_date || '';
         document.querySelector('.end-date p').textContent = bid?.end_date || item.end_date || '';
     } else if (isSwap) {
@@ -165,18 +170,22 @@ function loadImages(imagePaths) {
     if (!mainImage || !previewContainer) return;
 
     previewContainer.innerHTML = '';
-
-    if (!imagePaths || imagePaths.length === 0) {
-        mainImage.src = '';
+    
+    // Check if the images array has the correct path property (file_path)
+    const processedPaths = imagePaths.map(img => img.image_path || img.file_path || 'uploads/default.jpg');
+    
+    if (processedPaths.length === 0 || processedPaths[0] === 'uploads/default.jpg') {
+        mainImage.src = `${IMAGE_BASE_URL}uploads/default.jpg`;
         return;
     }
 
-    // Set main image
-    mainImage.src = `../server/item/${imagePaths[0]}`;
+    // Set main image - Use the IMAGE_BASE_URL defined at the top
+    mainImage.src = `${IMAGE_BASE_URL}${processedPaths[0]}`;
 
-    imagePaths.forEach((imgPath, index) => {
+    processedPaths.forEach((imgPath, index) => {
         const img = document.createElement('img');
-        img.src = `../server/item/${imgPath}`;
+        // Use the IMAGE_BASE_URL for all thumbnails
+        img.src = `${IMAGE_BASE_URL}${imgPath}`;
         if (index === 0) img.classList.add('active');
 
         img.addEventListener('click', () => {
@@ -191,24 +200,8 @@ function loadImages(imagePaths) {
 
 
 // ==========================================
-//  BIDDING HISTORY MODAL
+//  BIDDING HISTORY MODAL
 // ==========================================
-
-// let currentItemId = null;
-// let countdownInterval = null;
-
-// // Open modal when "View" button is clicked
-// document.addEventListener('click', function(event) {
-//     if (event.target.classList.contains('view-btn')) {
-//         const row = event.target.closest('tr');
-//         const itemId = row.getAttribute('id')?.replace('listing-row-', '');
-
-//         if (itemId) {
-//             currentItemId = itemId;
-//             openBidModal(itemId);
-//         }
-//     }
-// });
 
 // Close modal
 document.getElementById('bid-modal-close').addEventListener('click', closeBidModal);
@@ -218,18 +211,28 @@ document.getElementById('bid-modal-overlay').addEventListener('click', function 
     }
 });
 
-// function openSwapModal(itemId) {
-//     console.log("Open Swap Modal for item:", itemId);
-//     // TODO: implement your swap modal UI
-// }
-
+// --- UPDATED openBidModal ---
 function openBidModal(itemId) {
     const modal = document.getElementById('bid-modal-overlay');
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+    
+    // Reset timer display before fetch (CRITICAL)
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+    
+    // Ensure we clear the container to show "Loading Timer..."
+    const timerEl = document.getElementById('bid-timer');
+    if (timerEl) {
+        // Set initial state text to be white for visibility on dark background
+        timerEl.innerHTML = '<p style="color: white; text-align: center; padding: 20px;">Loading Timer...</p>';
+    }
 
     fetchBidHistory(itemId);
 }
+// ----------------------------
 
 function closeBidModal() {
     const modal = document.getElementById('bid-modal-overlay');
@@ -240,6 +243,8 @@ function closeBidModal() {
         clearInterval(countdownInterval);
         countdownInterval = null;
     }
+    // Clear the auction end time when closing
+    auctionEndTime = null; 
 }
 
 function fetchBidHistory(itemId) {
@@ -263,6 +268,12 @@ function populateBidModal(data) {
     const images = data.images;
     const history = data.bidding_history;
     const timeRemaining = data.time_remaining;
+    
+    // Ensure countdown is cleared before populating new data
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
 
     // Set item details
     document.getElementById('bid-item-title').textContent = item.title;
@@ -271,18 +282,23 @@ function populateBidModal(data) {
     document.getElementById('bid-starting-price').textContent = '₱' + parseFloat(item.starting_price || 0).toFixed(2);
     document.getElementById('bid-current-highest').textContent = '₱' + parseFloat(item.current_highest_bid || item.starting_price || 0).toFixed(2);
 
-    // Set images
+    // --- FIX 1: Set images using the global IMAGE_BASE_URL ---
+    const mainImage = document.getElementById('bid-main-image');
+    const thumbnailContainer = document.getElementById('bid-thumbnails');
+    
+    thumbnailContainer.innerHTML = '';
+    
+    // Determine the image path property (itemimage table uses image_path, not file_path)
+    const imageProperty = images.length > 0 && images[0].image_path ? 'image_path' : 'file_path';
+    
     if (images.length > 0) {
-        const mainImage = document.getElementById('bid-main-image');
-        mainImage.src = `../server/item/${images[0].file_path}`;
-
-        const thumbnailContainer = document.getElementById('bid-thumbnails');
-        thumbnailContainer.innerHTML = '';
+        mainImage.src = `${IMAGE_BASE_URL}${images[0][imageProperty]}`;
 
         images.forEach((img, index) => {
             const thumb = document.createElement('img');
-            thumb.src = `../server/item/${img.file_path}`;
+            thumb.src = `${IMAGE_BASE_URL}${img[imageProperty]}`;
             thumb.classList.add(index === 0 ? 'active' : '');
+            
             thumb.addEventListener('click', () => {
                 mainImage.src = thumb.src;
                 thumbnailContainer.querySelectorAll('img').forEach(t => t.classList.remove('active'));
@@ -290,13 +306,35 @@ function populateBidModal(data) {
             });
             thumbnailContainer.appendChild(thumb);
         });
+    } else {
+        mainImage.src = `${IMAGE_BASE_URL}uploads/default.jpg`;
     }
 
-    // Set countdown timer
-    if (timeRemaining && timeRemaining.is_active) {
-        startCountdown(timeRemaining.total_seconds);
+    // --- FIX 2: Anchor time and Start Countdown Timer ---
+    const timerContainer = document.getElementById('bid-timer');
+    if (timeRemaining && timeRemaining.is_active && timeRemaining.total_seconds > 0) {
+        
+        // Calculate the absolute end time in seconds since the epoch.
+        // This is crucial for consistent timer display upon re-opening the modal.
+        auctionEndTime = (Date.now() / 1000) + timeRemaining.total_seconds;
+
+        // Start countdown based on the calculated remaining time
+        startCountdown();
+
+        // --- TIMER DRIFT CHECK (If the server time is stale/inaccurate) ---
+        const currentRemaining = Math.max(0, Math.floor(auctionEndTime - (Date.now() / 1000)));
+        // Check if the server-provided time and the client-calculated time already differ significantly
+        if (Math.abs(currentRemaining - timeRemaining.total_seconds) > 5) { 
+            console.warn("Timer drift or stale server time detected. Re-fetching data in 0.5s to correct.");
+            // Force a re-fetch of history to get a fresher time.
+            setTimeout(() => {
+                fetchBidHistory(item.item_id);
+            }, 500); 
+        }
+
     } else {
-        document.getElementById('bid-timer').innerHTML = '<p style="text-align: center; padding: 20px;">Auction Ended</p>';
+        // If auction ended or time is zero, use white text on the dark background
+        timerContainer.innerHTML = '<p style="color: white; text-align: center; padding: 20px;">Auction Ended</p>';
     }
 
     // Set bidding history
@@ -354,7 +392,7 @@ function createBidItem(bid, isHighest) {
                 <div class="bidder-avatar">${initials}</div>
                 <div class="bidder-details">
                     <h4>${bid.username}</h4>
-                    <p>${bid.time_ago}</p>
+                    <p class="bidder-email">${bid.email}</p> <p>${bid.time_ago}</p>
                 </div>
             </div>
             <div class="bid-amount">₱${parseFloat(bid.bid_amount).toFixed(2)}</div>
@@ -365,17 +403,26 @@ function createBidItem(bid, isHighest) {
     return bidItem;
 }
 
-function startCountdown(totalSeconds) {
-    let remaining = totalSeconds;
+function startCountdown() {
+    // We calculate remaining time from the fixed auctionEndTime
 
-    updateTimerDisplay(remaining);
+    // Reset interval if running
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
+    
+    // Update display immediately (calculate remaining time)
+    let remainingSeconds = Math.max(0, Math.floor(auctionEndTime - (Date.now() / 1000)));
+    updateTimerDisplay(remainingSeconds);
 
     countdownInterval = setInterval(() => {
-        remaining--;
+        // Recalculate remaining seconds based on the fixed auctionEndTime
+        const remaining = Math.max(0, Math.floor(auctionEndTime - (Date.now() / 1000)));
 
         if (remaining <= 0) {
             clearInterval(countdownInterval);
-            document.getElementById('bid-timer').innerHTML = '<p style="text-align: center; padding: 20px;">Auction Ended</p>';
+            // Use white text to ensure "Auction Ended" is visible on the dark background
+            document.getElementById('bid-timer').innerHTML = '<p style="color: white; text-align: center; padding: 20px;">Auction Ended</p>';
             return;
         }
 
@@ -383,17 +430,48 @@ function startCountdown(totalSeconds) {
     }, 1000);
 }
 
+// --- FINAL FIX: updateTimerDisplay to use CSS classes only ---
 function updateTimerDisplay(seconds) {
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
 
-    document.getElementById('timer-days').textContent = String(days).padStart(2, '0');
-    document.getElementById('timer-hours').textContent = String(hours).padStart(2, '0');
-    document.getElementById('timer-minutes').textContent = String(minutes).padStart(2, '0');
-    document.getElementById('timer-seconds').textContent = String(secs).padStart(2, '0');
+    // Helper to pad single digits (e.g., 5 -> 05)
+    const pad = (num) => String(num).padStart(2, '0');
+    
+    const timerContainer = document.getElementById('bid-timer');
+
+    // ** Generating clean HTML using the classes that your CSS is targeting **
+    timerContainer.innerHTML = `
+        <div class="auction-ending-soon"> 
+            <p class="timer-label">Auction Ending Soon</p>
+            <div class="timer-display-group timer-display">
+                <div class="timer-box time-unit">
+                    <h2 class="time-value">${pad(days)}</h2>
+                    <span class="time-label">Days</span>
+                </div>
+                <div class="timer-box time-unit">
+                    <h2 class="time-value">${pad(hours)}</h2>
+                    <span class="time-label">Hours</span>
+                </div>
+                <div class="timer-box time-unit">
+                    <h2 class="time-value">${pad(minutes)}</h2>
+                    <span class="time-label">Minutes</span>
+                </div>
+                <div class="timer-box time-unit">
+                    <h2 class="time-value">${pad(secs)}</h2>
+                    <span class="time-label">Seconds</span>
+                </div>
+            </div>
+        </div>
+    `;
+    // NOTE: The classes 'auction-ending-soon', 'timer-display-group', 'time-unit', 
+    // 'time-value', and 'time-label' are now used to match the CSS you provided.
 }
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+
 
 // Handle Accept/Decline Actions
 window.handleBidAction = function (bidId, action) {
@@ -419,7 +497,7 @@ window.handleBidAction = function (bidId, action) {
                 alert(data.message);
                 // Refresh the modal and listings
                 fetchBidHistory(currentItemId);
-                fetchListings();
+                // fetchListings(); // Assuming this is defined elsewhere
             } else {
                 alert('Error: ' + data.message);
             }

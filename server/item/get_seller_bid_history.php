@@ -50,10 +50,11 @@ try {
     }
 
     /* -----------------------------
-        FETCH IMAGES
+        FETCH IMAGES - *** FIXED COLUMN SELECTION ***
     ------------------------------*/
 
-    $stmt = $db->prepare("SELECT * FROM itemimage WHERE item_id = ? ORDER BY image_id");
+    // CHANGE: Explicitly select 'image_path' to ensure consistency with client-side JavaScript
+    $stmt = $db->prepare("SELECT image_path FROM itemimage WHERE item_id = ? ORDER BY image_id");
     $stmt->bind_param("i", $item_id);
     $stmt->execute();
     $images = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -72,13 +73,13 @@ try {
              bo.bid_amount,
              bo.bid_status,
              bo.created_at,
-              u.user_id,
-              u.username,
-              u.email
-         FROM bidoffer bo
-         INNER JOIN user u ON bo.bidder_id = u.user_id
-         WHERE bo.item_id = ?
-         ORDER BY bo.bid_amount DESC, bo.created_at DESC
+             u.user_id,
+             u.username,
+             u.email
+           FROM bidoffer bo
+           INNER JOIN user u ON bo.bidder_id = u.user_id
+           WHERE bo.item_id = ?
+           ORDER BY bo.bid_amount DESC, bo.created_at DESC
     ");
 
 
