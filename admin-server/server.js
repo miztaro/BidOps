@@ -37,7 +37,6 @@ app.use(express.static(path.join(__dirname, '../admin')));
 // ==========================================
 
 // A. DASHBOARD / LISTINGS API
-// A. DASHBOARD / LISTINGS API
 app.get('/api/listings', async (req, res) => {
     try {
         const { category, date, sort } = req.query;
@@ -78,6 +77,8 @@ app.get('/api/listings', async (req, res) => {
 
         // Always sort by newest first
         query += ` ORDER BY i.created_date DESC`;
+        console.log("Executing Query:", query);
+        console.log("Params:", params);
 
         // DEBUG: Print the query to terminal to see if it's valid
         console.log("Executing Query:", query); 
