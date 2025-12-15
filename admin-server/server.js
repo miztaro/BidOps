@@ -226,6 +226,7 @@ app.get('/api/admin/stats', async (req, res) => {
         });
     } catch (err) {
         console.error("Dashboard Stats Error:", err);
+        console.log("THE ERROR IS HERE:", error);
         res.status(500).json({ success: false, message: err.message });
     }
 });
@@ -277,6 +278,7 @@ app.get('/api/user/:id', async (req, res) => {
 
         res.json({ success: true, user: users[0] });
     } catch (err) {
+        console.log("THE ERROR IS HERE:", error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
