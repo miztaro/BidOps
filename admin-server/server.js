@@ -37,10 +37,12 @@ app.use(express.static(path.join(__dirname, '../admin')));
 // ==========================================
 
 // A. DASHBOARD / LISTINGS API
+// A. DASHBOARD / LISTINGS API
 app.get('/api/listings', async (req, res) => {
     try {
         const { category, date, sort } = req.query;
         
+        // Base Query
         let query = `
             SELECT i.*, u.username as seller_name 
             FROM item i 
@@ -50,24 +52,41 @@ app.get('/api/listings', async (req, res) => {
         
         const params = [];
 
+        // 1. Filter by Category
         if (category && category !== 'all') {
             query += ` AND i.category_type = ?`;
             params.push(category);
         }
+
+        // 2. Filter by Specific Date (Submission Date)
         if (date) {
             query += ` AND DATE(i.created_date) = ?`;
             params.push(date);
         }
-        if (sort === 'today') query += ` AND DATE(i.created_date) = CURDATE()`;
-        else if (sort === 'week') query += ` AND i.created_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)`;
-        else if (sort === 'month') query += ` AND i.created_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)`;
 
+        // 3. Filter by Time Range (Sort dropdown)
+        // Only apply this filter if it's NOT 'all' and NOT 'all-time'
+        if (sort && sort !== 'all' && sort !== 'all-time') {
+            if (sort === 'today') {
+                query += ` AND DATE(i.created_date) = CURDATE()`;
+            } else if (sort === 'week') {
+                query += ` AND i.created_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)`;
+            } else if (sort === 'month') {
+                query += ` AND i.created_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)`;
+            }
+        }
+
+        // Always sort by newest first
         query += ` ORDER BY i.created_date DESC`;
+
+        // DEBUG: Print the query to terminal to see if it's valid
+        console.log("Executing Query:", query); 
+        console.log("Params:", params);
 
         const [rows] = await db.query(query, params);
         res.json({ success: true, data: rows });
     } catch (err) {
-        console.error(err);
+        console.error("Listing Error:", err);
         res.status(500).json({ success: false, message: err.message });
     }
 });
