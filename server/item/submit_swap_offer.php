@@ -1,155 +1,147 @@
 <?php
-// server/item/submit_swap_offer.php
-error_reporting(E_ALL); // Set error reporting for debugging
 session_start();
+// Error reporting should still be active for final checks
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 header('Content-Type: application/json');
-// Headers are generally handled better by the server configuration, but kept here for function.
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
 
-// Check login
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized or session expired.']);
+    echo json_encode(['success' => false, 'message' => 'Authentication error: User not logged in.']);
     exit;
 }
+$offerer_user_id = $_SESSION['user_id'];
 
-include '../config/database.php';
-
-// The ID of the user submitting the offer (the buyer)
-$offerer_id = $_SESSION['user_id']; 
-
-// Data from the JavaScript FormData POST
-$item_id_requested = $_POST['item_id'] ?? null; // The seller's item (Calculus book)
+// --- 1. INPUT VALIDATION & ASSIGNMENT ---
+$requested_item_id = $_POST['item_id'] ?? null;
 $offered_item_title = $_POST['offered_item_title'] ?? null;
-$offered_item_description = $_POST['offered_item_description'] ?? null;
-$offered_item_category = $_POST['offered_item_category'] ?? null;
-$message = $_POST['message'] ?? ''; // Currently unused, but good practice
+$offered_item_description = $_POST['offered_item_description'] ?? ''; 
+$offered_item_category = $_POST['offered_item_category'] ?? '';
+$message = $_POST['message'] ?? ''; 
+$item_image = $_FILES['item_image'] ?? null; // Get the file data
 
-if (!$item_id_requested || !$offered_item_title || !$offered_item_description || !$offered_item_category) {
-    echo json_encode(['success' => false, 'message' => 'All item details are required for the proposed item.']);
+if (!$requested_item_id || !$offered_item_title) {
+    echo json_encode(['success' => false, 'message' => 'Missing required swap ID or offered item title.']);
     exit;
 }
+if (!$item_image || $item_image['error'] !== UPLOAD_ERR_OK) {
+    echo json_encode(['success' => false, 'message' => 'No image file uploaded or an upload error occurred.']);
+    exit;
+}
+
+
+include_once '../config/database.php';
 
 $database = new Database();
 $db = $database->getConnection();
 
 try {
-    // 1. Validate the target item (the one the offerer wants)
+    $db->begin_transaction();
+
+    /* ----------------------------------------------------
+        A. INSERT THE USER'S OFFERED ITEM INTO THE ITEM TABLE
+    -----------------------------------------------------*/
     $stmt = $db->prepare("
-        SELECT i.item_id, i.seller_id 
-        FROM ITEM i 
-        WHERE i.item_id = ? AND i.item_type = 'swap' AND i.status = 'active'
+        INSERT INTO item 
+        (seller_id, title, description, category_type, item_type, status, created_date) 
+        VALUES (?, ?, ?, ?, 'swap', 'available', NOW())
     ");
-    $stmt->bind_param("i", $item_id_requested);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $target_item = $result->fetch_assoc();
     
-    if (!$target_item) {
-        echo json_encode(['success' => false, 'message' => 'Requested swap item not found or not available.']);
-        exit;
+    // FIX: Using "ssss" because seller_id (User ID) is VARCHAR
+    $stmt->bind_param(
+        "ssss", 
+        $offerer_user_id, 
+        $offered_item_title, 
+        $offered_item_description, 
+        $offered_item_category
+    );
+    
+    if (!$stmt->execute()) {
+        throw new Exception("Item insertion failed: " . $stmt->error);
     }
+    $offered_item_id = $db->insert_id; 
+
+    /* ----------------------------------------------------
+        B. IMAGE LOGIC (Final implementation)
+    -----------------------------------------------------*/
+    $target_dir = "uploads/";
     
-    // Check if user is trying to swap with their own item
-    if ($target_item['seller_id'] == $offerer_id) {
-        echo json_encode(['success' => false, 'message' => 'Cannot place a swap offer on your own item.']);
-        exit;
-    }
-    
-    // 2. Insert the NEW offered item into the ITEM table
-    $offered_item_id = insertNewItem($db, $offerer_id, $offered_item_title, $offered_item_description, $offered_item_category);
-    
-    if (isset($_FILES['item_image']) && $_FILES['item_image']['error'] === UPLOAD_ERR_OK) {
-        $image_path = uploadItemImage($_FILES['item_image'], $offered_item_id);
-        if ($image_path) {
-            $stmt = $db->prepare("INSERT INTO ITEMIMAGE (image_path, item_id) VALUES (?, ?)");
-            $stmt->bind_param("si", $image_path, $offered_item_id);
-            $stmt->execute();
+    // Check if the uploads directory exists and is writable (Crucial for XAMPP)
+    if (!is_dir($target_dir)) {
+        if (!mkdir($target_dir, 0777, true)) {
+            throw new Exception("Failed to create upload directory: " . $target_dir);
         }
     }
+    if (!is_writable($target_dir)) {
+        throw new Exception("Upload directory is not writable. Check folder permissions.");
+    }
     
-    // 3. Insert the Swap Offer record, linking both item IDs
-    // ASSUMING your swapoffer table has columns: requested_item_id, offered_item_id, user_id (offerer)
+    $file_extension = pathinfo($item_image["name"], PATHINFO_EXTENSION);
+    $unique_filename = uniqid('swap_', true) . '.' . $file_extension;
+    $target_file = $target_dir . $unique_filename;
+
+    if (move_uploaded_file($item_image["tmp_name"], $target_file)) {
+        // Success: Insert image path into itemimage table
+        $stmt = $db->prepare("INSERT INTO itemimage (item_id, image_path) VALUES (?, ?)");
+        $stmt->bind_param("is", $offered_item_id, $target_file); 
+        if (!$stmt->execute()) {
+            throw new Exception("Image path insertion failed: " . $stmt->error);
+        }
+    } else {
+        // Log the exact upload error if the move failed
+        $error_message = match($item_image['error']) {
+            UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
+            UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
+            UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded.',
+            UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
+            UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
+            UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
+            UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
+            default => 'Unknown file upload error.'
+        };
+        throw new Exception("File upload failed: " . $error_message);
+    }
+
+    /* ----------------------------------------------------
+        C. INSERT INTO SWAPOFFER TABLE - MINIMAL COLUMNS
+        (Using only the existing columns confirmed in your structure)
+    -----------------------------------------------------*/
     $stmt = $db->prepare("
-        INSERT INTO swapoffer (requested_item_id, offered_item_id, user_id, swap_status, created_at)
-        VALUES (?, ?, ?, 'pending', NOW())
+        INSERT INTO swapoffer 
+        (item_id, user_id, swap_status) 
+        VALUES (?, ?, 'pending')
     ");
-    // Change swap_id in DB to auto-increment primary key if possible. Using iiis here for (int, int, int, string) if item_id's and user_id are ints.
-    $stmt->bind_param("iii", $item_id_requested, $offered_item_id, $offerer_id);
-    $stmt->execute();
     
-    // Get the ID of the newly created swap offer record
-    $new_swap_offer_id = $db->insert_id; 
+    // Type Signature: "is" (i: requested item ID, s: user ID)
+    $stmt->bind_param(
+        "is", 
+        $requested_item_id, 
+        $offerer_user_id
+    );
     
+    if (!$stmt->execute()) {
+        throw new Exception("Swap offer insertion failed: " . $stmt->error);
+    }
+
+    $db->commit();
+
+    // SUCCESS RESPONSE
     echo json_encode([
-        'success' => true,
+        'success' => true, 
         'message' => 'Swap offer submitted successfully!',
-        'swap_offer_id' => $new_swap_offer_id,
         'offered_item_id' => $offered_item_id
     ]);
-    
+
 } catch (Exception $e) {
+    $db->rollback();
+    // ERROR RESPONSE
     echo json_encode([
         'success' => false,
-        'message' => 'Server error: ' . $e->getMessage()
+        'message' => 'Database or Server error: ' . $e->getMessage()
     ]);
 } finally {
     if (isset($db)) $db->close();
-}
-
-function insertNewItem($db, $user_id, $title, $description, $category) {
-    // NOTE: This assumes item_id is manually managed/auto-incremented.
-    // Let the database handle the item_id primary key if possible.
-    // If not, use the current logic:
-    $result = $db->query("SELECT MAX(item_id) as max_id FROM ITEM");
-    $row = $result->fetch_assoc();
-    $new_item_id = intval($row['max_id']) + 1;
-    
-    $stmt = $db->prepare("
-        INSERT INTO ITEM (item_id, title, description, category_type, status, item_type, seller_id)
-        VALUES (?, ?, ?, ?, 'active', 'swap', ?)
-    ");
-    // Ensure item_id is handled as integer 'i', user_id as integer 'i'
-    $stmt->bind_param("isssi", $new_item_id, $title, $description, $category, $user_id); 
-    
-    if (!$stmt->execute()) {
-        throw new Exception("Failed to insert new item into ITEM table: " . $stmt->error);
-    }
-    
-    $stmt = $db->prepare("INSERT INTO swapitem (item_id) VALUES (?)");
-    $stmt->bind_param("i", $new_item_id);
-    if (!$stmt->execute()) {
-         throw new Exception("Failed to insert new item into swapitem table: " . $stmt->error);
-    }
-    
-    return $new_item_id;
-}
-
-function uploadItemImage($file, $item_id) {
-    $upload_dir = "../uploads/"; // Changed to go up one directory to access the main uploads folder
-    if (!is_dir($upload_dir)) {
-        mkdir($upload_dir, 0777, true);
-    }
-
-    $file_extension = pathinfo($file["name"], PATHINFO_EXTENSION);
-    $filename = "swap_item_" . $item_id . "_" . uniqid() . "." . $file_extension;
-    $target_file = $upload_dir . $filename;
-
-    $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
-    if (!in_array(strtolower($file_extension), $allowed_types)) {
-        return null;
-    }
-
-    if ($file["size"] > 5 * 1024 * 1024) {
-        return null;
-    }
-
-    if (move_uploaded_file($file["tmp_name"], $target_file)) {
-        // Return path relative to the server/item/ folder where this script is called from
-        return "uploads/" . $filename; 
-    }
-
-    return null;
 }
 ?>
