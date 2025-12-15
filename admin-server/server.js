@@ -10,31 +10,25 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-
 // A. Serve ASSETS (Images/Fonts)
-// Fixes: <img src="../assets/images/..." >
 app.use('/assets', express.static(path.join(__dirname, '../assets')));
 
 // B. Serve ADMIN STYLES specifically
-// Fixes: <link href="styles/header.css">
 app.use('/styles', express.static(path.join(__dirname, '../admin/styles')));
 
 // C. Serve ADMIN JS specifically
 app.use('/js', express.static(path.join(__dirname, '../admin/js')));
 
 // D. Serve the CLIENT Folder 
-// Fixes: Redirects that go to "../client/login.html"
 app.use('/client', express.static(path.join(__dirname, '../client')));
 
-// E. Serve "Legacy" paths (Fixes links that say /BidOps/client/...)
+// E. Serve "Legacy" paths
 app.use('/BidOps/client', express.static(path.join(__dirname, '../client')));
 
 // F. Serve Uploads (User Images)
 app.use('/server/item/uploads', express.static(path.join(__dirname, '../server/item/uploads')));
 
 // G. Serve the ADMIN HTML files as the ROOT
-// This must be last!
 app.use(express.static(path.join(__dirname, '../admin')));
 
 
@@ -224,9 +218,9 @@ app.get('/api/admin/stats', async (req, res) => {
                 total_items: liveItems[0].count
             }
         });
-    } catch (err) {
+    } catch (err) { // FIXED: Changed 'error' to 'err' to match usage below
         console.error("Dashboard Stats Error:", err);
-        console.log("THE ERROR IS HERE:", error);
+        console.log("THE ERROR IS HERE:", err); // FIXED: Changed 'error' to 'err'
         res.status(500).json({ success: false, message: err.message });
     }
 });
@@ -234,7 +228,6 @@ app.get('/api/admin/stats', async (req, res) => {
 // B. ANALYTICS GRAPH (For the Chart)
 app.get('/api/admin/analytics', async (req, res) => {
     try {
-        // Get item counts for the last 7 days that have activity
         const itemQuery = `
             SELECT DATE(created_date) as date, COUNT(*) as count 
             FROM item 
@@ -242,23 +235,15 @@ app.get('/api/admin/analytics', async (req, res) => {
             ORDER BY date DESC
             LIMIT 7
         `;
-
         const [itemStats] = await db.query(itemQuery);
-
-        // Reverse so the graph goes from Old -> New
         itemStats.reverse();
 
         res.json({
             success: true,
-            chartData: {
-                items: itemStats,
-                // Users array is empty because your User table has no date column
-                users: [] 
-            }
+            chartData: { items: itemStats, users: [] }
         });
     } catch (err) {
         console.error("Analytics Error:", err);
-        // Return empty data instead of crashing so the page still loads
         res.json({ success: false, chartData: { items: [], users: [] } }); 
     }
 });
@@ -278,10 +263,11 @@ app.get('/api/user/:id', async (req, res) => {
 
         res.json({ success: true, user: users[0] });
     } catch (err) {
-        console.log("THE ERROR IS HERE:", error);
+        console.log("THE ERROR IS HERE:", err); // FIXED: Changed 'error' to 'err'
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Node Admin Server running at http://0.0.0.0:${PORT}`);
 });
