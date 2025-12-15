@@ -218,10 +218,15 @@ app.get('/api/admin/stats', async (req, res) => {
                 total_items: liveItems[0].count
             }
         });
-    } catch (err) { // FIXED: Changed 'error' to 'err' to match usage below
+    } catch (err) {
         console.error("Dashboard Stats Error:", err);
-        console.log("THE ERROR IS HERE:", err); // FIXED: Changed 'error' to 'err'
-        res.status(500).json({ success: false, message: err.message });
+        // Force the full error to show in the browser
+        res.status(500).json({ 
+            success: false, 
+            message: err.message || "Unknown Error",
+            sqlMessage: err.sqlMessage || "No SQL Message", 
+            code: err.code || "No Error Code"
+        });
     }
 });
 
