@@ -1,0 +1,28 @@
+html,
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+    height: 100%;
+}
+
+/* 2. REMOVE MAIN GAPS: Ensures the main container touches the top */
+main {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+    display: block;
+}
+
+/* 3. FIX SECTION GAPS: Often sections have default margins */
+#viewAll-section {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+        /* 4. PREVENT MARGIN COLLAPSE: This stops child elements from pushing the parent down */
+#header-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}

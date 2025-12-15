@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Items - Bid and Swap</title>
+    <link rel="stylesheet" href="tailwind/main-tailwind.css">
+    <link rel="stylesheet" href="../client/style/browse-items.css">
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+    <script src="js/client-guard.js"></script>
+
+</head>
+<body style="margin: 0; padding: 0;">
+
+    <!-- Added 'margin:0' and 'padding:0' to everything to kill the white space -->
+    <main style="margin: 0; padding: 0;">
+        
+        <section class="viewAll-section" id="viewAll-section" style="display: block; margin: 0; padding: 0;">
+            
+            <div id="header-wrapper">
+                <!-- HEADER: Placed First -->
+                <div id="header" style="width: 100%; margin: 0;"></div>
+            </div>
+
+            <!-- NAVIGATION: Placed Second -->
+            <div class="top-nav" style="position: relative; margin-top: 0; padding-top: 10;">
+                
+                <button class="back-home" onclick="window.location.href='homepage.html'">
+                    <iconify-icon icon="line-md:arrow-left" width="24" height="24"></iconify-icon>Back Home
+                </button>
+                
+                <div class="swap-bid-container">
+                    <button class="bid-btn active" id="filter-bid-btn">Bid</button>
+                    <button class="swap-btn" id="filter-swap-btn">Swap</button>
+                </div>
+
+                <div class="sort-container">
+                    <button class="sort-btn">
+                        <iconify-icon class="sort-icon" icon="material-symbols:sort-rounded" width="24" height="24"></iconify-icon>
+                        Sort
+                    </button>
+                    <div class="sort-dropdown" id="sort-dropdown" style="display: none;">
+                        <div class="sort-option" data-sort="asc">Lowest Start Price</div>
+                        <div class="sort-option" data-sort="desc">Highest Start Price</div>
+                        <div class="sort-option" data-sort="az">Title: A-Z</div>
+                        <div class="sort-option" data-sort="za">Title: Z-A</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item Containers -->
+            <div class="bid-cards-list" id="viewAll-bid-cards-list"></div>
+            <div class="swap-cards-list" id="viewAll-swap-cards-list" style="display:none;"></div>
+
+            <!-- Bottom Category Filter -->
+            <div class="bottom-nav">
+                <div class="category-name-des-container">
+                    <h3 class="title" id="viewAll-category-title">All Categories</h3>
+                    <p class="description">Discover amazing items from fellow SLU students of <span id="viewAll-category-description"> All Categories</span></p>
+                </div>
+                <div class="category-container" id="viewAll-category-container">
+                    <button class="category-btn" id="viewAll-category-btn">Category<iconify-icon icon="eva:arrow-down-outline" width="24" height="24"></iconify-icon></button>
+                    <div id="viewAll-category-dropDown" class="dropDown">
+                        <div class="dropDown-item">All Categories</div>
+                        <div class="dropDown-item">Electronics</div>
+                        <div class="dropDown-item">Sports</div>
+                        <div class="dropDown-item">Collectibles</div>
+                        <div class="dropDown-item">Accessories</div>
+                        <div class="dropDown-item">Fashion</div>
+                        <div class="dropDown-item">Gaming</div>
+                        <div class="dropDown-item">Home</div>
+                        <div class="dropDown-item">Photography</div>
+                        <div class="dropDown-item">Toys</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="js/browse-items.js" defer></script>
+</body>
+</html>

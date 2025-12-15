@@ -107,8 +107,6 @@ window.onload = function () {
 // 3. MAIN LOGIC (DOM READY)
 
 document.addEventListener('DOMContentLoaded', function() {
-
-
     const loginBtn = document.querySelector('.btn.primary');
     if (loginBtn) {
         loginBtn.addEventListener('click', handleFormLogin);

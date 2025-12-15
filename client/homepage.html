@@ -12,7 +12,7 @@
 <body>
     <div id="header"></div>
     <main>
-        <!--Home Page-->
+        <!--Home Page Section-->
         <section class="homepage-section" id="homepage-section">
             <div class="home-cover">
                 <img src="../assets/images/home-cover-img.png" alt="Home Cover Image">
@@ -21,34 +21,38 @@
                     <p>Discover the ultimate campus marketplace where SLU students bid on textbooks, swap study materials, and find essential academic resources</p>
                 </div>
                 <div class="buttons">
+                    <!-- This button triggers the modal via add-listing.js -->
                     <button class="add-listing-btn" id="addItemBtn">Add Item</button>                    
                 </div>
             </div>
            
+            <!-- Bids Preview -->
             <div class="available-bids">
                 <div class="available-bids-title">
                     <div class="left">
                         <h3>Available Bids</h3>
                         <p>Join the bidding war for amazing academic resources</p>
                     </div>
+                    <!-- Redirects to browse-items.html -->
                     <button class="view-all" id="bid-view-all">View All</button>
                 </div>
-
                 <div class="bid-cards-list" id="home-bid-cards-list"></div>
             </div>
 
+            <!-- Swaps Preview -->
             <div class="available-swaps">
                 <div class="available-swaps-title">
                     <div class="left">
                         <h3>Available Swaps</h3>
                         <p>Join the swapping hub for amazing academic resources</p>
                     </div>
+                    <!-- Redirects to browse-items.html -->
                     <button class="view-all" id="swap-view-all">View All</button>
                 </div>
-
                 <div class="swap-cards-list" id="home-swap-cards-list"></div>
             </div>
 
+            <!-- Categories -->
             <div class="browse-category">
                 <div class="top">
                     <h3>Browse by Categories</h3>
@@ -57,187 +61,136 @@
 
                 <div class="category-grid">
                     <button class="category-card" browse-category="Electronics">
-                        <iconify-icon icon="mdi:book-open-page-variant" id="category-logo"></iconify-icon>
-                        <a  class="category-link" href="#"><h6>Electronics</h6></a>
-                        <p>243 items</p>
+                        <iconify-icon icon="mdi:book-open-page-variant" id="category-logo"></iconify-icon><h6>Electronics</h6><p>Loading...</p>
                     </button>
-                    <button class="category-card" browse-category="Sports"><iconify-icon icon="mingcute:building-2-fill" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Sports</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Collectibles"><iconify-icon icon="foundation:torso-business" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Collectibles</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Accessories"><iconify-icon icon="heroicons:cpu-chip-20-solid" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Accessories</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Fashion"><iconify-icon icon="icomoon-free:lab" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Fashion</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Gaming"><iconify-icon icon="ion:people" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Gaming</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Home"><iconify-icon icon="mdi:medicine" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Home</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Photography"><iconify-icon icon="ph:chalkboard-teacher-fill" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Photography</h6></a><p>243 items</p></button>
-                    <button class="category-card" browse-category="Toys"><iconify-icon icon="octicon:law-16" id="category-logo"></iconify-icon><a href="#" class="category-link" ><h6>Toys</h6></a><p>243 items</p></button>
+                    <button class="category-card" browse-category="Sports"><iconify-icon icon="mingcute:building-2-fill" id="category-logo"></iconify-icon><h6>Sports</h6><p>Loading...</p></button>
+                    <button class="category-card" browse-category="Collectibles"><iconify-icon icon="foundation:torso-business" id="category-logo"></iconify-icon><h6>Collectibles</h6><p>Loading...</p></button>
+                    <button class="category-card" browse-category="Accessories"><iconify-icon icon="heroicons:cpu-chip-20-solid" id="category-logo"></iconify-icon><h6>Accessories</h6><p>Loading...</p></button>
+                    <button class="category-card" browse-category="Fashion"><iconify-icon icon="icomoon-free:lab" id="category-logo"></iconify-icon><h6>Fashion</h6><p>Loading...</p></button>
+                    <button class="category-card" browse-category="Gaming"><iconify-icon icon="ion:people" id="category-logo"></iconify-icon><h6>Gaming</h6><p>Loading...</p></button>
+                    <button class="category-card" browse-category="Home"><iconify-icon icon="mdi:medicine" id="category-logo"></iconify-icon><h6>Home</h6><p>Loading...</p></button>
+                    <button class="category-card" browse-category="Photography"><iconify-icon icon="ph:chalkboard-teacher-fill" id="category-logo"></iconify-icon><h6>Photography</h6><p>Loading...</p></button>
+                    <button class="category-card" browse-category="Toys"><iconify-icon icon="octicon:law-16" id="category-logo"></iconify-icon><h6>Toys</h6><p>Loading...</p></button>
                 </div>
             </div>
         </section>
 
-        <!---View All-->
-        <section class="viewAll-section" id="viewAll-section" style="display: none;">
-            <div class="top-nav">
-                <button class="back-home" id="back-home"><iconify-icon icon="line-md:arrow-left" width="24" height="24"></iconify-icon>Back Home</button>
-                <div class="swap-bid-container">
-                    <button class="bid-btn">Bid</button>
-                    <button class="swap-btn">Swap</button>
-                </div>
-                <div class="sort-container">
-                <button class="sort-btn">
-                    <iconify-icon class="sort-icon" icon="material-symbols:sort-rounded" width="24" height="24"></iconify-icon>
-                        Sort
-                </button>
-                <div class="sort-dropdown" id="sort-dropdown" style="display: none;">
-                    <div class="sort-option" data-sort="asc">Lowest Start Price</div>
-                    <div class="sort-option" data-sort="desc">Highest Start Price</div>
-                    <div class="sort-option" data-sort="az">Title: A-Z</div>
-                    <div class="sort-option" data-sort="za">Title: Z-A</div>
-                </div>
-                </div>
-            </div>
-
-            <div class="bid-cards-list" id="viewAll-bid-cards-list"></div>
-           
-            <div class="swap-cards-list" id="viewAll-swap-cards-list" style="display:none;"></div>
-
-            <div class="bottom-nav">
-                <div class="category-name-des-container">
-                    <h3 class="title" id="viewAll-category-title">All Categories</h3>
-                    <p class="description">Discover amazing items from fellow SLU students of <span id="viewAll-category-description"> All Categories</span></p>
-                </div>
-                <div class="category-container" id="viewAll-category-container">
-                    <button class="category-btn" id="viewAll-category-btn">Category<iconify-icon icon="eva:arrow-down-outline" width="24" height="24"></iconify-icon></button>
-                    <div id="viewAll-category-dropDown" class="dropDown">
-                        <div class="dropDown-item">All Categories</div>
-                        <div class="dropDown-item">Electronics</div>
-                        <div class="dropDown-item">Sports</div>
-                        <div class="dropDown-item">Collectibles</div>
-                        <div class="dropDown-item">Accessories</div>
-                        <div class="dropDown-item">Fashion</div>
-                        <div class="dropDown-item">Gaming</div>
-                        <div class="dropDown-item">Home</div>
-                        <div class="dropDown-item">Photography</div>
-                        <div class="dropDown-item">Toys</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-       
-        <!-- === Add Listing MOdal === -->
+        <!-- === Add Listing Modal (RESTORED HERE) === -->
         <div class="modal-overlay" id="addListingModal" style="display:none;">
-        <div class="modal-container">
-            <div class="modal-header">
-            <h2>Add Listing</h2>
-            <button class="modal-close" id="modalClose">&times;</button>
-            </div>
+            <div class="modal-container">
+                <div class="modal-header">
+                <h2>Add Listing</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+                </div>
 
-            <div class="listing-type-row">
-            <label for="listingTypeSelect" class="listing-type-label">Listing Type</label>
-            <select id="listingTypeSelect" class="listing-type-select" aria-label="Listing Type">
-                <option value="bid">Bid</option>
-                <option value="swap">Swap</option>
-            </select>
+                <div class="listing-type-row">
+                <label for="listingTypeSelect" class="listing-type-label">Listing Type</label>
+                <select id="listingTypeSelect" class="listing-type-select" aria-label="Listing Type">
+                    <option value="bid">Bid</option>
+                    <option value="swap">Swap</option>
+                </select>
+                <input type="hidden" id="listingType" name="listingType" value="bid">
+                </div>
 
-            <input type="hidden" id="listingType" name="listingType" value="bid">
-            </div>
+                <div class="modal-body">
+                <form id="modalListingForm" enctype="multipart/form-data" novalidate>
+                    <div id="modalMessage"></div>
 
-            <div class="modal-body">
-            <form id="modalListingForm" enctype="multipart/form-data" novalidate>
-                <div id="modalMessage"></div>
-
-                <div class="form-container">
-                <div class="panel-card">
-                    <div class="row two-cols">
-                    <div class="col">
-                        <label for="title">Item Title*</label>
-                        <input type="text" id="title" name="title" placeholder="Enter item title" maxlength="50" required>
-                        <div class="char-count"><span id="titleCount">0</span>/50</div>
-                    </div>
-
-                    <div class="col">
-                        <label for="category">Category*</label>
-                        <select id="category" name="category" required>
-                        <option value="">Select Category</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Sports">Sports</option>
-                        <option value="Collectibles">Collectibles</option>
-                        <option value="Accessories">Accessories</option>
-                        <option value="Fashion">Fashion</option>
-                        <option value="Gaming">Gaming</option>
-                        <option value="Home">Home</option>
-                        <option value="Photography">Photography</option>
-                        <option value="Toys">Toys</option>
-                        </select>
-                    </div>
-                    </div>
-
-                    <div class="row full">
-                    <label for="description">Description*</label>
-                    <textarea id="description" name="description" rows="5" placeholder="Describe your item in detail..." required></textarea>
-                    </div>
-
-                    <div id="bidFields" class="bid-fields" style="display:block;">
-                    <div class="row three-cols">
+                    <div class="form-container">
+                    <div class="panel-card">
+                        <div class="row two-cols">
                         <div class="col">
-                        <label for="starting_price">Starting Price*</label>
-                        <div class="price-input">
-                            <span class="currency">₱</span>
-                            <input type="number" id="starting_price" name="starting_price" step="0.01" min="0" placeholder="0" required>
-                        </div>
+                            <label for="title">Item Title*</label>
+                            <input type="text" id="title" name="title" placeholder="Enter item title" maxlength="50" required>
+                            <div class="char-count"><span id="titleCount">0</span>/50</div>
                         </div>
 
                         <div class="col">
-                        <label for="start_date">Start Date*</label>
-                        <input type="datetime-local" id="start_date" name="start_date" required>
+                            <label for="category">Category*</label>
+                            <select id="category" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Sports">Sports</option>
+                            <option value="Collectibles">Collectibles</option>
+                            <option value="Accessories">Accessories</option>
+                            <option value="Fashion">Fashion</option>
+                            <option value="Gaming">Gaming</option>
+                            <option value="Home">Home</option>
+                            <option value="Photography">Photography</option>
+                            <option value="Toys">Toys</option>
+                            </select>
+                        </div>
                         </div>
 
-                        <div class="col">
-                        <label for="end_date">End Date*</label>
-                        <input type="datetime-local" id="end_date" name="end_date" required>
+                        <div class="row full">
+                        <label for="description">Description*</label>
+                        <textarea id="description" name="description" rows="5" placeholder="Describe your item in detail..." required></textarea>
                         </div>
-                    </div>
 
-                    <div class="row small-col">
-                        <div class="col">
-                        <label>Bid Increment: <span id="incrementValue">5%</span></label>
-                        <div class="increment-slider-container">
-                            <input type="range" id="bidIncrement" name="bid_increment_percent" min="1" max="20" value="5" step="1" class="increment-slider">
-                            <div class="slider-labels">
-                            <span>1%</span>
-                            <span>20%</span>
+                        <div id="bidFields" class="bid-fields" style="display:block;">
+                        <div class="row three-cols">
+                            <div class="col">
+                            <label for="starting_price">Starting Price*</label>
+                            <div class="price-input">
+                                <span class="currency">₱</span>
+                                <input type="number" id="starting_price" name="starting_price" step="0.01" min="0" placeholder="0" required>
+                            </div>
+                            </div>
+
+                            <div class="col">
+                            <label for="start_date">Start Date*</label>
+                            <input type="datetime-local" id="start_date" name="start_date" required>
+                            </div>
+
+                            <div class="col">
+                            <label for="end_date">End Date*</label>
+                            <input type="datetime-local" id="end_date" name="end_date" required>
+                            </div>
+                        </div>
+
+                        <div class="row small-col">
+                            <div class="col">
+                            <label>Bid Increment: <span id="incrementValue">5%</span></label>
+                            <div class="increment-slider-container">
+                                <input type="range" id="bidIncrement" name="bid_increment_percent" min="1" max="20" value="5" step="1" class="increment-slider">
+                                <div class="slider-labels">
+                                <span>1%</span>
+                                <span>20%</span>
+                                </div>
+                            </div>
                             </div>
                         </div>
                         </div>
-                    </div>
-                    </div>
 
-                    <!-- IMAGES -->
-                    <div class="row full">
-                    <label>Item Images</label>
-                    <div class="image-upload-area" id="imageUploadArea">
-                        <div id="imagePreview" class="image-preview"></div>
+                        <!-- IMAGES -->
+                        <div class="row full">
+                        <label>Item Images</label>
+                        <div class="image-upload-area" id="imageUploadArea">
+                            <div id="imagePreview" class="image-preview"></div>
 
-                        <div class="upload-placeholder" id="uploadPlaceholder">
-                        <iconify-icon icon="bi:image" width="48" height="48"></iconify-icon>
-                        <p>Drag and drop images here, or click to select</p>
-                        <p class="upload-note">Maximum 5 images, up to 10MB each</p>
+                            <div class="upload-placeholder" id="uploadPlaceholder">
+                            <iconify-icon icon="bi:image" width="48" height="48"></iconify-icon>
+                            <p>Drag and drop images here, or click to select</p>
+                            <p class="upload-note">Maximum 5 images, up to 10MB each</p>
+                            </div>
+
+                            <input type="file" id="image" name="image" accept="image/*" multiple>
+                        </div>
                         </div>
 
-                        <input type="file" id="image" name="image" accept="image/*" multiple>
+                        <div class="form-actions">
+                        <button type="button" class="cancel-btn" id="modalCancelBtn">Cancel</button>
+                        <button type="submit" class="create-btn">Create Listing</button>
+                        </div>
                     </div>
                     </div>
-
-                    <div class="form-actions">
-                    <button type="button" class="cancel-btn" id="modalCancelBtn">Cancel</button>
-                    <button type="submit" class="create-btn">Create Listing</button>
-                    </div>
+                </form>
                 </div>
-                </div>
-            </form>
             </div>
-        </div>
         </div>
     </main>
     <div id="footer"></div>
+    <!-- Keep add-listing.js to make the modal work -->
     <script src="js/add-listing.js" defer></script>
     <script src="js/homepage.js" defer></script>
 </body>
