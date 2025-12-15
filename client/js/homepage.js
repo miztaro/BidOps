@@ -103,7 +103,6 @@ function createBidCard(bid) {
     : `<div style="background: #073066; height: 100%; display: flex; align-items: center; justify-content: center; color: white;"><iconify-icon icon="mdi:package-variant" width="50" height="50"></iconify-icon></div>`;
 
   bidCard.innerHTML = `
-        <div class="top">${imageContent}<button class="heart-button-bid"><iconify-icon icon="tabler:heart" width="25" height="25"></iconify-icon></button></div>
         <div class="bottom">
             <h6>${bid.title}</h6>
             <p class="category">${bid.category_type}</p>
@@ -130,7 +129,6 @@ function createSwapCard(swap) {
         <div class="bottom"><h6>${swap.title}</h6><p>${swap.category_type}</p></div>
         <div class="button-container">
             <button class="make-offer-btn"><a href="view-swap.html?item_id=${swap.item_id}">Make Offer</a></button>
-            <button class="heart-button-swap"><iconify-icon icon="tabler:heart" width="25" height="25"></iconify-icon></button>
         </div>`;
   return swapCard;
 }

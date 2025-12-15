@@ -169,35 +169,6 @@ main{padding: 0;}
     object-fit: cover;
 }
 
-.bid-cards-list .bid-card .top .heart-button-bid {
-  flex: 1;
-  padding: 5px;
-  border: 1px solid #073066;
-  color: #073066;
-  background: transparent;
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: 2%;
-  right: 2%;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.bid-cards-list .bid-card .top .heart-button-bid.active {
-  color: #B41B1B;
-  background-color: #fff;
-  border: none;
-  transform: scale(1.1);
-}
-
-.bid-cards-list .bid-card .top .heart-button-bid:hover{
-    transition: 0.5s ease;
-    background-color: #fff;
-    border: none;
-}
 
 .bid-cards-list .bid-card .bottom{
     border-top: 1px solid #073066;
@@ -400,33 +371,6 @@ main{padding: 0;}
 
 .swap-cards-list .swap-card .button-container button:hover a {
     color: #073066;
-}
-
-.swap-cards-list .swap-card .button-container .heart-button-swap{
-    flex:1;
-    padding:5px;
-    background-color: #fff;
-    color: #073066;
-    border-radius: 15px;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.swap-cards-list .swap-card .button-container .heart-button-swap:hover{
-    transition: 0.5s ease;
-    background: transparent;
-    border: 1px solid #073066;
-}
-
-.swap-cards-list .swap-card .button-container .heart-button-swap.active {
-  color: #B41B1B;
-  background-color: #fff;
-  border: none;
-  transform: scale(1.1);
 }
 
 .homepage-section .browse-category{
