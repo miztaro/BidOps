@@ -6,7 +6,7 @@
     // If we are trying to logout, DO NOT auto-redirect back to dashboard.
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('action') === 'logout') {
-        return; // STOP HERE. Let the page load so we can clear the session.
+        return; 
     }
 
     // B. NORMAL AUTO-REDIRECT
@@ -27,33 +27,85 @@
     }
 })();
 
-// 2. GOOGLE LOGIN SETUP
+// ...(Auto-Redirect)  ...
 
 function handleGoogleLoginResponse(response) {
-    console.log("Google JWT received. Redirecting...");
-    window.location.href = `/BidOps/server/auth/google-login.php?credential=${response.credential}`;
+    console.log("Google JWT received. Verifying...");
+
+    // 1. Send credential to PHP
+    fetch('../server/auth/google-login.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential })
+    })
+    .then(async res => {
+        const text = await res.text(); // Get raw text first
+        try {
+            const data = JSON.parse(text); // Try to parse JSON
+            return data;
+        } catch (err) {
+        
+            console.error("SERVER ERROR (HTML Response):", text);
+            throw new Error("Server returned HTML instead of JSON. See console for details.");
+        }
+    })
+    .then(data => {
+        if (data.success) {
+            localStorage.setItem('role', 'user');
+            localStorage.setItem('user_id', data.user.user_id);
+            localStorage.setItem('username', data.user.username);
+            localStorage.setItem('email', data.user.email);
+
+            alert("Login successful!");
+            window.location.href = 'homepage.html';
+        } else {
+            alert(data.message);
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Google Auth Error:', error);
+        alert('Login failed. Check the console (F12) for the server error.');
+    });
 }
 
+// B. THE TRIGGER: Initialize and Render the Button
 window.onload = function () {
     if (typeof google !== 'undefined') {
+        
+        // 1. Initialize
         google.accounts.id.initialize({
             client_id: "904457542130-klcnacmhmpes2oruc6lkh4rpi6afn1l2.apps.googleusercontent.com",
             callback: handleGoogleLoginResponse,
-            ux_mode: "popup"
+            ux_mode: "popup", 
+            auto_select: false // <--- Ensures it doesn't auto-click
         });
 
-        const googleBtn = document.getElementById('google-login-btn');
-        if (googleBtn) {
-            googleBtn.addEventListener('click', () => {
-                google.accounts.id.prompt();
-            });
+        // 2. Render the Google Button into your div
+        // This replaces the .prompt() call which causes the "upper right" overlay
+        const container = document.getElementById("google-button-container");
+        
+        if (container) {
+            google.accounts.id.renderButton(
+                container,
+                { 
+                    theme: "outline", 
+                    size: "large", 
+                    type: "standard",
+                    shape: "rectangular",
+                    text: "signin_with",
+                    logo_alignment: "left",
+                    width: 250 // Adjust width to match your design
+                } 
+            );
         }
     }
 };
 
-// ==============================================
 // 3. MAIN LOGIC (DOM READY)
-// ==============================================
+
 document.addEventListener('DOMContentLoaded', function() {
     // Run session cleanup or check
     checkExistingSession();
@@ -142,44 +194,3 @@ function handleFormLogin(event) {
     });
 }
 
-
-// 5. SESSION CHECK & LOGOUT HANDLER
-
-function checkExistingSession() {
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    // --- A. LOGOUT CLEANUP ---
-    if (urlParams.get('action') === 'logout') {
-        console.log("Logout signal detected. Cleaning up...");
-
-        // 1. Clear Client-Side Storage (Port 80)
-        localStorage.clear();
-
-        // 2. Kill PHP Session
-        fetch('/BidOps/server/auth/logout.php')
-            .then(() => {
-                console.log("PHP Session killed.");
-                // Remove ?action=logout from URL so refreshing works normally
-                const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                window.history.replaceState({}, document.title, cleanUrl);
-            });
-            
-        // STOP HERE. Do not check for session.
-        return; 
-    }
-
-    // --- B. NORMAL SESSION CHECK ---
-    fetch('/BidOps/server/auth/get_role.php', { credentials: 'include' })
-    .then(response => response.json())
-    .then(data => {
-        if (data.role === 'admin') {
-            const currentIP = window.location.hostname;
-            const protocol = window.location.protocol;
-            window.location.href = `${protocol}//${currentIP}:3000/homepage.html?role=${data.role}&user=${data.username}&id=${data.id}`;
-        } 
-        else if (data.role === 'user') {
-            window.location.href = 'homepage.html';
-        }
-    })
-    .catch(() => console.log('No active session')); 
-}

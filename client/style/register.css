@@ -129,20 +129,10 @@ body{
 }
 
 /* google button */
-.btn.google{
-  width: 100%;
-  background: #fff;
-  border: 1px solid rgba(0,0,0,0.12);
-  color:#222;
-  padding: 9px 12px;
-  border-radius: 8px;
-  display:flex;
-  align-items:center;
-}
-.btn.google .gicon{
-  width:18px;
-  height:18px;
-  display:inline-block;
+.google-btn-wrapper{
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
 }
 .subtext{
     font-size: 13px;

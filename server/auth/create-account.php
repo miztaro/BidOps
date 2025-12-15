@@ -1,73 +1,69 @@
 <?php
+// server/auth/create-account.php
 session_start();
-
-// Correct path to database config
 require __DIR__ . '/../config/database.php'; 
 
-// 1. Security Check: Ensure they came from Google Auth
+// 1. Security: Make sure they came from Google Registration
 if (!isset($_SESSION['google_register'])) {
-    header("Location: /BidOps/client/register.html");
+    header("Location: ../../client/register.html");
     exit();
 }
 
 // 2. Get Form Data
 $username = trim($_POST['username'] ?? '');
 $password = $_POST['password'] ?? '';
-$confirm_password = $_POST['confirm-password'] ?? '';
+$confirm = $_POST['confirm-password'] ?? ''; 
 $email = $_SESSION['google_register']['email'];
 
-// Basic Validation
-if (empty($username) || empty($password)) {
-    die("Please fill all fields.");
-}
-if ($password !== $confirm_password) {
-    echo "<script>alert('Passwords do not match.'); window.history.back();</script>";
-    exit();
-}
+if (empty($username) || empty($password)) { die("Please fill all fields."); }
+if ($password !== $confirm) { die("Passwords do not match."); }
 
 $db = new Database();
 $conn = $db->getConnection();
 
-// 3. GENERATE NEW USER ID (Format: u1, u2... u15, u16)
-// We cast the substring to UNSIGNED to ensure u10 comes after u9
-$id_sql = "SELECT user_id FROM user 
-           WHERE user_id LIKE 'u%' 
-           ORDER BY CAST(SUBSTR(user_id, 2) AS UNSIGNED) DESC LIMIT 1";
-$id_res = $conn->query($id_sql);
+// ======================================================
+// 3. SET USER ID FROM EMAIL
+// Example: "2244768@slu.email.com" -> ID becomes "2244768"
+// ======================================================
 
-$new_id = 'u1'; // Default if table is empty
-if ($id_res && $id_res->num_rows > 0) {
-    $row = $id_res->fetch_assoc();
-    $last_id = $row['user_id']; // e.g., "u15"
-    // Remove 'u', convert to int, add 1
-    $num = (int)substr($last_id, 1); 
-    $new_id = 'u' . ($num + 1); 
-}
+// Split the email at the "@" symbol
+$email_parts = explode("@", $email);
 
-// 4. Hash Password
+// Take the first part (index 0) as the ID
+$new_id = $email_parts[0]; 
+
+// ======================================================
+
+// 4. Insert User into Database
 $hashed_password = password_hash($password, PASSWORD_DEFAULT); 
 
-// 5. Insert into 'user' table
-// Columns based on your DB: user_id, email, password, username, warning_count, is_banned, is_deleted
-$sql = "INSERT INTO user (user_id, email, password, username, warning_count, is_banned, is_deleted) VALUES (?, ?, ?, ?, 0, 0, 0)";
-$stmt = $conn->prepare($sql);
+$stmt = $conn->prepare("INSERT INTO user (user_id, email, password, username, warning_count, is_banned, is_deleted) VALUES (?, ?, ?, ?, 0, 0, 0)");
+$stmt->bind_param("ssss", $new_id, $email, $hashed_password, $username);
 
-if ($stmt) {
-    $stmt->bind_param("ssss", $new_id, $email, $hashed_password, $username);
+if ($stmt->execute()) {
+    // 5. Success! Clear temp session
+    unset($_SESSION['google_register']);
     
-    if ($stmt->execute()) {
-        // SUCCESS: clear session and redirect
-        unset($_SESSION['google_register']);
-        
-        echo "<script>
-            alert('Account created successfully! Your ID is $new_id. Please log in.');
-            window.location.href = '/BidOps/client/login.html'; 
-          </script>";
-        exit();
-    } else {
-        die("Database Execution Error: " . $stmt->error);
-    }
+    // Auto-save session so they don't have to login again
+    $_SESSION['role'] = 'user';
+    $_SESSION['user_id'] = $new_id;
+    $_SESSION['username'] = $username;
+    $_SESSION['email'] = $email;
+
+    // Redirect to Login (or Homepage)
+    echo "<script>
+        alert('Account created successfully! Your User ID is: $new_id');
+        window.location.href = '../../client/login.html'; 
+    </script>";
 } else {
-    die("Database Preparation Error: " . $conn->error);
+    // Handle error if that ID already exists (Duplicate entry)
+    if ($conn->errno === 1062) { // 1062 is the SQL error code for Duplicate Key
+        echo "<script>
+            alert('An account with this ID ($new_id) already exists.');
+            window.history.back();
+        </script>";
+    } else {
+        echo "Database Error: " . $stmt->error;
+    }
 }
 ?>

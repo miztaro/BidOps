@@ -65,9 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $database = new Database();
         $db = $database->getConnection();
 
-        /* ----------------------
-            CHECK USER LOGIN
-        -----------------------*/
+        //CHECK USER LOGIN
+        
 
         $queryUser = "SELECT user_id, username, email, password, is_banned 
                       FROM user
@@ -93,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         
             // We check:
-            // 1. Is it a Hash? (password_verify) - For your NEW account
+            // 1. Is it a Hash? (password_verify) - For NEW account
             // 2. Is it Plain Text? (===) - For OLD dummy accounts (u1-u15)
             $input_password = $data->password;
             $stored_password = $user['password'];
@@ -125,9 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
            
         }
 
-        /* ----------------------
-            CHECK ADMIN LOGIN
-        -----------------------*/
+        //CHECK ADMIN LOGIN
         if (!$found) {
             $queryAdmin = "SELECT admin_id, username, password FROM admin WHERE username = ?";
             $stmtAdmin = $db->prepare($queryAdmin);
@@ -163,9 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        /* ----------------------
-            INVALID LOGIN
-        -----------------------*/
+        // INVALID LOGIN
         echo json_encode([
             "success" => false,
             "message" => "Invalid username or password!"

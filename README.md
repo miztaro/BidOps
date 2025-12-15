@@ -78,6 +78,8 @@ STEP 2: START THE NODE.JS SERVER (ADMIN MODULE)
 
    2. Install Dependencies (Installs Express, MySQL2, etc.):
       $ sudo npm install
+      $ sudo npm install -g nodemon
+
       (This might take a moment. If it hangs, ensure VM has internet).
 
    3. Open the Firewall for Port 3000:
@@ -85,7 +87,9 @@ STEP 2: START THE NODE.JS SERVER (ADMIN MODULE)
       $ sudo ufw reload
 
    4. Start the Server:
-      $ node server.js
+      $ node server.js 
+      or
+      $ nodemon server.js 
       
    (Keep this terminal open, or use 'nohup node server.js &' to run in background).
 
@@ -123,8 +127,8 @@ TEST SCENARIO B: ADMIN MODULE (NodeJS)
 - Password:    pass123
 
 [ ADMINISTRATOR ]
-- Username:    admin
-- Password:    admin123 (Update based on your DB)
+- Username:    superadmin  
+- Password:    adminpass (Update based on your DB)
 
 7. TROUBLESHOOTING
 ------------------------------------------------------------------------------
