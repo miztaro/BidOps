@@ -19,20 +19,22 @@ try {
     /* -----------------------------
         FETCH SWAP ITEM DETAILS
     ------------------------------*/
-    $query = "SELECT 
-                i.item_id,
-                i.title,
-                i.description,
-                i.category_type,
-                i.status,
-                i.created_date,
-                i.item_type,
-                i.seller_id,
-                u.username as seller_name,
-                u.email as seller_email
-              FROM item i
-              JOIN item u ON i.seller_id = u.user_id
-              WHERE i.item_id = ? AND i.item_type = 'swap'";
+    $query = "
+        SELECT 
+            i.item_id,
+            i.title,
+            i.description,
+            i.category_type,
+            i.status,
+            i.created_date,
+            i.item_type,
+            i.seller_id,
+            u.username as seller_name,  /* <--- Fetching from USER table */
+            u.email as seller_email     /* <--- Fetching from USER table */
+        FROM item i
+        JOIN user u ON i.seller_id = u.user_id  /* <--- FIX: Joined with the USER table */
+        WHERE i.item_id = ? AND i.item_type = 'swap'
+    ";
 
     $stmt = $db->prepare($query);
     $stmt->bind_param("i", $item_id);
@@ -41,7 +43,7 @@ try {
     $item = $result->fetch_assoc();
 
     if (!$item) {
-        echo json_encode(['success' => false, 'message' => 'Swap item not found']);
+        echo json_encode(['success' => false, 'message' => 'Swap item not found or is not a swap item.']);
         exit;
     }
 
@@ -64,6 +66,8 @@ try {
     ]);
 
 } catch (Exception $e) {
+    // Send a proper 500 error code
+    http_response_code(500);
     echo json_encode([
         'success' => false, 
         'message' => 'Database error: ' . $e->getMessage()

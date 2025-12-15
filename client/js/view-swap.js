@@ -1,9 +1,12 @@
+// js/view-swap.js
+
 const urlParams = new URLSearchParams(window.location.search);
 const backToPreviousBtn = document.getElementById('backToPrevious');
 const placeSwapBtn = document.getElementById('placeSwapBtn');
 const itemId = urlParams.get('item_id');
 let swapItemData = null;
 
+// --- INITIALIZATION ---
 window.addEventListener('load', () => {
     if (!itemId) {
         alert('No swap item specified');
@@ -11,22 +14,26 @@ window.addEventListener('load', () => {
         return;
     }
     
+    // Call setup functions immediately
+    setupBackButton();
     loadHeader();
     disableAllButtons();
     loadSwapItemDetails();
 });
 
+// --- UI CONTROL FUNCTIONS ---
+
 function disableAllButtons() {
     // Disable Place Swap Offer button
-    if (placeSwapBtn) {
-        placeSwapBtn.disabled = true;
-        placeSwapBtn.style.opacity = '0.6';
-        placeSwapBtn.style.cursor = 'not-allowed';
-        placeSwapBtn.title = 'Swap feature is currently disabled';
-        placeSwapBtn.innerHTML = '<iconify-icon icon="mdi:swap-horizontal"></iconify-icon> Place Swap Offer';
-        
-        // Remove the click event listener
-        placeSwapBtn.replaceWith(placeSwapBtn.cloneNode(true));
+    const currentPlaceSwapBtn = document.getElementById('placeSwapBtn');
+    if (currentPlaceSwapBtn) {
+        currentPlaceSwapBtn.disabled = true;
+        currentPlaceSwapBtn.style.opacity = '0.6';
+        currentPlaceSwapBtn.style.cursor = 'not-allowed';
+        currentPlaceSwapBtn.title = 'Item details loading...';
+        // Re-get the element and replace to remove any previously attached listeners
+        const newPlaceSwapBtn = currentPlaceSwapBtn.cloneNode(true);
+        currentPlaceSwapBtn.replaceWith(newPlaceSwapBtn);
     }
     
     // Disable Add to Favorites button
@@ -41,16 +48,34 @@ function disableAllButtons() {
         // Remove the click event listener
         favoritesBtn.replaceWith(favoritesBtn.cloneNode(true));
     }
-    
-    
+}
+
+function enableSwapOffer() {
+    const updatedPlaceSwapBtn = document.getElementById('placeSwapBtn');
+    if (updatedPlaceSwapBtn) {
+        updatedPlaceSwapBtn.disabled = false;
+        updatedPlaceSwapBtn.style.opacity = '1';
+        updatedPlaceSwapBtn.style.cursor = 'pointer';
+        updatedPlaceSwapBtn.title = 'Click to propose a swap.';
+        
+        // Re-attach the click listener
+        updatedPlaceSwapBtn.addEventListener('click', () => {
+             openSwapOfferModal();
+        });
+    }
+}
+
 
 function setupBackButton() {
-    if (backToPreviousBtn) {
-        backToPreviousBtn.addEventListener('click', () => {
+    const backBtn = document.getElementById('backToPrevious');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
             window.history.back();
         });
     }
 }
+
+// --- DATA LOADING & RENDERING ---
 
 function loadHeader() {
     fetch("header.html")
@@ -62,7 +87,6 @@ function loadHeader() {
             script.src = "js/header.js";
             script.defer = true;
             document.body.appendChild(script);
-            setupBackButton();
         })
         .catch(error => console.error("Error loading header:", error));
 }
@@ -104,6 +128,8 @@ function loadSwapItemDetails() {
                 console.log('No images found for this item');
                 setupDefaultImage();
             }
+            
+            enableSwapOffer();
         })
         .catch(error => {
             console.error('Fetch error:', error);
@@ -115,9 +141,8 @@ function setupDefaultImage() {
     const mainImage = document.getElementById('mainImage');
     const thumbnailContainer = document.querySelector('.thumbnail-container');
     
-    mainImage.src = '../assets/images/slu-logo.png';
-    
-    thumbnailContainer.innerHTML = '';
+    if (mainImage) mainImage.src = '../assets/images/slu-logo.png';
+    if (thumbnailContainer) thumbnailContainer.innerHTML = '';
     
     console.log('Using default image');
 }
@@ -127,8 +152,11 @@ function populateSwapItemDetails(data) {
     
     console.log('Populating details for:', item.title);
     
-    document.querySelector('.item-title').textContent = item.title || 'No Title';
-    document.querySelector('.item-description').textContent = item.description || 'No description available.';
+    const titleElement = document.querySelector('.item-title');
+    const descElement = document.querySelector('.item-description');
+    
+    if (titleElement) titleElement.textContent = item.title || 'No Title';
+    if (descElement) descElement.textContent = item.description || 'No description available.';
     
     const sellerName = document.querySelector('.seller-details h4');
     const sellerEmail = document.querySelector('.seller-details p');
@@ -149,6 +177,8 @@ function setupImageGallery(images) {
     const mainImage = document.getElementById('mainImage');
     const thumbnailContainer = document.querySelector('.thumbnail-container');
     
+    if (!mainImage || !thumbnailContainer) return;
+
     const firstImage = images[0];
     mainImage.src = `../server/item/${firstImage.image_path}`;
     
@@ -171,9 +201,7 @@ function setupImageGallery(images) {
 }
 
 
-// placeSwapBtn.addEventListener('click', () => {
-//     openSwapOfferModal();
-// });
+// --- MODAL & SWAP OFFER LOGIC ---
 
 function openSwapOfferModal() {
     fetch('swap-modal.html')
@@ -193,6 +221,8 @@ function initializeSwapModal() {
     const closeModal = document.getElementById('closeModal');
     const newItemFormElement = document.getElementById('newItemFormElement');
     const cancelSwap = document.getElementById('cancelSwap');
+
+    if (!modalOverlay || !closeModal || !newItemFormElement || !cancelSwap) return;
 
     document.getElementById('targetItemImage').src = document.getElementById('mainImage').src;
     document.getElementById('targetItemTitle').textContent = swapItemData.title;
@@ -233,6 +263,8 @@ function initializeSwapModal() {
 
 function submitSwapOffer(itemName, itemDescription, itemCategory, itemImage, message) {
     const submitBtn = document.querySelector('.submit-swap-btn');
+    if (!submitBtn) return;
+    
     submitBtn.disabled = true;
     submitBtn.textContent = 'Submitting Offer...';
 
@@ -252,7 +284,8 @@ function submitSwapOffer(itemName, itemDescription, itemCategory, itemImage, mes
     .then(result => {
         if (result.success) {
             alert('Swap offer submitted successfully!');
-            document.getElementById('swapModalOverlay').remove();
+            const modalOverlay = document.getElementById('swapModalOverlay');
+            if (modalOverlay) modalOverlay.remove();
         } else {
             alert('Error: ' + result.message);
             submitBtn.disabled = false;
@@ -265,5 +298,4 @@ function submitSwapOffer(itemName, itemDescription, itemCategory, itemImage, mes
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit Swap Offer';
     });
-}
 }

@@ -7,6 +7,12 @@ header('Access-Control-Allow-Headers: Content-Type');
 
 include_once '../config/database.php';
 
+// --- AUTHENTICATION CHECK ---
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'message' => 'Unauthorized: User not logged in']);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
     exit;
@@ -21,19 +27,24 @@ if (!isset($data['swap_id']) || !isset($data['action'])) {
 
 $swap_id = $data['swap_id'];
 $action = $data['action']; // 'accept' or 'decline'
+$current_user_id = $_SESSION['user_id'];
+
+$database = new Database();
+$db = $database->getConnection();
 
 try {
-    $database = new Database();
-    $db = $database->getConnection();
-
-    // Start transaction
+    // Start transaction for atomic updates
     $db->begin_transaction();
 
-    // Fetch the swap offer details
+    // Fetch the swap offer details, including the seller's ID for authorization
+    // NOTE: Using requested_item_id and offered_item_id for consistency.
     $stmt = $db->prepare("
-        SELECT so.*, i.item_id, i.title, i.seller_id
+        SELECT 
+            so.requested_item_id, 
+            so.offered_item_id, 
+            i.seller_id
         FROM swapoffer so
-        INNER JOIN item i ON so.item_id = i.item_id
+        INNER JOIN item i ON so.requested_item_id = i.item_id
         WHERE so.swap_id = ?
     ");
     $stmt->bind_param("i", $swap_id);
@@ -44,36 +55,56 @@ try {
         throw new Exception('Swap offer not found');
     }
 
+    // --- AUTHORIZATION CHECK (CRUCIAL FIX) ---
+    if ($swap['seller_id'] != $current_user_id) {
+        $db->rollback();
+        echo json_encode(['success' => false, 'message' => 'Forbidden: You are not the seller of this item.']);
+        exit;
+    }
+    // --- END AUTHORIZATION CHECK ---
+
+    $requested_item_id = $swap['requested_item_id']; // The item the seller listed
+    $offered_item_id = $swap['offered_item_id'];     // The item the buyer offered
+
     if ($action === 'accept') {
         /* -----------------------------
-            ACCEPT SWAP
+            ACCEPT SWAP: 4 DATABASE ACTIONS
         ------------------------------*/
 
-        // Update swap status to 'completed'
+        // 1. Update accepted swap status to 'completed'
         $stmt = $db->prepare("UPDATE swapoffer SET swap_status = 'completed' WHERE swap_id = ?");
         $stmt->bind_param("i", $swap_id);
         $stmt->execute();
 
-        // Decline all other swap offers for this item
+        // 2. Decline all other PENDING swap offers for the requested item
         $stmt = $db->prepare("
             UPDATE swapoffer 
-            SET swap_status = 'cancelled' 
-            WHERE item_id = ? AND swap_id != ? AND swap_status = 'pending'
+            SET swap_status = 'declined' 
+            WHERE requested_item_id = ? AND swap_id != ? AND swap_status = 'pending'
         ");
-        $stmt->bind_param("ii", $swap['item_id'], $swap_id);
+        $stmt->bind_param("ii", $requested_item_id, $swap_id);
         $stmt->execute();
 
-        // Update item status to 'swapped'
+        // 3. Mark the seller's original item as 'swapped'
         $stmt = $db->prepare("UPDATE item SET status = 'swapped' WHERE item_id = ?");
-        $stmt->bind_param("i", $swap['item_id']);
+        $stmt->bind_param("i", $requested_item_id);
         $stmt->execute();
+        
+        // 4. Mark the buyer's offered item as 'swapped' 
+        // This prevents the buyer from offering the item again.
+        $stmt = $db->prepare("UPDATE item SET status = 'swapped' WHERE item_id = ?");
+        $stmt->bind_param("i", $offered_item_id);
+        $stmt->execute();
+
 
         $db->commit();
 
         echo json_encode([
             'success' => true,
-            'message' => 'Swap accepted successfully! Item is now marked as swapped.',
-            'action' => 'accept'
+            'message' => 'Swap accepted! Both items are marked as swapped.',
+            'action' => 'accept',
+            'requested_item_id' => $requested_item_id,
+            'offered_item_id' => $offered_item_id
         ]);
 
     } elseif ($action === 'decline') {
@@ -81,10 +112,12 @@ try {
             DECLINE SWAP
         ------------------------------*/
 
-        // Update swap status to 'cancelled'
-        $stmt = $db->prepare("UPDATE swapoffer SET swap_status = 'cancelled' WHERE swap_id = ?");
+        // Update the specific swap status to 'declined' (not cancelled, to distinguish)
+        $stmt = $db->prepare("UPDATE swapoffer SET swap_status = 'declined' WHERE swap_id = ?");
         $stmt->bind_param("i", $swap_id);
         $stmt->execute();
+
+        // If this was the only pending offer, the requested item stays active.
 
         $db->commit();
 
@@ -95,7 +128,7 @@ try {
         ]);
 
     } else {
-        throw new Exception('Invalid action');
+        throw new Exception('Invalid action specified');
     }
 
 } catch (Exception $e) {
@@ -104,5 +137,7 @@ try {
         'success' => false,
         'message' => 'Error: ' . $e->getMessage()
     ]);
+} finally {
+    if (isset($db)) $db->close();
 }
 ?>
