@@ -17,6 +17,7 @@
       <p class="subtext">Review and manage user-submitted reports</p>
     </section>
 
+    <!-- Filter Section -->
     <section class="filter-section">
       <div class="filter-group">
         <label>Report Type:</label>
@@ -33,7 +34,7 @@
       </div>
       
       <div class="filter-group">
-        <label>Sort by:</label>
+        <label>Filter Time:</label>
         <select id="filter-sort">
           <option value="all">All time</option>
           <option value="today">Today</option>
@@ -42,33 +43,36 @@
         </select>
       </div>
       
-      <button id="apply-filters">Apply Filters</button>
+      <button id="apply-filters" class="primary-btn">Apply Filters</button>
     </section>
 
+    <!-- Reports Table -->
     <section class="reports-table-container">
       <table class="reports-table">
         <thead>
           <tr>
-            <th>Report ID</th>
-            <th>Report Target</th>
-            <th>Reporter</th>
-            <th>Description</th>
+            <th>ID</th>
+            <th>Target</th>
+            <th>Reporter Email</th>
+            <th>Reason</th>
             <th>Date</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody id="reports-table-body">
-          <!-- Reports inserted here -->
+          <!-- JS injects rows here -->
         </tbody>
       </table>
     </section>
 
-    <section id="empty-state" class="hidden">
-      <p>No reports found.</p>
+    <!-- Empty State -->
+    <section id="empty-state" class="hidden" style="text-align:center; padding: 2rem; color: #666;">
+      <iconify-icon icon="mdi:clipboard-check-outline" width="48"></iconify-icon>
+      <p>No pending reports found.</p>
     </section>
 
     <div class="pagination">
-      <p id="pagination-info">Showing 0 reports</p>
+      <p id="pagination-info">Loading...</p>
     </div>
   </main>
 
@@ -99,18 +103,53 @@
           <span class="value" id="modal-date"></span>
         </div>
         <div class="detail-row full-width">
-          <span class="label">Description:</span>
-          <p class="description-text" id="modal-description"></p>
+          <span class="label">Reason / Description:</span>
+          <div class="description-box" id="modal-description"></div>
         </div>
       </div>
       <div class="modal-actions">
         <button class="btn-view-item" id="modal-view-item">View Target</button>
-        <button class="btn-ban" id="modal-ban">Ban Target</button>
-        <button class="btn-dismiss" id="modal-dismiss">Dismiss</button>
+        <div class="right-actions">
+            <button class="btn-dismiss" id="modal-dismiss">Dismiss</button>
+            <button class="btn-ban" id="modal-ban">Ban Target</button>
+        </div>
       </div>
     </div>
   </div>
+  <!-- USER PROFILE POPUP MODAL -->
+  <div id="user-profile-view-modal" class="user-view-overlay" style="display: none;">
+      <div class="user-view-content">
+          <button id="close-user-view" class="user-view-close">&times;</button>
+        
+          <div class="user-view-header">
+            <!-- The Avatar Image -->
+             <img id="view-user-avatar" class="user-view-avatar" alt="User Avatar">
+            
+              <h2 id="view-user-name">Loading...</h2>
+              <p class="user-view-id">ID: <span id="view-user-id">--</span></p>
+              <p class="user-view-email"><iconify-icon icon="mdi:email-outline"></iconify-icon> <span id="view-user-email">--</span></p>
+          </div>
 
+          <div class="user-view-body">
+              <!-- Additional User Stats or Info can go here -->
+              <div class="user-stat-box">
+                  <p>Status</p>
+                  <h4 id="view-user-status" class="status-active">Active</h4>
+             </div>
+          </div>
+
+          <div class="user-view-actions">
+            <!-- Report Button (Visible only for Clients) -->
+              <button id="btn-report-user" class="btn-report-action" style="display: none;">
+                  <iconify-icon icon="mdi:alert-octagon"></iconify-icon> Report User
+              </button>
+            
+              <!-- Close Button -->
+              <button id="btn-close-user-view" class="btn-secondary-action">Close</button>
+         </div>
+      </div>
+  </div>
   <script src="js/manage-reports.js"></script>
+  <script src="js/view-user-profile.js"></script>
 </body>
 </html>

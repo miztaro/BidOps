@@ -3,123 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bid and Swap</title>
+    <title>Admin Dashboard | Swap and Bid</title>
+    
     <link rel="stylesheet" href="styles/homepage.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     <script src="js/admin-guard.js"></script>
 </head>
 <body>
+    <!-- Header Placeholder -->
     <div id="header"></div>
-    <main>
-        <!--Home Page-->
-        <section class="homepage-section" id="homepage-section"href="homepage.html">
-            <div class="home-cover">
-                <img src="../assets/images/home-cover-img.png" alt="Home Cover Image">
-                <div class="title">
-                    <h1>Trade Smart,<br>Study Smarter</h1>
-                    <p>Discover the ultimate campus marketplace where SLU students bid on textbooks, swap study materials, and find essential academic resources</p>
-                </div>
+
+    <main class="dashboard-container">
+        <!-- SECTION 1: Welcome & Date -->
+        <section class="welcome-banner">
+            <div class="welcome-text">
+                <h1>Admin Dashboard</h1>
+                <p>Overview of system performance, analytics, and pending tasks.</p>
             </div>
-            
-            <div class="available-bids">
-                <div class="available-bids-title">
-                    <div class="left">
-                        <h3>Active Bids</h3>
-                        <p>Monitor all active bidding items</p>
-                    </div>
-                    <button class="view-all" id="bid-view-all">View All</button>
-                </div>
-
-                <div class="bid-cards-list" id="home-bid-cards-list"></div>
+            <div class="date-display" id="current-date">
+                Loading date...
             </div>
+        </section>
 
-            <div class="available-swaps">
-                <div class="available-swaps-title">
-                    <div class="left">
-                        <h3>Available Swaps</h3>
-                        <p>Join the swapping hub for amazing academic resources</p>
-                    </div>
-                    <button class="view-all" id="swap-view-all">View All</button>
+        <!-- SECTION 2: KPI Stats Grid -->
+        <section class="stats-grid">
+            <!-- Pending Listings (Clickable) -->
+            <div class="stat-card warning" onclick="window.location.href='manage-listings.html'">
+                <div class="icon-box">
+                    <iconify-icon icon="mdi:clipboard-text-clock-outline"></iconify-icon>
                 </div>
-
-                <div class="swap-cards-list" id="home-swap-cards-list"></div>
+                <div class="stat-info">
+                    <h3 id="pending-count">--</h3>
+                    <p>Pending Listings</p>
+                </div>
+                <iconify-icon class="arrow" icon="material-symbols:arrow-forward-ios-rounded"></iconify-icon>
             </div>
 
-            <div class="browse-category">
-                <div class="top">
-                    <h3>Browse by Categories</h3>
-                    <p>Filter items by category for better management</p>
+            <!-- Open Reports (Clickable) -->
+            <div class="stat-card danger" onclick="window.location.href='manage-reports.html'">
+                <div class="icon-box">
+                    <iconify-icon icon="mdi:alert-box-outline"></iconify-icon>
                 </div>
+                <div class="stat-info">
+                    <h3 id="report-count">--</h3>
+                    <p>Open Reports</p>
+                </div>
+                <iconify-icon class="arrow" icon="material-symbols:arrow-forward-ios-rounded"></iconify-icon>
+            </div>
 
-                <div class="category-grid">
-                    <button class="category-card" browse-category="Electronics">
-                        <iconify-icon icon="mdi:book-open-page-variant" id="category-logo"></iconify-icon>
-                        <h6>Electronics</h6>
-                        <p>0 items</p>
-                    </button>
-                    <button class="category-card" browse-category="Sports"><iconify-icon icon="mingcute:building-2-fill" id="category-logo"></iconify-icon><h6>Sports</h6><p>0 items</p></button>
-                    <button class="category-card" browse-category="Collectibles"><iconify-icon icon="foundation:torso-business" id="category-logo"></iconify-icon><h6>Collectibles</h6><p>0 items</p></button>
-                    <button class="category-card" browse-category="Accessories"><iconify-icon icon="heroicons:cpu-chip-20-solid" id="category-logo"></iconify-icon><h6>Accessories</h6><p>0 items</p></button>
-                    <button class="category-card" browse-category="Fashion"><iconify-icon icon="icomoon-free:lab" id="category-logo"></iconify-icon><h6>Fashion</h6><p>0 items</p></button>
-                    <button class="category-card" browse-category="Gaming"><iconify-icon icon="ion:people" id="category-logo"></iconify-icon><h6>Gaming</h6><p>0 items</p></button>
-                    <button class="category-card" browse-category="Home"><iconify-icon icon="mdi:medicine" id="category-logo"></iconify-icon><h6>Home</h6><p>0 items</p></button>
-                    <button class="category-card" browse-category="Photography"><iconify-icon icon="ph:chalkboard-teacher-fill" id="category-logo"></iconify-icon><h6>Photography</h6><p>0 items</p></button>
-                    <button class="category-card" browse-category="Toys"><iconify-icon icon="octicon:law-16" id="category-logo"></iconify-icon><h6>Toys</h6><p>0 items</p></button>
+            <!-- Active Users -->
+            <div class="stat-card info">
+                <div class="icon-box">
+                    <iconify-icon icon="mdi:users-group"></iconify-icon>
+                </div>
+                <div class="stat-info">
+                    <h3 id="user-count">--</h3>
+                    <p>Active Users</p>
+                </div>
+            </div>
+
+            <!-- Live Listings -->
+            <div class="stat-card success">
+                <div class="icon-box">
+                    <iconify-icon icon="mdi:shopping-outline"></iconify-icon>
+                </div>
+                <div class="stat-info">
+                    <h3 id="item-count">--</h3>
+                    <p>Live Listings</p>
                 </div>
             </div>
         </section>
 
-        <!---View All-->
-        <section class="viewAll-section" id="viewAll-section" style="display: none;">
-            <div class="top-nav">
-                <button class="back-home" id="back-home"><iconify-icon icon="line-md:arrow-left" width="24" height="24"></iconify-icon>Back Home</button>
-                <div class="swap-bid-container">
-                    <button class="bid-btn">Bid</button>
-                    <button class="swap-btn">Swap</button>
+        <!-- SECTION 3: Analytics Graph -->
+        <section class="chart-section">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Weekly Activity Overview</h2>
+                    <!-- Filter is disabled for now as the API returns last 7 days automatically -->
+                    <select id="chart-filter" disabled>
+                        <option>Last 7 Days</option>
+                    </select>
                 </div>
-                <div class="sort-container">
-                <button class="sort-btn">
-                    <iconify-icon class="sort-icon" icon="material-symbols:sort-rounded" width="24" height="24"></iconify-icon>
-                        Sort
-                </button>
-                <div class="sort-dropdown" id="sort-dropdown" style="display: none;">
-                    <div class="sort-option" data-sort="asc">Lowest Start Price</div>
-                    <div class="sort-option" data-sort="desc">Highest Start Price</div>
-                    <div class="sort-option" data-sort="az">Title: A-Z</div>
-                    <div class="sort-option" data-sort="za">Title: Z-A</div>
-                </div>
+                <!-- The Canvas where Chart.js draws the graph -->
+                <canvas id="activityChart"></canvas>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Quick Actions & System Status -->
+        <section class="dashboard-content">
+            
+            <!-- Quick Management Panel -->
+            <div class="action-panel">
+                <h2>Quick Management</h2>
+                <div class="action-buttons">
+                    <a href="manage-listings.html" class="action-btn">
+                        <iconify-icon icon="mdi:eye-check-outline"></iconify-icon>
+                        <span>Review Pending Listings</span>
+                    </a>
+                    <a href="manage-reports.html" class="action-btn">
+                        <iconify-icon icon="mdi:shield-alert-outline"></iconify-icon>
+                        <span>Manage User Reports</span>
+                    </a>
+                    <button class="action-btn secondary" onclick="alert('System logs generated in server console.')">
+                        <iconify-icon icon="mdi:file-chart-outline"></iconify-icon>
+                        <span>Generate Logs</span>
+                    </button>
                 </div>
             </div>
 
-            <div class="bid-cards-list" id="viewAll-bid-cards-list"></div>
-            
-            <div class="swap-cards-list" id="viewAll-swap-cards-list" style="display:none;"></div>
-
-            <div class="bottom-nav">
-                <div class="category-name-des-container">
-                    <h3 class="title" id="viewAll-category-title">All Categories</h3>
-                    <p class="description">Discover amazing items from fellow SLU students of <span id="viewAll-category-description"> All Categories</span></p>
-                </div>
-                <div class="category-container" id="viewAll-category-container">
-                    <button class="category-btn" id="viewAll-category-btn">Category<iconify-icon icon="eva:arrow-down-outline" width="24" height="24"></iconify-icon></button>
-                    <div id="viewAll-category-dropDown" class="dropDown">
-                        <div class="dropDown-item">All Categories</div>
-                        <div class="dropDown-item">Electronics</div>
-                        <div class="dropDown-item">Sports</div>
-                        <div class="dropDown-item">Collectibles</div>
-                        <div class="dropDown-item">Accessories</div>
-                        <div class="dropDown-item">Fashion</div>
-                        <div class="dropDown-item">Gaming</div>
-                        <div class="dropDown-item">Home</div>
-                        <div class="dropDown-item">Photography</div>
-                        <div class="dropDown-item">Toys</div>
+            <!-- System Health Panel -->
+            <div class="system-panel">
+                <h2>System Health</h2>
+                <div class="status-list">
+                    <div class="status-item">
+                        <span class="status-dot online"></span>
+                        <div class="status-details">
+                            <strong>Database Connection</strong>
+                            <span>Operational</span>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-dot online"></span>
+                        <div class="status-details">
+                            <strong>Node Server</strong>
+                            <span>Running (Port 3000)</span>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-dot warning"></span>
+                        <div class="status-details">
+                            <strong>Storage</strong>
+                            <span>Uploads Folder Active</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
     </main>
-    <script src="js/nav-bar.js"></script>
-    <script src="js/homepage.js" defer></script>
+    <!-- USER PROFILE POPUP MODAL -->
+    <div id="user-profile-view-modal" class="user-view-overlay" style="display: none;">
+        <div class="user-view-content">
+            <button id="close-user-view" class="user-view-close">&times;</button>
+        
+           <div class="user-view-header">
+               <!-- The Avatar Image -->
+               <img id="view-user-avatar" class="user-view-avatar" alt="User Avatar">
 
+            <h2 id="view-user-name">Loading...</h2>
+               <p class="user-view-id">ID: <span id="view-user-id">--</span></p>
+                   <p class="user-view-email"><iconify-icon icon="mdi:email-outline"></iconify-icon> <span id="view-user-email">--</span></p>
+           </div>
+
+        <div class="user-view-body">
+                <!-- Additional User Stats or Info can go here -->
+            <div class="user-stat-box">
+                    <p>Status</p>
+                <h4 id="view-user-status" class="status-active">Active</h4>
+                </div>
+        </div>
+
+            <div class="user-view-actions">
+                <!-- Report Button (Visible only for Clients) -->
+                <button id="btn-report-user" class="btn-report-action" style="display: none;">
+                    <iconify-icon icon="mdi:alert-octagon"></iconify-icon> Report User
+                </button>
+
+                <!-- Close Button -->
+                <button id="btn-close-user-view" class="btn-secondary-action">Close</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/homepage.js"></script>
+    <script src="js/view-user-profile.js"></script>
 </body>
 </html>
