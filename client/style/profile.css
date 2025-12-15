@@ -152,7 +152,7 @@ html {
   @apply lg:flex lg:flex-[4.5] lg:flex-col lg:p-0 lg:pr-[30px] lg:pb-[30px] lg:gap-[10px];
 }
 
-.profile-section .right-side .title-container {
+.right-side .title-container {
     width: 100%;
     height: auto;
     flex: 1;
@@ -162,20 +162,20 @@ html {
     align-items: center;
 }
 
-.right-side .title-container h3 {
+.title-container h3 {
     font-size: clamp(1.5rem, 4vw, 3.5rem);
     font-family: 'Montserrat-Bold', sans-serif;
     color: var(--primary);
 }
 
-.right-side .title-container .analytics {
+.title-container .analytics {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 20px;
 }
 
-.right-side .title-container .analytics>div {
+.title-container .analytics>div {
     text-align: center;
     padding: 30px;
     border: 1px solid var(--primary);
@@ -186,27 +186,27 @@ html {
     font-family: 'Montserrat-Regular', sans-serif;
 }
 
-.right-side .title-container .analytics>div:first-child{
+.title-container .analytics>div:first-child{
     background-color: var(--primary);
     color: var(--primary-white);
 }
 
-.right-side .title-container .analytics>div:first-child h6,
-.right-side .title-container .analytics>div:first-child p {
+.title-container .analytics>div:first-child h6,
+title-container .analytics>div:first-child p {
     color: var(--primary-white);
 }
 
-.right-side .title-container .analytics>div:hover {
+.title-container .analytics>div:hover {
     transform: translateY(-5px);
 }
 
-.right-side .title-container .analytics>div h6 {
+.title-container .analytics>div h6 {
     font-size: 1.5em;
     font-family: 'Montserrat-Bold', sans-serif;
     color: var(--primary);
 }
 
-.right-side .title-container .analytics>div p {
+.title-container .analytics>div p {
     color: var(--dark-secondary);
     font-size: 1em;
 }

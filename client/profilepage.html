@@ -67,13 +67,14 @@
                 <h6>My Favorites</h6>
                 <p>0 Items</p>
             </button>
-            <button id="profile-feedbacks-btn" class="feedbacks-btn" onclick="window.location.href='feedbacks.html'">
+            <button id="profile-feedbacks-btn" class="feedbacks-btn">
                 <iconify-icon class="feedbacks-logo" icon="mdi:star-circle" width="34" height="34"></iconify-icon>
                 <h6>My Feedbacks</h6>
                 <p>View Ratings</p>
             </button>
-                <button id="profile-transactions-btn" class="transactions-btn" onclick="window.location.href='transactions.html'">
-                <iconify-icon class="transactions-logo" icon="mdi:credit-card-outline" width="34" height="34"></iconify-icon>
+            <button id="profile-transactions-btn" class="transactions-btn">
+                <iconify-icon class="transactions-logo" icon="mdi:credit-card-outline" width="34"
+                    height="34"></iconify-icon>
                 <h6>My Transactions</h6>
                 <p>View Transactions</p>
             </button>
@@ -82,7 +83,8 @@
         <section class="right-side">
             <div id="profile-user-info-content" class="profile-user-info-content">
                 <div class="user-img-container">
-                    <img id="profilePicture" class="profile-avatar"  src="../server/item/uploads/placeholder-profile.jpg" alt="">
+                    <img id="profilePicture" class="profile-avatar" src="../server/item/uploads/placeholder-profile.jpg"
+                        alt="">
                 </div>
 
                 <div class="user-info-container">
@@ -103,7 +105,7 @@
                 </div>
 
                 <div class="profile-buttons-container">
-                    <button id="delete-btn" class="button-delete">Delete Account</button>                
+                    <button id="delete-btn" class="button-delete">Delete Account</button>
                     <button id="sign-out-btn" class="button-sign-out">Sign Out</button>
                 </div>
             </div>
@@ -252,7 +254,82 @@
                     </table>
                 </div>
             </div>
+
+            <div id="profile-feedback-content" class="profile-feedback-content">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Rater</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Completed At</th>
+                                <th>Transaction Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedback-tbody">
+                            <!-- taken from JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <section id="profile-transactions-content" class="profile-transactions-content">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Amount/Price</th>
+                                <th>Completed At</th>
+                                <th>Vendor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </section>
+
+        <!-- Transactions rating modal -->
+        <div id="rating-modal" class="rating-modal-overlay" style="display: none;">
+            <div class="rating-modal-container">
+                <button class="rating-modal-close" id="rating-modal-close">
+                    <iconify-icon icon="material-symbols:close" width="32" height="32"></iconify-icon>
+                </button>
+
+                <div class="rating-modal-content">
+                    <h3 id="rating-item-title">Rate Transaction</h3>
+                    <input type="hidden" id="rating-transaction-id" value="">
+                    <input type="hidden" id="rating-partner-id" value="">
+
+                    <div class="star-rating-container">
+                        <div class="star-rating" id="star-rating">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                        <span id="current-rating">0</span>
+                    </div>
+
+                    <div class="comment-section">
+                        <label for="rating-comment">Comment (Optional)</label>
+                        <textarea id="rating-comment" rows="4" placeholder="Share your experience..."></textarea>
+                    </div>
+
+                    <div class="rating-buttons">
+                        <button id="submit-rating" class="submit-rating-btn">Submit Rating</button>
+                        <button id="cancel-rating" class="cancel-rating-btn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <section class="edit-overlay">
             <form class="form-container" method="POST" enctype="multipart/form-data"
@@ -507,11 +584,11 @@
 
                 <section class="bids-body-sec">
                     <section class="left-side">
-                  
+
                     </section>
 
                     <section class="right-side">
-      
+
                     </section>
                 </section>
             </div>
@@ -561,11 +638,11 @@
 
                 <section class="swaps-body-sec">
                     <section class="left-side">
-                  
+
                     </section>
 
                     <section class="right-side">
-                    
+
                     </section>
                 </section>
             </div>
@@ -595,6 +672,8 @@
     </main>
     <div id="footer"></div>
     <script type="module" src="js/profilepage.js"></script>
+    <script type="module" src="js/feedbacks.js"></script>
+    <script type="module" src="js/transactions.js"></script>
     <script type="module" src="js/profile-list-event/list-edit-item.js"></script>
     <script type="module" src="js/profile-list-event/list-view-item.js"></script>
     <script type="module" src="js/profile-bids-event/bids-view-item.js"></script>

@@ -1,3 +1,5 @@
+import { loadTransactions } from "./transactions";
+import { loadRatings } from "./feedbacks";
 document.addEventListener('DOMContentLoaded', function () {
   fetch("header.html")
     .then(response => response.text())
@@ -94,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ctx.fillStyle = stringToColor(username);
     ctx.fillRect(0, 0, size, size);
 
-    const fontSize = size * 0.5; 
+    const fontSize = size * 0.5;
     ctx.fillStyle = "#ffffff";
     ctx.font = `bold ${fontSize}px Arial`;
     ctx.textAlign = "center";
@@ -509,7 +511,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function updateTitleForSection(sectionId) {
     const titleContainer = document.querySelector(".title-container");
-     if (!titleContainer) return;
+    if (!titleContainer) return;
     const titleHeading = document.querySelector(".title-container h3");
     const currentAnalytics = document.querySelector(".title-container .analytics");
 
@@ -534,6 +536,8 @@ document.addEventListener('DOMContentLoaded', function () {
       titleHeading.textContent = "My Listings";
       const listingAnalytics = createListingAnalytics(listings);
       currentAnalytics.replaceWith(listingAnalytics);
+    } else {
+      titleHeading.textContent = "";
     }
   }
 
@@ -541,12 +545,19 @@ document.addEventListener('DOMContentLoaded', function () {
     "profile-user-info-content": document.getElementById("profile-user-info-btn"),
     "profile-listings-content": document.getElementById("profile-listings-btn"),
     "profile-bids-content": document.getElementById("profile-bids-btn"),
-    "profile-swaps-content": document.getElementById("profile-swaps-btn")
+    "profile-swaps-content": document.getElementById("profile-swaps-btn"),
+    "profile-feedback-content": document.getElementById("profile-feedbacks-btn"),
+    "profile-transactions-content": document.getElementById("profile-transactions-btn")
   };
 
-  const contents = document.querySelectorAll(
-    "#profile-user-info-content, #profile-listings-content, #profile-bids-content, #profile-swaps-content"
-  );
+  const contents = document.querySelectorAll(`
+    #profile-user-info-content,
+    #profile-listings-content,
+    #profile-bids-content,
+    #profile-swaps-content,
+    #profile-feedback-content,
+    #profile-transactions-content
+  `);
 
   function showContent(id) {
     contents.forEach(c => {
@@ -561,6 +572,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     Object.values(buttons).forEach(btn => btn.classList.remove("active"));
     buttons[id].classList.add("active");
+
+    if (id === "profile-transactions-content") {
+      loadTransactions();
+    } else if (id === "profile-feedback-content"){
+      loadRatings();
+    }
   }
 
   showContent("profile-user-info-content");

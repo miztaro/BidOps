@@ -1,12 +1,11 @@
 .profile-transactions-content {
     background-color: var(--primary-base);
     border-radius: 20px;
+    max-height: 90vh;
+    height: auto;
     border: 1px solid var(--primary);
-    flex: 1;
+    flex: 12;
     padding: 30px;
-    min-height: 70vh;
-    display: flex;
-    flex-direction: column;
 }
 
 .profile-transactions-content .table-container {
@@ -33,62 +32,26 @@
     text-transform: uppercase;
 }
 
-.status-success { background: #d4edda; color: #155724; }
-.status-pending { background: #fff3cd; color: #856404; }
-.status-failed { background: #f8d7da; color: #721c24; }
-.status-cancelled { background: #f5c6cb; color: #7d1a27; }
-
-.profile-section {
-    padding-top: 20px; 
-    display: flex;
-    gap: 20px; 
-    min-height: 80vh; 
+.status-success {
+    background: #d4edda;
+    color: #155724;
 }
 
-.left-nav-menu {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; 
-    align-items: stretch;
-    padding: 20px 0; 
-    flex: 1;
-    max-width: 300px; 
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
 }
 
-.left-nav-menu .back-home {
-    align-self: flex-start; 
-    margin-bottom: 20px; 
+.status-failed {
+    background: #f8d7da;
+    color: #721c24;
 }
 
-.right-side {
-    flex: 4;
-    padding: 20px 30px; 
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.status-cancelled {
+    background: #f5c6cb;
+    color: #7d1a27;
 }
 
-.title-container {
-    padding: 20px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--primary-base);
-    border-radius: 12px;
-}
-
-.title-container h3 {
-    font-size: 2.5em;
-    margin: 0;
-}
-
-.table-container {
-    flex: 1; 
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
 
 .profile-transactions-content table {
     width: 100%;
@@ -116,57 +79,19 @@
 .profile-transactions-content tbody tr {
     background: var(--primary-white);
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease;
 }
 
 .profile-transactions-content tbody tr:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .profile-transactions-content td {
     padding: 18px 12px;
     vertical-align: middle;
     border-bottom: 1px solid #eee;
-}
-
-.analytics {
-    display: flex;
-    gap: 15px;
-}
-
-.analytics > div {
-    padding: 20px;
-    border: 1px solid var(--primary);
-    border-radius: 12px;
-    text-align: center;
-    min-width: 120px;
-    transition: all 0.3s ease;
-}
-
-.analytics > div:hover {
-    color: white;
-    transform: translateY(-5px);
-}
-
-.back-home { 
-    border-radius: 12px;
-    padding: 8px 12px;
-    font-family: 'Montserrat-Bold', sans-serif;
-    font-size: 1.1em;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 15px;
-    margin-left: 10px;
-    background: none;
-    border: none;
-}
-
-.back-home:hover {
-    transform: translateX(-3px);
 }
 
 .rating-modal-overlay {
@@ -350,12 +275,12 @@
 }
 
 .rate-btn {
-    background:#4caf4f8b;
+    background: #4caf4f8b;
     color: white;
 }
 
 .rate-btn:hover {
-    background:  #3d8b40d7;
+    background: #3d8b40d7;
 }
 
 
@@ -366,13 +291,13 @@
         font-size: 0.8em;
         min-width: 90px;
     }
-    
+
     .profile-transactions-content tbody td:last-child {
         flex-direction: column;
         gap: 8px;
         align-items: stretch;
     }
-    
+
     .rate-btn {
         width: 100%;
     }
@@ -389,13 +314,13 @@
     .profile-section {
         flex-direction: column;
     }
-    
+
     .left-nav-menu {
         flex-direction: row;
         justify-content: center;
         max-width: none;
     }
-    
+
     .right-side {
         padding: 10px;
     }

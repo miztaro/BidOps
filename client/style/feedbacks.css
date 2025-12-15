@@ -26,44 +26,14 @@
     color: #f5c518;
 }
 
-.profile-section {
-    padding-top: 20px; 
-    display: flex;
-    gap: 20px; 
-    min-height: 80vh; 
-}
-
-.left-nav-menu {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; 
-    align-items: stretch;
-    padding: 20px 0; 
-    flex: 1;
-    max-width: 300px; 
-}
-
-.left-nav-menu .back-home {
-    align-self: flex-start; 
-    margin-bottom: 20px; 
-}
-
-.right-side {
-    flex: 4;
-    padding: 20px 30px; 
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
 .title-container {
-    padding: 20px;
     width: 100%;
-    display: flex;
+    height: auto;
+    flex: 1;
+    display: none;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    background: var(--primary-base);
-    border-radius: 12px;
 }
 
 .title-container h3 {
@@ -74,12 +44,11 @@
 .profile-feedback-content {
     background-color: var(--primary-base);
     border-radius: 20px;
+    max-height: 90vh;
+    height: auto;
     border: 1px solid var(--primary);
-    flex: 1;
+    flex: 12;
     padding: 30px;
-    min-height: 70vh; 
-    display: flex;
-    flex-direction: column;
 }
 
 .table-container {
@@ -134,85 +103,6 @@
     font-size: 1.4em;
     color: #f5c518;
 }
-
-.analytics {
-    display: flex;
-    gap: 15px;
-}
-
-.analytics > div {
-    padding: 20px;
-    border: 1px solid var(--primary);
-    border-radius: 12px;
-    text-align: center;
-    min-width: 120px;
-    transition: all 0.3s ease;
-}
-
-.analytics > div:hover {
-    background: var(--primary);
-    color: white;
-    transform: translateY(-5px);
-}
-
-.back-profile { 
-    border-radius: 12px;
-    padding: 8px 12px;
-    font-family: 'Montserrat-Bold', sans-serif;
-    font-size: 1.1em;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 15px;
-    margin-left: 10px;
-    background: none;
-    border: none;
-}
-
-.back-profile:hover {
-    transform: translateX(-3px);
-}
-
-.left-nav-menu .back-profile {
-    background: none;
-    border: none;
-    padding: 8px 12px;
-    width: auto;
-    box-shadow: none;
-    transition: transform 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    color: var(--primary);
-    font-family: 'Montserrat-Bold', sans-serif;
-    margin-bottom: 15px;
-}
-
-.left-nav-menu .back-profile:hover {
-    transform: translateX(5px);
-    box-shadow: none;
-}
-
-.left-nav-menu .back-profile iconify-icon {
-    font-size: 1.5em; 
-    color: var(--primary);
-    background: none;
-    border-radius: 0;
-    padding: 4px;
-    margin-bottom: 0;
-    box-shadow: none;
-}
-
-.left-nav-menu .back-profile span {
-    font-size: 0.95em;
-    color: #8C8A8A;
-}
-
-
-
-
 
 @media (max-width: 768px) {
     .profile-section {

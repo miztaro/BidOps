@@ -1,62 +1,85 @@
 <?php
+session_start();
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 header('Content-Type: application/json');
 
-$host = 'localhost';
-$user = 'root';
-$pass = '';        
-$db   = 'bidops';
-
-$conn = new mysqli($host, $user, $pass, $db);
-
-if ($conn->connect_error) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'DB connection failed']);
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'User not logged in'
+    ]);
     exit;
 }
 
-/*
-  Show all ratings for now. Complete this when user login in implemented!!!
+$user_id = $_SESSION['user_id'];
 
-  Join:
-  - userrating (who rated, rating, comment, transaction_id)
-  - transactionreceipt (to know item and buyer/seller)
-  - item (item title)
-  - user (rater username)
-*/
+include_once '../config/database.php';
 
-$sql = "
-SELECT 
-    ur.rating_id,
-    ur.rating,
-    ur.comment,
-    ur.rater_id,
-    rater.username AS rater_username,
-    ur.transaction_id,
-    tr.status AS transaction_status,
-    tr.completed_at,
-    tr.item_id,
-    i.title AS item_title,
-    tr.buyer_id,
-    tr.seller_id
-FROM userrating ur
-LEFT JOIN transactionreceipt tr ON ur.transaction_id = tr.transaction_id
-LEFT JOIN item i ON tr.item_id = i.item_id
-LEFT JOIN user rater ON ur.rater_id = rater.user_id
-ORDER BY ur.rating_id DESC
-";
+try {
+    $database = new Database();
+    $conn = $database->getConnection();
 
-$result = $conn->query($sql);
+    if ($conn->connect_error) {
+        throw new Exception("Database connection failed: " . $conn->connect_error);
+    }
 
-$ratings = [];
-if ($result) {
+    $sql = "
+    SELECT 
+        ur.rating_id,
+        ur.rating,
+        ur.comment,
+        ur.rater_id,
+        rater.username AS rater_username,
+        ur.transaction_id,
+        tr.status AS transaction_status,
+        tr.completed_at,
+        tr.item_id,
+        i.title AS item_title,
+        tr.buyer_id,
+        tr.seller_id
+    FROM userrating ur
+    LEFT JOIN transactionreceipt tr 
+        ON ur.transaction_id = tr.transaction_id
+    LEFT JOIN item i 
+        ON tr.item_id = i.item_id
+    LEFT JOIN user rater 
+        ON ur.rater_id = rater.user_id
+    WHERE 
+        tr.buyer_id = ? 
+        OR tr.seller_id = ?
+    ORDER BY ur.rating_id DESC
+    ";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $user_id, $user_id);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    $ratings = [];
+
     while ($row = $result->fetch_assoc()) {
         $ratings[] = $row;
     }
+
+    $stmt->close();
+    $conn->close();
+
+    echo json_encode([
+        'success' => true,
+        'ratings' => $ratings
+    ]);
+
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error fetching ratings: ' . $e->getMessage()
+    ]);
+    exit;
 }
-
-echo json_encode([
-    'success' => true,
-    'ratings' => $ratings
-]);
-
-$conn->close();
+?>
