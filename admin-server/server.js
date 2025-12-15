@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const db = require('./database'); // Uses the database.js we created
+const db = require('./database'); // Uses your existing database connection
 
 const app = express();
 const PORT = 3000;
@@ -10,37 +10,125 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
+// ==========================================
+// 1. STATIC FILE SERVING
+// ==========================================
 
 // A. Serve ASSETS (Images/Fonts)
-// Fixes: <img src="../assets/images/..." >
 app.use('/assets', express.static(path.join(__dirname, '../assets')));
 
-// B. Serve ADMIN STYLES specifically
-// Fixes: <link href="styles/header.css">
+// B. Serve ADMIN STYLES
 app.use('/styles', express.static(path.join(__dirname, '../admin/styles')));
 
-// C. Serve ADMIN JS specifically
+// C. Serve ADMIN JS
 app.use('/js', express.static(path.join(__dirname, '../admin/js')));
 
-// D. Serve the CLIENT Folder 
-// Fixes: Redirects that go to "../client/login.html"
+// D. Serve CLIENT Folder
 app.use('/client', express.static(path.join(__dirname, '../client')));
 
-// E. Serve "Legacy" paths (Fixes links that say /BidOps/client/...)
+// E. Legacy Redirects
 app.use('/BidOps/client', express.static(path.join(__dirname, '../client')));
 
-// F. Serve Uploads (User Images)
+// F. Serve Uploads
 app.use('/server/item/uploads', express.static(path.join(__dirname, '../server/item/uploads')));
 
-// G. Serve the ADMIN HTML files as the ROOT
-// This must be last!
+// G. Serve ADMIN HTML as root
 app.use(express.static(path.join(__dirname, '../admin')));
 
 
 // ==========================================
-// --- 2. ADMIN API ROUTES ---
+// 2. ADMIN API ROUTES
 // ==========================================
+
+/**
+ * GET /api/admin/stats
+ * Fetches real counts for the dashboard cards.
+ */
+app.get('/api/admin/stats', async (req, res) => {
+    try {
+        const [
+            [pendingListings],
+            [openReports],
+            [activeUsers],
+            [liveItems]
+        ] = await Promise.all([
+            db.query("SELECT COUNT(*) as count FROM item WHERE status = 'pending_approval'"),
+            db.query("SELECT COUNT(*) as count FROM report WHERE status = 'pending'"),
+            db.query("SELECT COUNT(*) as count FROM user WHERE is_banned = 0"), 
+            db.query("SELECT COUNT(*) as count FROM item WHERE status = 'active'")
+        ]);
+
+        res.json({
+            success: true,
+            stats: {
+                pending_listings: pendingListings[0].count,
+                open_reports: openReports[0].count,
+                active_users: activeUsers[0].count,
+                total_items: liveItems[0].count
+            }
+        });
+    } catch (err) {
+        console.error("Dashboard Stats Error:", err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+/**
+ * GET /api/admin/analytics
+ */
+app.get('/api/admin/analytics', async (req, res) => {
+    try {
+        // Query: Get item counts grouped by date
+        // ORDER BY date DESC LIMIT 7 gets the most recent 7 days with data
+        const itemQuery = `
+            SELECT DATE(created_date) as date, COUNT(*) as count 
+            FROM item 
+            GROUP BY DATE(created_date)
+            ORDER BY date DESC
+            LIMIT 7
+        `;
+
+        const [itemStats] = await db.query(itemQuery);
+
+        // Reverse array so the graph goes from Left (Oldest) to Right (Newest)
+        itemStats.reverse();
+
+        res.json({
+            success: true,
+            chartData: {
+                items: itemStats,
+                users: [] // Sending empty array because user table has no date column
+            }
+        });
+    } catch (err) {
+        console.error("Analytics Error:", err);
+        // Return empty structure on error so frontend doesn't crash
+        res.json({ success: false, chartData: { items: [], users: [] } }); 
+    }
+});
+
+/**
+ * GET /api/admin/recent-activity
+ */
+app.get('/api/admin/recent-activity', async (req, res) => {
+    try {
+        const query = `
+            (SELECT 'new_listing' as type, title as description, created_date as date 
+             FROM item ORDER BY created_date DESC LIMIT 5)
+            UNION
+            (SELECT 'new_report' as type, description, created_at as date 
+             FROM report ORDER BY created_at DESC LIMIT 5)
+            ORDER BY date DESC LIMIT 5
+        `;
+
+        const [rows] = await db.query(query);
+        res.json({ success: true, activity: rows });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 
 // A. DASHBOARD / LISTINGS API
 app.get('/api/listings', async (req, res) => {
@@ -196,6 +284,28 @@ app.delete('/api/item/:id', async (req, res) => {
         await db.query("DELETE FROM item WHERE item_id = ?", [req.params.id]);
         res.json({ success: true, message: 'Item deleted' });
     } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+// H. GET USER PROFILE (For Admin View Modal)
+app.get('/api/user/:id', async (req, res) => {
+    try {
+        const userId = req.params.id;
+        
+        // Query the user table
+        const [users] = await db.query(
+            "SELECT user_id, username, email, is_banned, warning_count FROM user WHERE user_id = ?", 
+            [userId]
+        );
+
+        if (users.length === 0) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        res.json({ success: true, user: users[0] });
+
+    } catch (err) {
+        console.error("Error fetching user:", err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
 });
 
 
