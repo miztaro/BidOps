@@ -1,5 +1,5 @@
 
-// 1. AUTO-REDIRECT IF ALREADY LOGGED IN
+// 1. AUTO-REDIRECT IF ALREADY LOGGED INgoogle
 
 (function() {
     // A. CHECK FOR LOGOUT SIGNAL FIRST
@@ -107,8 +107,7 @@ window.onload = function () {
 // 3. MAIN LOGIC (DOM READY)
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Run session cleanup or check
-    checkExistingSession();
+
 
     const loginBtn = document.querySelector('.btn.primary');
     if (loginBtn) {
