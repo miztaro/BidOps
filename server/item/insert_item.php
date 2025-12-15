@@ -189,8 +189,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $db->begin_transaction();
 
         try {
-            $query = "INSERT INTO ITEM (title, description, category_type, item_type, seller_id, status)
-                      VALUES (?, ?, ?, ?, ?, 'active')";
+            $query = "INSERT INTO item (title, description, category_type, item_type, seller_id, status)
+                      VALUES (?, ?, ?, ?, ?, 'pending_approval')";
             $stmt = $db->prepare($query);
             $stmt->bind_param("sssss", $title, $description, $category, $listingType, $seller_id);
 
@@ -198,7 +198,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $item_id = $db->insert_id;
 
             if (!empty($savedImages)) {
-                $imageQuery = "INSERT INTO ITEMIMAGE (image_path, item_id) VALUES (?, ?)";
+                $imageQuery = "INSERT INTO itemimage (image_path, item_id) VALUES (?, ?)";
                 $imageStmt = $db->prepare($imageQuery);
                 foreach ($savedImages as $path) {
                     $imageStmt->bind_param("si", $path, $item_id);
@@ -207,13 +207,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             if($listingType == 'bid') {
-                $bidQuery = "INSERT INTO BIDITEM (item_id, starting_price, start_date, end_date, bid_increment_percent)
+                $bidQuery = "INSERT INTO biditem (item_id, starting_price, start_date, end_date, bid_increment_percent)
                             VALUES (?, ?, NOW(), ?, ?)";
                 $bidStmt = $db->prepare($bidQuery);
                 $bidStmt->bind_param("idss", $item_id, $starting_price, $end_date_mysql, $bid_increment_percent);
                 if(!$bidStmt->execute()) throw new Exception("Failed to create bid item.");
             } else {
-                $swapQuery = "INSERT INTO SWAPITEM (item_id) VALUES (?)";
+                $swapQuery = "INSERT INTO swapitem (item_id) VALUES (?)";
                 $swapStmt = $db->prepare($swapQuery);
                 $swapStmt->bind_param("i", $item_id);
                 if(!$swapStmt->execute()) throw new Exception("Failed to create swap item.");
