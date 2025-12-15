@@ -2,19 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateDate();
     fetchDashboardStats();
     initActivityChart(); // <--- Initialize the Graph
-    fetch('header.html')
-    .then(response => response.text())
-    .then(data => {
-        document.getElementById('header').innerHTML = data;
-        const logoutBtn = document.getElementById('logoutBtn');
-        if(logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                localStorage.clear();
-                const currentIP = window.location.hostname; 
-                window.location.href = `http://${currentIP}/BidOps/client/login.html`;
-            });
-        }
-    });
+
 });
 
 function updateDate() {
