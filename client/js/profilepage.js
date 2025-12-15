@@ -1,5 +1,5 @@
-import { loadTransactions } from "./transactions";
-import { loadRatings } from "./feedbacks";
+import { loadTransactions } from "./transactions.js";
+import { loadRatings } from "./feedbacks.js";
 document.addEventListener('DOMContentLoaded', function () {
   fetch("header.html")
     .then(response => response.text())
