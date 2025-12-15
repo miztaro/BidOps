@@ -56,21 +56,34 @@ Run the following commands to install Apache, MySQL, PHP, and Node.js.
 Follow these steps to deploy the application code and database.
 
 STEP 1: DEPLOY CODE TO APACHE PHP (USER MODULE)
-   1. Clone the repo (or copy files):
-      $ git clone -b finals https://github.com/miztaro/BidOps.git
+   1. Create the project directory:
+      $ sudo mkdir -p /var/www/html/
       
-   2. Create the project directory:
-      $ sudo mkdir -p /var/www/html/BidOps
+   2. Go to the project directory:
+      $ cd /var/www/html/
+   3. Clone the repo (or copy files):
+      $ sudo git clone -b finals https://github.com/miztaro/BidOps.git   
 
-   3. Move the project files:
-      $ sudo cp -r BidOps/* /var/www/html/BidOps/
-
-   4. Set Permissions (Crucial for file uploads):
+   3. Set Permissions (Crucial for file uploads):
+      $ sudo chown -R $USER:$USER /var/www/html/BidOps
       $ sudo chown -R www-data:www-data /var/www/html/BidOps
       $ sudo chmod -R 755 /var/www/html/BidOps
       $ sudo chmod -R 777 /var/www/html/BidOps/server/item/uploads
 
-STEP 2: START THE NODE.JS SERVER (ADMIN MODULE)
+
+STEP 2: DATABASE SETUP
+   1. Start MySQL and enable it:
+      $ sudo systemctl start mysql
+      $ sudo systemctl enable mysql
+
+   2. Create the Database and Import Data:
+      $ sudo mysql -u root < /var/www/html/BidOps/database/bidops.sql
+
+   3. Configure Database Password (If needed):
+      Ensure /var/www/html/BidOps/server/config/database.php matches your 
+      Ubuntu MySQL credentials (default is often no password or 'root').
+
+STEP 3: START THE NODE.JS SERVER (ADMIN MODULE)
    *Note: This must be done in the 'admin-server' folder where package.json exists.*
 
    1. Navigate to the Admin Server folder:
@@ -93,19 +106,7 @@ STEP 2: START THE NODE.JS SERVER (ADMIN MODULE)
       
    (Keep this terminal open, or use 'nohup node server.js &' to run in background).
 
-STEP 3: DATABASE SETUP
-   1. Start MySQL and enable it:
-      $ sudo systemctl start mysql
-      $ sudo systemctl enable mysql
-
-   2. Create the Database and Import Data:
-      $ sudo mysql -u root < /var/www/html/BidOps/database/bidops.sql
-
-   3. Configure Database Password (If needed):
-      Ensure /var/www/html/BidOps/server/config/database.php matches your 
-      Ubuntu MySQL credentials (default is often no password or 'root').
-
-6. TESTING GUIDE
+4. TESTING GUIDE
 ------------------------------------------------------------------------------
 Use your Host Machine (Windows) or Phone connected to the same WiFi.
 Replace <UBUNTU_IP> with the address found using `ip a`.
@@ -120,7 +121,7 @@ TEST SCENARIO B: ADMIN MODULE (NodeJS)
    2. Action: Log in (or access directly via PHP redirect).
    3. Verification: Check that the dashboard loads.
 
-6. CREDENTIALS
+5. CREDENTIALS
 ------------------------------------------------------------------------------
 [ STANDARD USER ]
 - Username:    John
@@ -130,7 +131,7 @@ TEST SCENARIO B: ADMIN MODULE (NodeJS)
 - Username:    superadmin  
 - Password:    adminpass (Update based on your DB)
 
-7. TROUBLESHOOTING
+6. TROUBLESHOOTING
 ------------------------------------------------------------------------------
 - "Cannot GET /": Check if you are accessing port 3000.
 - Node Modules Missing: Run `npm install` specifically inside the `admin-server` folder.

@@ -1,5 +1,5 @@
-import { loadTransactions } from "./transactions.js";
-import { loadRatings } from "./feedbacks.js";
+import { loadTransactions } from "./transactions";
+import { loadRatings } from "./feedbacks";
 document.addEventListener('DOMContentLoaded', function () {
   fetch("header.html")
     .then(response => response.text())
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
   //User Profile Data & Functions
   async function fetchUserInfo() {
     try {
-      const response = await fetch("/bidops/server/user/get_user_info.php", {
+      const response = await fetch("../server/user/get_user_info.php", {
         method: "GET",
         credentials: "include",
       });
@@ -107,24 +107,16 @@ document.addEventListener('DOMContentLoaded', function () {
     return canvas.toDataURL("image/png");
   }
 
-function applyUserAvatar(username) {
+  function applyUserAvatar(username) {
     const avatar = generateProfilePicture(username);
 
     if (!avatar) return;
 
-    // 1. Update Main Profile Page Image
     const mainImg = document.getElementById("profilePicture");
     if (mainImg) mainImg.src = avatar;
 
-    // 2. Update Sidebar Thumbnail
     const thumbImg = document.querySelector("#profile-user-info-btn .profile-avatar");
     if (thumbImg) thumbImg.src = avatar;
-
-    // 3. NEW: Update Header Image
-    const headerImg = document.getElementById("user-header-profile-icon");
-    if (headerImg) {
-        headerImg.src = avatar; 
-    }
   }
 
   function stringToColor(str) {
@@ -143,7 +135,7 @@ function applyUserAvatar(username) {
     if (!newUsername) return alert("Username cannot be empty.");
 
     try {
-      const response = await fetch("/bidops/server/user/update_user_info.php", {
+      const response = await fetch("../server/user/update_user_info.php", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -177,7 +169,7 @@ function applyUserAvatar(username) {
     if (!newPassword) return alert("Password cannot be empty.");
 
     try {
-      const response = await fetch("/bidops/server/user/update_user_info.php", {
+      const response = await fetch("../server/user/update_user_info.php", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -209,7 +201,7 @@ function applyUserAvatar(username) {
     if (!confirmed) return;
 
     try {
-      const response = await fetch("/bidops/server/user/update_user_info.php", {
+      const response = await fetch("../server/user/update_user_info.php", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -266,7 +258,7 @@ function applyUserAvatar(username) {
   //Listings Data & Functions
   let listings = [];
   function fetchListings() {
-    fetch('/bidops/server/item/get_items.php', {
+    fetch('../server/item/get_items.php', {
       method: 'GET',
       credentials: 'include'
     })
@@ -372,7 +364,7 @@ function applyUserAvatar(username) {
   //Winning Bids Data & Functions 
   let winningBids = [];
   function fetchWinningBids() {
-    fetch('/bidops/server/item/get_transactions.php', {
+    fetch('../server/item/get_transactions.php', {
       method: 'GET',
       credentials: 'include'
     })
@@ -447,7 +439,7 @@ function applyUserAvatar(username) {
 
   let swappedItems = [];
   function fetchSwappedItems() {
-    fetch('/bidops/server/item/get_transactions.php', {
+    fetch('../server/item/get_transactions.php', {
       method: 'GET',
       credentials: 'include'
     })

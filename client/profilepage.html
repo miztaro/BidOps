@@ -14,22 +14,23 @@
     <script src="js/client-guard.js"></script>
 </head>
 
-<div class="swap-modal-overlay" id="swap-modal" style="display: none;">
-    <div class="swap-modal-content">
-
-        <span class="swap-modal-close" id="closeSwapModal">&times;</span>
-
-        <h2>Swap Item Details</h2>
-
-        <div id="swap-modal-body">
-
-        </div>
-
-    </div>
-</div>
 
 <body>
     <div id="header"></div>
+    <div class="swap-modal-overlay" id="swap-modal" style="display: none;">
+        <div class="swap-modal-content">
+
+            <span class="swap-modal-close" id="closeSwapModal">&times;</span>
+
+            <h2>Swap Item Details</h2>
+
+            <div id="swap-modal-body">
+
+            </div>
+
+        </div>
+    </div>
+
     <main class="profile-section">
         <section class="left-nav-menu ">
             <button class="back-home" id="back-home"><iconify-icon icon="line-md:arrow-left" width="34"
@@ -104,7 +105,7 @@
                     <button id="sign-out-btn" class="button-sign-out">Sign Out</button>
                 </div>
             </div>
-
+            
             <div class="title-container">
                 <h3>My Listings</h3>
                 <div class="analytics"></div>
@@ -666,6 +667,7 @@
         </section>
     </main>
     <div id="footer"></div>
+    <script src="js/header.js"></script> 
     <script type="module" src="js/profilepage.js"></script>
     <script type="module" src="js/feedbacks.js"></script>
     <script type="module" src="js/transactions.js"></script>
