@@ -139,7 +139,7 @@ function handleFormLogin(event) {
     loginBtn.textContent = 'Logging in...';
     loginBtn.disabled = true;
 
-    fetch('/BidOps/server/auth/login.php', {
+    fetch('../server/auth/login.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: username, password: password }),
