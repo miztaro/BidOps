@@ -107,16 +107,24 @@ document.addEventListener('DOMContentLoaded', function () {
     return canvas.toDataURL("image/png");
   }
 
-  function applyUserAvatar(username) {
+function applyUserAvatar(username) {
     const avatar = generateProfilePicture(username);
 
     if (!avatar) return;
 
+    // 1. Update Main Profile Page Image
     const mainImg = document.getElementById("profilePicture");
     if (mainImg) mainImg.src = avatar;
 
+    // 2. Update Sidebar Thumbnail
     const thumbImg = document.querySelector("#profile-user-info-btn .profile-avatar");
     if (thumbImg) thumbImg.src = avatar;
+
+    // 3. NEW: Update Header Image
+    const headerImg = document.getElementById("user-header-profile-icon");
+    if (headerImg) {
+        headerImg.src = avatar; 
+    }
   }
 
   function stringToColor(str) {

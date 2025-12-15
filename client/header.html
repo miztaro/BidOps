@@ -1,31 +1,53 @@
 <link rel="stylesheet" href="tailwind/main-tailwind.css">
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 
+<!-- CSS MAGIC: Automatically hide icon when image loads -->
+<style>
+  /* 1. By default, hide the image */
+  #user-header-profile-icon { display: none; }
+  
+  /* 2. By default, show the icon */
+  #header-default-icon { display: block; }
+
+  /* 3. IF the image has a source (avatar generated), SHOW image */
+  #user-header-profile-icon[src^="data:"] { display: block; }
+
+  /* 4. IF the image is showing, HIDE the icon next to it */
+  #user-header-profile-icon[src^="data:"] + #header-default-icon { display: none; }
+</style>
+
 <header class="main-header">
-  <!-- LEFT: logo image -->
-<div class="header-left">
-  <!-- The link points to homepage.html in the same folder -->
-  <a href="homepage.html">
-    <img id="header-logo" src="../assets/images/HeaderLogo.png" alt="SLU Swap and Bid" class="slu-header-img">
-  </a>
-</div>
-  <!-- RIGHT: icons (top) + search + add button (bottom) -->
+  <div class="header-left">
+    <a href="homepage.html">
+      <img id="header-logo" src="../assets/images/HeaderLogo.png" alt="SLU Swap and Bid" class="slu-header-img">
+    </a>
+  </div>
+
   <div class="header-right">
     <div class="header-icons">
-      <iconify-icon icon="ri:message-3-line" width="25" height="25"></iconify-icon>
-      <iconify-icon id="user-header-profile-icon" icon="gg:profile" width="38" height="38"></iconify-icon>
+      <iconify-icon icon="ri:message-3-line" width="25" height="25" style="cursor: pointer;" onclick="window.location.href='messages.html'"></iconify-icon>
+      
+      <!-- PROFILE LINK -->
+      <a href="profilepage.html" style="text-decoration: none; cursor: pointer; display: flex; align-items: center;">
+        
+        <!-- IMAGE: ID matches profilepage.js requirement -->
+        <img id="user-header-profile-icon" 
+             src="" 
+             alt="Profile" 
+             style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover;">
+        
+        <!-- DEFAULT ICON -->
+        <iconify-icon id="header-default-icon" icon="gg:profile" width="38" height="38" style="color: #333;"></iconify-icon>
+      
+      </a>
     </div>
 
     <div class="header-bottom">
       <div class="header-search">
-        <input type="text" placeholder="Search items, books, equipment..." />
-        <button>
-          <iconify-icon icon="mdi:magnify" width="22"></iconify-icon>
-        </button>
+        <input type="text" placeholder="Search items..." />
+        <button><iconify-icon icon="mdi:magnify" width="22"></iconify-icon></button>
       </div>
-      <button class="add-listing-btn" id="addItemBtn">
-        Add Listing <span>+</span>
-      </button>
+      <button class="add-listing-btn" id="addItemBtn">Add Listing <span>+</span></button>
     </div>
   </div>
 </header>
