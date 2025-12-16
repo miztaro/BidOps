@@ -5,56 +5,56 @@ console.log("Homepage Script loaded");
 const homeBidContainer = document.getElementById("home-bid-cards-list");
 const homeSwapContainer = document.getElementById("home-swap-cards-list");
 
-document.addEventListener("DOMContentLoaded", function() {
-    // 1. Load Header
-    fetch("header.html").then(r => r.text()).then(h => {
-        document.getElementById("header").innerHTML = h;
-        const script = document.createElement("script");
-        script.src = "js/header.js"; 
-        script.defer = true;
-        document.body.appendChild(script);
-        
-        const pIcon = document.getElementById("user-header-profile-icon");
-        if(pIcon) pIcon.addEventListener("click", () => window.location.href = "profilepage.html");
-    });
-    
-    // 2. Load Footer
-    fetch("footer.html").then(r => r.text()).then(f => {
-        document.getElementById("footer").innerHTML = f;
-    });
+document.addEventListener("DOMContentLoaded", function () {
+  // 1. Load Header
+  fetch("header.html").then(r => r.text()).then(h => {
+    document.getElementById("header").innerHTML = h;
+    const script = document.createElement("script");
+    script.src = "js/header.js";
+    script.defer = true;
+    document.body.appendChild(script);
 
-    // 3. Load Items
-    fetchItems(); 
+    const pIcon = document.getElementById("user-header-profile-icon");
+    if (pIcon) pIcon.addEventListener("click", () => window.location.href = "profilepage.html");
+  });
+
+  // 2. Load Footer
+  fetch("footer.html").then(r => r.text()).then(f => {
+    document.getElementById("footer").innerHTML = f;
+  });
+
+  // 3. Load Items
+  fetchItems();
 });
 
 // --- REDIRECTS TO NEW PAGE ---
 
 document.getElementById("bid-view-all").addEventListener("click", () => {
-    window.location.href = "browse-items.html?type=bid";
+  window.location.href = "browse-items.html?type=bid";
 });
 
 document.getElementById("swap-view-all").addEventListener("click", () => {
-    window.location.href = "browse-items.html?type=swap";
+  window.location.href = "browse-items.html?type=swap";
 });
 
 // --- CATEGORY REDIRECTS ---
 
 document.querySelectorAll(".category-card").forEach(card => {
-    const categoryName = card.getAttribute("browse-category");
-    const countElem = card.querySelector("p");
+  const categoryName = card.getAttribute("browse-category");
+  const countElem = card.querySelector("p");
 
-    // Get Item Count
-    fetch(`../server/item/get_items.php?category=${categoryName}`)
-        .then(r => r.json())
-        .then(data => {
-            const count = data.items ? data.items.length : 0;
-            countElem.textContent = `${count} items`;
-        });
-
-    // Click Redirect
-    card.addEventListener("click", () => {
-        window.location.href = `browse-items.html?category=${encodeURIComponent(categoryName)}`;
+  // Get Item Count
+  fetch(`../server/item/get_items.php?category=${categoryName}`)
+    .then(r => r.json())
+    .then(data => {
+      const count = data.items ? data.items.length : 0;
+      countElem.textContent = `${count} items`;
     });
+
+  // Click Redirect
+  card.addEventListener("click", () => {
+    window.location.href = `browse-items.html?category=${encodeURIComponent(categoryName)}`;
+  });
 });
 
 // --- FETCH HOME PREVIEW ITEMS ---
@@ -98,11 +98,12 @@ function createBidCard(bid) {
   bidCard.classList.add("bid-card");
   const priceValue = parseFloat(bid.starting_price || 0);
 
-  const imageContent = bid.images && bid.images.length > 0 
+  const imageContent = bid.images && bid.images.length > 0
     ? `<img src="../server/item/${bid.images[0]}" alt="${bid.title}">`
     : `<div style="background: #073066; height: 100%; display: flex; align-items: center; justify-content: center; color: white;"><iconify-icon icon="mdi:package-variant" width="50" height="50"></iconify-icon></div>`;
 
   bidCard.innerHTML = `
+        <div class="img-container">${imageContent}</div>
         <div class="bottom">
             <h6>${bid.title}</h6>
             <p class="category">${bid.category_type}</p>
