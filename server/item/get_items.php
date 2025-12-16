@@ -21,6 +21,13 @@ header("Access-Control-Allow-Credentials: true");
 
 include_once '../config/database.php';
 
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Please login']);
+    exit;
+}
+
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 // Create mysqli connection
 $database = new Database();
@@ -64,6 +71,12 @@ try {
     $types = '';
     $params = [];
 
+    if ($user_id) {
+        $query .= " AND i.seller_id != ?";
+        $types .= 's';
+        $params[] = $user_id;
+    }
+    
     if (!empty($category) && $category != 'All Programs') {
         $query .= " AND i.category_type = ?";
         $types .= 's';
@@ -127,8 +140,6 @@ try {
     
     // --- START: CORRECTED LISTINGS LOGIC (For My Listings tab) ---
     $listings = [];
-    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-    
     if($user_id){
         $listingQuery = "
             SELECT 
