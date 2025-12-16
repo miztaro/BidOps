@@ -257,6 +257,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   //Listings Data & Functions
   let listings = [];
+  const bidBtn = document.getElementById("filter-bid-btn");
+  const swapBtn = document.getElementById("filter-swap-btn");
+  const tbody = document.querySelector("#profile-listings-content table tbody");
+  let currentMode;
+
   function fetchListings() {
     fetch('../server/item/get_items.php', {
       method: 'GET',
@@ -278,22 +283,22 @@ document.addEventListener('DOMContentLoaded', function () {
           dateListed: item.created_date,
           status: item.status,
         }));
-        renderItems(listings, "listings");
-        const listingsBtnCounter = document.querySelector("#profile-listings-btn p");
-        if (listingsBtnCounter) listingsBtnCounter.textContent = `${listings.length} Items`;
 
-        if (data.categories) {
-          const categoryDropdown = document.getElementById("categoryDropdown");
-          categoryDropdown.innerHTML = `<p class="dropDown-item">All Categories</p>`; // reset
+        currentMode = listings.length > 0 ? listings[0].mode : 'bid';
+        renderListings(currentMode);
+        setupToggleButtons();
 
-          data.categories.forEach(cat => {
-            const p = document.createElement("p");
-            p.className = "dropDown-item";
-            p.textContent = cat;
-            categoryDropdown.appendChild(p);
-          });
-          attachDropDownItemListeners();
+        if (currentMode === 'bid') {
+          bidBtn.classList.add("active");
+          swapBtn.classList.remove("active");
+        } else {
+          swapBtn.classList.add("active");
+          bidBtn.classList.remove("active");
         }
+
+        const listingsBtnCounter = document.querySelector("#profile-listings-btn p");
+        if (listingsBtnCounter) listingsBtnCounter.textContent = `${listings.length} ${listings.length === 1 ? "Item" : "Items"}`;
+
       })
       .catch(error => console.error("Error loading listings: ", error));
   }
@@ -358,6 +363,41 @@ document.addEventListener('DOMContentLoaded', function () {
     `;
     return analytics;
   }
+
+  function renderListings(mode) {
+    tbody.innerHTML = '';
+
+    const filtered = listings.filter(item => item.mode.toLowerCase() === mode.toLowerCase());
+
+    if (filtered.length === 0) {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td colspan="6" style="text-align:center;">No ${mode} listings available</td>`;
+      tbody.appendChild(row);
+    } else {
+      filtered.forEach(listing => {
+        tbody.appendChild(createListingRow(listing));
+      });
+    }
+  }
+
+  function toggleView(viewType) {
+    currentMode = viewType;
+
+    if (viewType === 'bid') {
+      bidBtn.classList.add("active");
+      swapBtn.classList.remove("active");
+    } else {
+      swapBtn.classList.add("active");
+      bidBtn.classList.remove("active");
+    }
+    renderListings(viewType);
+  }
+
+  function setupToggleButtons() {
+    bidBtn.addEventListener("click", () => toggleView('bid'));
+    swapBtn.addEventListener("click", () => toggleView('swap'));
+  }
+
   fetchListings();
   //End of Listings Data & Functions
 
@@ -386,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function () {
           });
           renderItems(winningBids, "bids");
           const bidsBtnCounter = document.querySelector("#profile-bids-btn p");
-          if (bidsBtnCounter) bidsBtnCounter.textContent = `${winningBids.length} Items`;
+          if (bidsBtnCounter) bidsBtnCounter.textContent = `${winningBids.length} ${winningBids.length === 1 ? "Item" : "Items"}`;
         } else {
           console.error('Failed to fetch transactions:', data.message);
         }
@@ -460,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function () {
           });
           renderItems(swappedItems, "swaps");
           const swapsBtnCounter = document.querySelector("#profile-swaps-btn p");
-          if (swapsBtnCounter) swapsBtnCounter.textContent = `${swappedItems.length} Items`;
+          if (swapsBtnCounter) swapsBtnCounter.textContent = `${swappedItems.length} ${swappedItems.length === 1 ? "Item" : "Items"}`;
         } else {
           console.error('Failed to fetch transactions:', data.message);
         }
@@ -575,7 +615,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (id === "profile-transactions-content") {
       loadTransactions();
-    } else if (id === "profile-feedback-content"){
+    } else if (id === "profile-feedback-content") {
       loadRatings();
     }
   }
@@ -586,12 +626,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // ---------------- RENDERING & FILTERING OF ITEMS ----------------
-
-  let sectionFilters = {
-    listings: { Category: null, Mode: null, Status: null },
-    bids: { Category: null, Mode: null, Status: null },
-    swaps: { Category: null, Mode: null, Status: null },
-  };
 
   // Rendering of items to display (only renders for the target section)
   function renderItems(itemsArray, section) {
@@ -615,163 +649,7 @@ document.addEventListener('DOMContentLoaded', function () {
         swapsBody.appendChild(row);
       }
     });
-
-    // if (section === "listings") {
-    //   updateTitleForSection("profile-listings-content");
-    // }
   }
-
-  function applyFilter(type, value, section) {
-    const currentFilters = sectionFilters[section];
-
-    type = type.toLowerCase();
-
-    if (type === "Category" && value === "All Categories") {
-      currentFilters.Category = null;
-    } else if (type === "category") {
-      currentFilters.Category = value;
-    } else if (type === "mode" && value.toLowerCase() === "all") {
-      currentFilters.Mode = null;
-    } else if (type === "mode") {
-      currentFilters.Mode = value;
-    } else if (type === "status" && value.toLowerCase() === "all") {
-      currentFilters.Status = null;
-    } else if (type === "status") {
-      currentFilters.Status = value;
-    }
-
-    let data = [];
-    if (section === "listings") data = listings;
-    else if (section === "bids") data = winningBids;
-    else if (section === "swaps") data = swappedItems;
-
-    const filtered = data.filter(item => {
-      return (
-        (!currentFilters.Category || item.category.toLowerCase() === currentFilters.Category.toLowerCase()) &&
-        (!currentFilters.Mode || item.mode.toLowerCase() === currentFilters.Mode.toLowerCase()) &&
-        (!currentFilters.Status || item.status.toLowerCase() === currentFilters.Status.toLowerCase())
-      );
-    });
-
-    renderItems(filtered, section);
-  }
-
-
-  // ---------------- DROPDOWN HANDLING ----------------
-
-  // LISTINGS
-  const listingsFilterBtn = document.getElementById("listings-filter-btn");
-  const listingsFilterDropdown = document.querySelector(".listings-filter-dropdown");
-
-  listingsFilterBtn.addEventListener("click", (event) => {
-    event.stopPropagation();
-    listingsFilterDropdown.classList.toggle("active");
-    listingsFilterBtn.classList.toggle("active");
-  });
-
-  // BIDS
-  const bidsFilterBtn = document.getElementById("bids-filter-btn");
-  const bidsFilterDropdown = document.querySelector(".bids-filter-dropdown");
-
-  bidsFilterBtn.addEventListener("click", (event) => {
-    event.stopPropagation();
-    bidsFilterDropdown.classList.toggle("active");
-    bidsFilterBtn.classList.toggle("active");
-  });
-
-  // SWAPS
-  const swapsFilterBtn = document.getElementById("swaps-filter-btn");
-  const swapsFilterDropdown = document.querySelector(".swaps-filter-dropdown");
-
-  swapsFilterBtn.addEventListener("click", (event) => {
-    event.stopPropagation();
-    swapsFilterDropdown.classList.toggle("active");
-    swapsFilterBtn.classList.toggle("active");
-  });
-
-  const allFilterBtns = document.querySelectorAll(".listings-filter-btn, .bids-filter-btn, .swaps-filter-btn");
-  const allFilterDropdowns = document.querySelectorAll(".listings-filter-dropdown, .bids-filter-dropdown, .swaps-filter-dropdown");
-  const filterHeaders = document.querySelectorAll(".dropDown-header");
-  const showAllBtns = document.querySelectorAll(".show-all");
-  const subDropDownItems = document.querySelectorAll(".sub-dropdown .dropDown-item");
-
-  // Handle dropdown header click
-  filterHeaders.forEach(header => {
-    header.addEventListener("click", (event) => {
-      event.stopPropagation();
-      const subDropDown = header.nextElementSibling;
-      const isOpen = subDropDown.classList.contains("show");
-
-      document.querySelectorAll(".sub-dropdown").forEach(sd => sd.classList.remove("show"));
-      filterHeaders.forEach(h => h.classList.remove("active"));
-
-      if (!isOpen) {
-        subDropDown.classList.add("show");
-        header.classList.add("active");
-      }
-    });
-  });
-
-  // Handle clicks outside of dropdowns
-  document.addEventListener("click", (event) => {
-    const isClickInsideDropdown = Array.from(allFilterDropdowns).some(dropdown =>
-      dropdown.contains(event.target)
-    );
-    const isClickOnBtn = Array.from(allFilterBtns).some(btn =>
-      btn === event.target
-    );
-
-    if (!isClickInsideDropdown && !isClickOnBtn) {
-      allFilterDropdowns.forEach(dropdown => dropdown.classList.remove("active"));
-      allFilterBtns.forEach(btn => btn.classList.remove("active"));
-      document.querySelectorAll(".sub-dropdown").forEach(sd => sd.classList.remove("show"));
-      filterHeaders.forEach(h => h.classList.remove("active"));
-    }
-  });
-
-  function attachDropDownItemListeners() {
-    document.querySelectorAll(".sub-dropdown .dropDown-item").forEach(item => {
-      item.addEventListener("click", (event) => {
-        event.stopPropagation();
-        const selectedText = item.textContent.trim();
-        const filterType = item.closest(".dropdown-section")
-          .querySelector(".dropDown-header")
-          .textContent.trim()
-          .toLowerCase();
-        let section = "listings";
-        if (item.closest(".bids-filter-dropdown")) section = "bids";
-        else if (item.closest(".swaps-filter-dropdown")) section = "swaps";
-
-        applyFilter(filterType, selectedText, section);
-        allFilterDropdowns.forEach(dropdown => dropdown.classList.remove("active"));
-        allFilterBtns.forEach(btn => btn.classList.remove("active"));
-        document.querySelectorAll(".sub-dropdown").forEach(sd => sd.classList.remove("show"));
-        filterHeaders.forEach(h => h.classList.remove("active"));
-      });
-    });
-  }
-
-  // Handle “Show All” for each section
-  showAllBtns.forEach(btn => {
-    btn.addEventListener("click", (event) => {
-      event.stopPropagation();
-
-      allFilterDropdowns.forEach(dropdown => dropdown.classList.remove("active"));
-      allFilterBtns.forEach(btn => btn.classList.remove("active"));
-      document.querySelectorAll(".sub-dropdown").forEach(sd => sd.classList.remove("show"));
-
-      if (btn.closest(".listings-filter")) {
-        sectionFilters.listings = { Category: null, Mode: null, Status: null };
-        renderItems(listings, "listings");
-      } else if (btn.closest(".bids-filter")) {
-        sectionFilters.bids = { Category: null, Mode: null, Status: null };
-        renderItems(winningBids, "bids");
-      } else if (btn.closest(".swaps-filter")) {
-        sectionFilters.swaps = { Category: null, Mode: null, Status: null };
-        renderItems(swappedItems, "swaps");
-      }
-    });
-  });
 });
 
 let currentSwapItemId = null;

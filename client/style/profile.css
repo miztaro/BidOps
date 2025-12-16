@@ -18,14 +18,14 @@ html {
 }
 
 .left-nav-menu {
-  /* Default: small screens */
-  @apply inline-grid flex-[3] w-[90%] p-0 pb-[30px] pl-[15px] pr-0 gap-[10px] mx-auto;
+    /* Default: small screens */
+    @apply inline-grid flex-[3] w-[90%] p-0 pb-[30px] pl-[15px] pr-0 gap-[10px] mx-auto;
 
-  /* Medium screens */
-  @apply md:inline-grid md:flex-[2] md:pl-[25px] md:gap-[10px] md:w-full;
+    /* Medium screens */
+    @apply md:inline-grid md:flex-[2] md:pl-[25px] md:gap-[10px] md:w-full;
 
-  /* Large screens */
-  @apply lg:inline-grid lg:flex-[1] lg:pl-[30px] lg:gap-[15px];
+    /* Large screens */
+    @apply lg:inline-grid lg:flex-[1] lg:pl-[30px] lg:gap-[15px];
 }
 
 .left-nav-menu .back-home {
@@ -145,11 +145,11 @@ html {
 }
 
 .profile-section .right-side {
-  /* Default: small screens → hidden */
-  @apply hidden;
+    /* Default: small screens → hidden */
+    @apply hidden;
 
-  /* Large screens → flex container, column layout, padding, gap, and flex grow */
-  @apply lg:flex lg:flex-[4.5] lg:flex-col lg:p-0 lg:pr-[30px] lg:pb-[30px] lg:gap-[10px];
+    /* Large screens → flex container, column layout, padding, gap, and flex grow */
+    @apply lg:flex lg:flex-[4.5] lg:flex-col lg:p-0 lg:pr-[30px] lg:pb-[30px] lg:gap-[10px];
 }
 
 .right-side .title-container {
@@ -186,7 +186,7 @@ html {
     font-family: 'Montserrat-Regular', sans-serif;
 }
 
-.title-container .analytics>div:first-child{
+.title-container .analytics>div:first-child {
     background-color: var(--primary);
     color: var(--primary-white);
 }
@@ -243,29 +243,55 @@ title-container .analytics>div:first-child p {
 .profile-listings-content .table-container table thead,
 .profile-bids-content .table-container table thead,
 .profile-swaps-content .table-container table thead {
-    top: 0;
-    position: sticky;
+    /* top: 0;
+    position: sticky; */
     z-index: 20;
     background-color: var(--primary-base);
 }
 
-
 .profile-listings-content .table-container table th,
 .profile-bids-content .table-container table th,
 .profile-swaps-content .table-container table th {
+    position: sticky;
+    top: 0;
+
     font-size: 1em;
     font-family: 'Montserrat-Bold', sans-serif;
     color: var(--primary);
     padding-bottom: 10px;
 }
 
-.profile-listings-content .table-container table th.listings-filter,
-.profile-bids-content .table-container table th.bids-filter,
-.profile-swaps-content .table-container table th.swaps-filter {
+.profile-listings-content .table-container .listings-filter-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 15px;
+}
+
+.listings-filter-container  .filter-bid-btn,
+.listings-filter-container  .filter-swap-btn {
+    padding: 5px 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--primary);
+    border-radius: 20px;
+    color: var(--primary);
+    background-color: transparent;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.3s ease-in;
+}
+
+.listings-filter-container .filter-bid-btn:hover,
+.listings-filter-container .filter-swap-btn:hover {
+    background-color: var(--primary);
+    color: var(--primary-white);
+}
+.listings-filter-container .filter-bid-btn.active,
+.listings-filter-container .filter-swap-btn.active{
+    background-color: var(--primary);
+    color: var(--primary-white);
 }
 
 .profile-listings-content .table-container table .listings-body-row,
@@ -318,150 +344,6 @@ title-container .analytics>div:first-child p {
 .profile-listings-content .table-container table .listings-body-row .status.sold-items {
     background-color: #8C8A8A;
 }
-
-
-.listings-filter-container,
-.bids-filter-container,
-.swaps-filter-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.listings-filter-btn,
-.bids-filter-btn,
-.swaps-filter-btn,
-.transactions {
-    padding: 3px 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid var(--primary);
-    border-radius: 20px;
-    color: var(--primary);
-    background-color: transparent;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: 0.3s ease-in;
-
-}
-
-.listings-filter-btn:hover,
-.bids-filter-btn:hover,
-.swaps-filter-btn:hover {
-    background-color: var(--primary);
-    color: var(--primary-white);
-}
-
-.show-all {
-    font-size: 0.8em;
-    font-family: 'Montserrat-Regular', sans-serif;
-    cursor: pointer;
-    transition: 0.5s ease;
-    margin: 0;
-    justify-content: center;
-}
-
-.show-all:hover {
-    color: var(--primary-red);
-}
-
-.listings-filter-dropdown,
-.bids-filter-dropdown,
-.swaps-filter-dropdown {
-    position: absolute;
-    top: 28%;
-    left: 90%;
-    transform: translateX(-50%);
-    width: 250px;
-    background-color: var(--primary-white);
-    border: 1px solid var(--primary);
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    display: none;
-    flex-direction: column;
-    z-index: 9999;
-    max-height: 280px;
-    overflow-y: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    scroll-behavior: smooth;
-}
-
-.listings-filter-dropdown::-webkit-scrollbar,
-.bids-filter-dropdown::-webkit-scrollbar,
-.swaps-filter-dropdown::-webkit-scrollbar {
-    display: none;
-}
-
-
-.listings-filter-dropdown.active,
-.bids-filter-dropdown.active,
-.swaps-filter-dropdown.active {
-    display: flex;
-    animation: fadeIn 0.25s ease-in-out;
-}
-
-.dropdown-section .dropDown-header {
-    font-size: 1em;
-    font-family: 'Montserrat-Bold', sans-serif;
-    background-color: var(--primary-white);
-    padding: 8px 10px;
-    color: var(--primary);
-    margin: 0;
-    cursor: pointer;
-    border-top: 1px solid #eee;
-}
-
-.dropdown-section .dropDown-header:hover {
-    background-color: #eee;
-}
-
-.dropdown-section .dropDown-header.active {
-    background-color: var(--primary);
-    color: var(--primary-white);
-}
-
-.dropdown-section:first-child .dropDown-header {
-    border-top: none;
-}
-
-.sub-dropdown {
-    display: none;
-    flex-direction: column;
-    background-color: var(--primary-white);
-    border-top: 1px solid #eee;
-}
-
-.sub-dropdown .dropDown-item {
-    padding: 8px 10px;
-    cursor: pointer;
-    font-size: 0.8em;
-    transition: background 0.2s ease;
-    color: black;
-    font-family: 'Montserrat-Regular', sans-serif;
-}
-
-.sub-dropdown .dropDown-item:hover {
-    background-color: #eee;
-}
-
-.sub-dropdown.show {
-    display: flex;
-    animation: fadeIn 0.25s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
 
 .profile-listings-content table .listings-body-row td,
 .profile-bids-content table .bids-body-row td,
@@ -533,7 +415,7 @@ title-container .analytics>div:first-child p {
     border: 2px solid var(--primary);
 }
 
-.profile-user-info-content .user-img-container .profile-avatar{
+.profile-user-info-content .user-img-container .profile-avatar {
     object-fit: cover;
     height: 100%;
     width: 100%;
@@ -546,7 +428,7 @@ title-container .analytics>div:first-child p {
 
 .user-info-container #user-name-container,
 .user-info-container #user-id-container,
-.user-info-container #user-email-container{
+.user-info-container #user-email-container {
     display: flex;
     justify-content: space-between;
     width: 450px;
@@ -573,7 +455,7 @@ title-container .analytics>div:first-child p {
 }
 
 .user-info-container #user-id-container #user-id,
-.user-info-container #user-email-container #user-email{
+.user-info-container #user-email-container #user-email {
     font-family: 'Montserrat-SemiBold', sans-serif;
     font-size: 1em;
 }
@@ -593,7 +475,7 @@ title-container .analytics>div:first-child p {
     transition: 0.5s ease-in-out;
 }
 
-.user-info-container #change-pass-btn:hover{
+.user-info-container #change-pass-btn:hover {
     background-color: var(--primary);
     color: var(--primary-white);
 }
@@ -607,7 +489,7 @@ title-container .analytics>div:first-child p {
 }
 
 .profile-buttons-container #sign-out-btn,
-.profile-buttons-container #delete-btn{
+.profile-buttons-container #delete-btn {
     padding: 10px 15px;
     border-radius: 20px;
     border: 1px solid var(--primary);
@@ -619,7 +501,7 @@ title-container .analytics>div:first-child p {
 
 .user-info-container #change-pass-btn:hover,
 .profile-buttons-container #delete-btn:hover,
-.profile-buttons-container #sign-out-btn:hover{
+.profile-buttons-container #sign-out-btn:hover {
     background-color: var(--primary);
     color: var(--primary-white);
 }

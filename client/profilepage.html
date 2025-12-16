@@ -50,18 +50,18 @@
                 <iconify-icon class="listings-logo" icon="material-symbols:list-rounded" width="34"
                     height="34"></iconify-icon>
                 <h6>My Listings</h6>
-                <p>0 Items</p>
+                <p>No Item</p>
             </button>
             <button id="profile-bids-btn" class="bids-btn">
                 <iconify-icon class="bids-logo" icon="material-symbols:bid-landscape-rounded" width="34"
                     height="34"></iconify-icon>
                 <h6>My Winning Bids</h6>
-                <p>0 Items</p>
+                <p>No Item</p>
             </button>
             <button id="profile-swaps-btn" class="swaps-btn">
                 <iconify-icon class="swaps-logo" icon="ph:swap-bold" width="34" height="34"></iconify-icon>
                 <h6>My Swapped Items</h6>
-                <p>0 Items</p>
+                <p>No Item</p>
             </button>
             <button id="profile-feedbacks-btn" class="feedbacks-btn">
                 <iconify-icon class="feedbacks-logo" icon="mdi:star-circle" width="34" height="34"></iconify-icon>
@@ -105,7 +105,7 @@
                     <button id="sign-out-btn" class="button-sign-out">Sign Out</button>
                 </div>
             </div>
-            
+
             <div class="title-container">
                 <h3>My Listings</h3>
                 <div class="analytics"></div>
@@ -121,13 +121,11 @@
                                 <th>Mode</th>
                                 <th>Date Listed</th>
                                 <th>Status</th>
-                                <th class="listings-filter">
+                                <th>
                                     <div class="listings-filter-container">
-                                        <button id="listings-filter-btn" class="listings-filter-btn"><iconify-icon
-                                                icon="flowbite:filter-outline" width="24"
-                                                height="24"></iconify-icon></button>
+                                        <button id="filter-bid-btn" class="filter-bid-btn">Bid</button>
+                                        <button id="filter-swap-btn" class="filter-swap-btn">Swap</button>
                                     </div>
-                                    <p class="show-all">Clear filter</p>
                                 </th>
                             </tr>
                         </thead>
@@ -135,32 +133,6 @@
                             <!-- <tr class="listings-body-row" id="listings-body-row"></tr> -->
                         </tbody>
                     </table>
-                </div>
-                <div class="listings-filter-dropdown">
-                    <div class="dropdown-section">
-                        <h6 class="dropDown-header">Category</h6>
-                        <div class="sub-dropdown">
-                            <p class="dropDown-item" id="categoryDropdown">All Categories</p>
-                        </div>
-                    </div>
-
-                    <div class="dropdown-section">
-                        <h6 class="dropDown-header">Mode</h6>
-                        <div class="sub-dropdown">
-                            <p class="dropDown-item">Swap</p>
-                            <p class="dropDown-item">Bid</p>
-                        </div>
-                    </div>
-
-                    <div class="dropdown-section">
-                        <h6 class="dropDown-header">Status</h6>
-                        <div class="sub-dropdown">
-                            <p class="dropDown-item">Active</p>
-                            <p class="dropDown-item">Pending_Approval</p>
-                            <p class="dropDown-item">Approval_Rejected</p>
-                            <p class="dropDown-item">Sold</p>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -174,31 +146,6 @@
                                 <th>Winning Bid</th>
                                 <th>Vendor</th>
                                 <th>Date Won</th>
-                                <th class="bids-filter">
-                                    <div class="bids-filter-container">
-                                        <button id="bids-filter-btn" class="bids-filter-btn"><iconify-icon
-                                                icon="flowbite:filter-outline" width="24"
-                                                height="24"></iconify-icon></button>
-                                        <div class="bids-filter-dropdown">
-                                            <div class="dropdown-section">
-                                                <h6 class="dropDown-header">Programs</h6>
-                                                <div class="sub-dropdown">
-                                                    <p class="dropDown-item">All Categories</p>
-                                                    <p class="dropDown-item">Accessories</p>
-                                                    <p class="dropDown-item">Collectibles</p>
-                                                    <p class="dropDown-item">Electronics</p>
-                                                    <p class="dropDown-item">Fashion</p>
-                                                    <p class="dropDown-item">Gaming</p>
-                                                    <p class="dropDown-item">Home</p>
-                                                    <p class="dropDown-item">Photography</p>
-                                                    <p class="dropDown-item">Sports</p>
-                                                    <p class="dropDown-item">Toys</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p class="show-all">Clear Filter</p>
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -217,31 +164,6 @@
                                 <th>Category</th>
                                 <th>Date Swapped</th>
                                 <th>Vendor</th>
-                                <th class="swaps-filter">
-                                    <div class="swaps-filter-container">
-                                        <button id="swaps-filter-btn" class="swaps-filter-btn"><iconify-icon
-                                                icon="flowbite:filter-outline" width="24"
-                                                height="24"></iconify-icon></button>
-                                        <div class="swaps-filter-dropdown">
-                                            <div class="dropdown-section">
-                                                <h6 class="dropDown-header">Categories</h6>
-                                                <div class="sub-dropdown">
-                                                    <p class="dropDown-item">All Categories</p>
-                                                    <p class="dropDown-item">Accessories</p>
-                                                    <p class="dropDown-item">Collectibles</p>
-                                                    <p class="dropDown-item">Electronics</p>
-                                                    <p class="dropDown-item">Fashion</p>
-                                                    <p class="dropDown-item">Gaming</p>
-                                                    <p class="dropDown-item">Home</p>
-                                                    <p class="dropDown-item">Photography</p>
-                                                    <p class="dropDown-item">Sports</p>
-                                                    <p class="dropDown-item">Toys</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p class="show-all">Clear Filter</p>
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -667,7 +589,7 @@
         </section>
     </main>
     <div id="footer"></div>
-    <script src="js/header.js"></script> 
+    <script src="js/header.js"></script>
     <script type="module" src="js/profilepage.js"></script>
     <script type="module" src="js/feedbacks.js"></script>
     <script type="module" src="js/transactions.js"></script>

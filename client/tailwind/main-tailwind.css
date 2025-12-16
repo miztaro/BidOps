@@ -414,6 +414,10 @@ html {
   background-color: var(--primary);
   color: var(--primary-white);
 }
+.listings-filter-container .filter-bid-btn.active, .listings-filter-container .filter-swap-btn.active {
+  background-color: var(--primary);
+  color: var(--primary-white);
+}
 .profile-listings-content .table-container table .listings-body-row, .profile-bids-content .table-container table .bids-body-row, .profile-swaps-content .table-container table .swaps-body-row {
   background-color: var(--primary-white);
   border: 1px solid var(--primary);
