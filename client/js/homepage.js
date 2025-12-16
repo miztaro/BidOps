@@ -25,6 +25,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 3. Load Items
   fetchItems();
+
+  // 4. Load Category Cards
+  loadCategories();
+
 });
 
 // --- REDIRECTS TO NEW PAGE ---
@@ -38,48 +42,82 @@ document.getElementById("swap-view-all").addEventListener("click", () => {
 });
 
 // --- CATEGORY REDIRECTS ---
+async function loadCategories() {
+  try {
+    const categoryButtons = document.querySelectorAll(".category-card");
+    const res = await fetch("../server/item/get_items.php");
+    const data = await res.json();
 
-document.querySelectorAll(".category-card").forEach(card => {
-  const categoryName = card.getAttribute("browse-category");
-  const countElem = card.querySelector("p");
+    const categories = data.categories || [];
 
-  // Get Item Count
-  fetch(`../server/item/get_items.php?category=${categoryName}`)
-    .then(r => r.json())
-    .then(data => {
-      const count = data.items ? data.items.length : 0;
-      countElem.textContent = `${count} items`;
+    categoryButtons.forEach(btn => {
+      const btnCategory = btn.getAttribute("browse-category");
+
+      const cat = categories.find(c => c.name === btnCategory);
+
+      const countElem = btn.querySelector("p");
+      if (countElem) {
+        if (cat && cat.count > 0) {
+          const itemWord = cat.count === 1 ? "item" : "items";
+          countElem.textContent = `${cat.count} ${itemWord}`;
+        } else {
+          countElem.textContent = "No Item";
+        }
+      }
+
+      // Click Redirect
+      btn.addEventListener("click", () => {
+        window.location.href = `browse-items.html?category=${encodeURIComponent(cat.name)}`;
+      });
     });
-
-  // Click Redirect
-  card.addEventListener("click", () => {
-    window.location.href = `browse-items.html?category=${encodeURIComponent(categoryName)}`;
-  });
-});
+  } catch (err) {
+    console.error("Error loading categories:", err);
+  }
+}
 
 // --- FETCH HOME PREVIEW ITEMS ---
+async function fetchItems() {
+  try {
+    const response = await fetch('../server/item/get_items.php');
+    const data = await response.json();
 
-function fetchItems() {
-  fetch('../server/item/get_items.php')
-    .then(response => response.json())
-    .then(data => {
-      const items = data.items || [];
-      const bids = items.filter(item => item.item_type === 'bid');
-      const swaps = items.filter(item => item.item_type === 'swap');
+    const items = data.items || [];
 
-      homeBidContainer.innerHTML = '';
-      homeSwapContainer.innerHTML = '';
+    let bids = items.filter(item => item.item_type === 'bid');
+    let swaps = items.filter(item => item.item_type === 'swap');
 
-      // Only show top 4
-      bids.slice(0, 4).forEach(bid => {
-        homeBidContainer.appendChild(createBidCard(bid));
-      });
+    homeBidContainer.innerHTML = '';
+    homeSwapContainer.innerHTML = '';
 
-      swaps.slice(0, 4).forEach(swap => {
-        homeSwapContainer.appendChild(createSwapCard(swap));
-      });
-    })
-    .catch(error => console.error('Error loading items:', error));
+    // --- Bids ---
+    const availableBidsSection = homeBidContainer.closest(".available-bids");
+    const noBids = homeBidContainer.closest(".available-bids").querySelector("#no-card-text");
+    const bidsTitle = availableBidsSection.querySelector(".available-bids-title");
+    if (bids.length === 0) {
+      noBids.style.display = "flex";
+      if (bidsTitle) bidsTitle.style.display = "none";
+    } else {
+      noBids.style.display = "none";
+      if (bidsTitle) bidsTitle.style.display = "flex";
+      bids.slice(0, 4).forEach(bid => homeBidContainer.appendChild(createBidCard(bid)));
+    }
+
+    // --- Swaps ---
+    const availableSwapsSection = homeSwapContainer.closest(".available-swaps");
+    const noSwaps = homeSwapContainer.closest(".available-swaps").querySelector("#no-card-text");
+    const swapsTitle = availableSwapsSection.querySelector(".available-swaps-title");
+    if (swaps.length === 0) {
+      noSwaps.style.display = "flex";
+       if (swapsTitle) swapsTitle.style.display = "none";
+    } else {
+      noSwaps.style.display = "none";
+      if (swapsTitle) swapsTitle.style.display = "flex"; 
+      swaps.slice(0, 4).forEach(swap => homeSwapContainer.appendChild(createSwapCard(swap)));
+    }
+
+  } catch (error) {
+    console.error('Error loading items:', error);
+  }
 }
 
 // --- CARD CREATION HELPERS ---

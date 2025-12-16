@@ -90,6 +90,18 @@ main{padding: 0;}
     padding: 40px;
 }
 
+.homepage-section .no-card-text{
+    display: flex;
+    align-self: center;
+    justify-content: center;
+}
+
+.homepage-section .no-card-text h3{
+    color: var(--dark-secondary);
+    font-size: 2em;
+    font-family:'Montserrat-Regular',sans-serif;
+}
+
 .available-bids .available-bids-title,
 .available-swaps .available-swaps-title{
     width: 100%;
@@ -425,6 +437,12 @@ main{padding: 0;}
     font-family:'Montserrat-Bold',sans-serif;
     color:#073066;
     text-decoration: none;
+}
+
+.browse-category .category-grid .category-card h6{
+    font-size: 1.3em;
+    color: var(--primary);
+    font-family:'Montserrat-Bold',sans-serif;
 }
 
 .browse-category .category-grid .category-card p{

@@ -204,7 +204,7 @@ function createSwapCard(swap) {
         <div class="top"><div class="offer-wrap"><p>Swap Offer</p></div><p class="posted-items">Recently posted</p></div>
         <div class="img-container">${imgHTML}</div>
         <div class="bottom"><h6>${swap.title}</h6><p>${swap.category_type}</p></div>
-        <div class="button-container"><button class="make-offer-btn"><a href="view-swap.html?item_id=${swap.item_id}">Make Offer</a></button><button class="heart-button-swap"><iconify-icon icon="tabler:heart" width="25"></iconify-icon></button></div>`;
+        <div class="button-container"><button class="make-offer-btn"><a href="view-swap.html?item_id=${swap.item_id}">Make Offer</a></button>`;
     return card;
 }
 
