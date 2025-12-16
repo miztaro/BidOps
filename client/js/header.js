@@ -28,6 +28,7 @@ function loadHeaderAndWatch() {
 function initLogic() {
     initHeaderClicks();
     ensureHeaderUserData();
+    initSearchLogic();
 }
 
 function initHeaderClicks() {
@@ -102,5 +103,41 @@ function applyHeaderAvatar(username) {
     const headerImg = document.getElementById("user-header-profile-icon");
     if (headerImg) {
         headerImg.src = avatarUrl;
+    }
+}
+
+//search
+function initSearchLogic() {
+    // Select the input and button inside the header
+    const searchContainer = document.querySelector('.header-search');
+    if (!searchContainer) return;
+
+    const input = searchContainer.querySelector('input');
+    const button = searchContainer.querySelector('button');
+
+    const performSearch = () => {
+        const query = input.value.trim();
+        if (query) {
+            // Redirect to browse-items.html with the search query in the URL
+            window.location.href = `browse-items.html?search=${encodeURIComponent(query)}`;
+        }
+    };
+
+    // 1. Handle Click on Magnifying Glass
+    if (button) {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            performSearch();
+        });
+    }
+
+    // 2. Handle "Enter" key in input box
+    if (input) {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch();
+            }
+        });
     }
 }

@@ -7,11 +7,30 @@ const bidBtn = document.getElementById("filter-bid-btn");
 const swapBtn = document.getElementById("filter-swap-btn");
 const categoryTitle = document.getElementById("viewAll-category-title");
 const categoryDesc = document.getElementById("viewAll-category-description");
+const categoryBtnText = document.getElementById("viewAll-category-btn"); // To update the button text
 
-// 2. Load Header/Footer
+// GLOBAL STATE
+let currentCategory = "All Categories";
+let currentSearchTerm = "";
+
+// 2. Load Header/Footer & Init Page
 document.addEventListener("DOMContentLoaded", function() {
+    
+    // Check URL Parameters immediately
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get('type'); 
+    const categoryParam = urlParams.get('category');
+    const searchParam = urlParams.get('search'); 
+
+    // Set Global State from URL
+    if (categoryParam) currentCategory = categoryParam;
+    if (searchParam) currentSearchTerm = searchParam;
+
+    // Fetch Header
     fetch("header.html").then(r => r.text()).then(h => {
         document.getElementById("header").innerHTML = h;
+        
+        // Load header logic script
         const script = document.createElement("script");
         script.src = "js/header.js"; 
         script.defer = true;
@@ -21,32 +40,29 @@ document.addEventListener("DOMContentLoaded", function() {
         const pIcon = document.getElementById("user-header-profile-icon");
         if(pIcon) pIcon.addEventListener("click", () => window.location.href = "profilepage.html");
         
-        // Init Search
-        setTimeout(initSearch, 500);
+        // Pre-fill header search input if exists
+        if (currentSearchTerm) {
+            const headerInput = document.querySelector(".header-search input");
+            if (headerInput) headerInput.value = currentSearchTerm;
+        }
+
+        // Init Live Search Listener (for typing in the header)
+        setTimeout(initSearchListener, 500);
     });
 
     fetch("footer.html").then(r => r.text()).then(f => {
         document.getElementById("footer").innerHTML = f;
     });
 
-    // 3. CHECK URL PARAMETERS (The Magic Part)
-    const urlParams = new URLSearchParams(window.location.search);
-    const type = urlParams.get('type'); // 'bid' or 'swap'
-    const category = urlParams.get('category'); // e.g. 'Electronics'
-
-    // Set Active Tab based on URL
+    // Set Active Tab (Bid vs Swap)
     if (type === 'swap') {
         toggleView('swap');
     } else {
         toggleView('bid');
     }
 
-    // Set Category based on URL
-    if (category) {
-        setCategory(category);
-    } else {
-        fetchItems("All Categories");
-    }
+    // Initial Fetch with the loaded state
+    fetchItems(currentCategory, currentSearchTerm);
 });
 
 // 3. Toggle View Function
@@ -64,115 +80,194 @@ function toggleView(viewType) {
     }
 }
 
-// Event Listeners for Buttons
 bidBtn.addEventListener("click", () => toggleView('bid'));
 swapBtn.addEventListener("click", () => toggleView('swap'));
 
-// 4. Fetch Items
-function fetchItems(category = "All Categories") {
+// 4. Fetch Items (The Core Logic)
+function fetchItems(category, search) {
+    // Update Global State
+    currentCategory = category;
+    currentSearchTerm = search;
+
+    // 1. URL Construction (Server filters by Category)
     let url = '../server/item/get_items.php';
     if (category !== "All Categories") {
-        url += `?category=${category}`;
+        url += `?category=${encodeURIComponent(category)}`;
     }
 
+    // 2. Fetch Data
     fetch(url)
     .then(response => response.json())
     .then(data => {
-        const items = data.items || [];
-        
-        // Clear containers
-        bidContainer.innerHTML = "";
-        swapContainer.innerHTML = "";
+        let items = data.items || [];
 
-        const bids = items.filter(i => i.item_type === 'bid');
-        const swaps = items.filter(i => i.item_type === 'swap');
-
-        // Populate Bids
-        bids.forEach(bid => {
-            bidContainer.appendChild(createBidCard(bid));
-        });
-
-        // Populate Swaps
-        swaps.forEach(swap => {
-            swapContainer.appendChild(createSwapCard(swap));
-        });
-
-        // Handle empty states
-        if (bids.length === 0 && bidBtn.classList.contains('active')) {
-            bidContainer.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>No bids found in this category.</p>";
+        // 3. Client-side Search Filtering
+        // We filter the results returned by the category to see if they match the search term
+        if (currentSearchTerm && currentSearchTerm.trim() !== "") {
+            const lowerQuery = currentSearchTerm.toLowerCase();
+            items = items.filter(item => 
+                item.title.toLowerCase().includes(lowerQuery) || 
+                (item.description && item.description.toLowerCase().includes(lowerQuery))
+            );
         }
-        if (swaps.length === 0 && swapBtn.classList.contains('active')) {
-            swapContainer.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>No swaps found in this category.</p>";
-        }
+
+        // 4. Update UI Text
+        updatePageText();
+
+        // 5. Render Items
+        renderItems(items);
     })
     .catch(err => console.error(err));
 }
 
+function updatePageText() {
+    // Update the Category Dropdown Button text to show what is selected
+    // Note: We access childNodes[0] usually to avoid overwriting the icon, 
+    // but here we can just rebuild the inner HTML to be safe.
+    categoryBtnText.innerHTML = `${currentCategory} <iconify-icon icon="eva:arrow-down-outline" width="24" height="24"></iconify-icon>`;
+
+    if (currentSearchTerm && currentSearchTerm.trim() !== "") {
+        // CASE: Search is Active
+        // The user specifically requested this format:
+        categoryTitle.textContent = `Search Results: "${currentSearchTerm}"`;
+        
+        // We can keep "All Categories" in the description or change it. 
+        // Based on request: "Discover... items matching 'ps5'"
+        const descText = document.getElementById("viewAll-category-description");
+        // We replace the span content
+        descText.textContent = ` items matching "${currentSearchTerm}"`; 
+        
+        // If a specific category is selected, we might want to mention it, 
+        // but the prompt asked for the specific "matching" text. 
+    } else {
+        // CASE: No Search, just Category navigation
+        categoryTitle.textContent = currentCategory;
+        const descText = document.getElementById("viewAll-category-description");
+        descText.textContent = ` ${currentCategory}`;
+    }
+}
+
+function renderItems(items) {
+    // Clear containers
+    bidContainer.innerHTML = "";
+    swapContainer.innerHTML = "";
+
+    const bids = items.filter(i => i.item_type === 'bid');
+    const swaps = items.filter(i => i.item_type === 'swap');
+
+    bids.forEach(bid => bidContainer.appendChild(createBidCard(bid)));
+    swaps.forEach(swap => swapContainer.appendChild(createSwapCard(swap)));
+
+    // Empty States
+    if (bids.length === 0) {
+        bidContainer.innerHTML = `<p style='grid-column: 1/-1; text-align:center;'>No bids found.</p>`;
+    }
+    if (swaps.length === 0) {
+        swapContainer.innerHTML = `<p style='grid-column: 1/-1; text-align:center;'>No swaps found.</p>`;
+    }
+}
+
 // 5. Category Logic
-const categoryBtn = document.getElementById("viewAll-category-btn");
 const categoryDropDown = document.getElementById("viewAll-category-dropDown");
 
-categoryBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    categoryDropDown.classList.toggle("active");
-});
+if (categoryBtnText) {
+    categoryBtnText.addEventListener("click", (e) => {
+        e.stopPropagation();
+        categoryDropDown.classList.toggle("active");
+    });
+}
 
 document.querySelectorAll(".dropDown-item").forEach(item => {
     item.addEventListener("click", () => {
-        setCategory(item.textContent.trim());
+        const selectedCategory = item.textContent.trim();
+        // IMPORTANT: We pass 'currentSearchTerm' so we don't lose the search
+        fetchItems(selectedCategory, currentSearchTerm);
         categoryDropDown.classList.remove("active");
     });
 });
 
 document.addEventListener("click", (e) => {
-    if (!categoryBtn.contains(e.target)) categoryDropDown.classList.remove("active");
+    if (categoryBtnText && !categoryBtnText.contains(e.target)) categoryDropDown.classList.remove("active");
 });
 
-function setCategory(name) {
-    categoryTitle.textContent = name;
-    categoryDesc.textContent = name;
-    fetchItems(name);
+
+// 6. Search Listener (When typing in the header on this page)
+function initSearchListener() {
+    const input = document.querySelector(".header-search input");
+    if(!input) return;
+
+    // When user types, update state and re-fetch (or re-filter)
+    input.addEventListener("input", () => {
+        const val = input.value;
+        // Update global state
+        currentSearchTerm = val;
+        // Re-run fetch logic (which handles filtering)
+        // We do a full fetchItems to ensure category logic is applied correctly
+        fetchItems(currentCategory, currentSearchTerm);
+    });
+
+    // Optional: Handle "Enter" to update URL (so refresh works)
+    input.addEventListener("keypress", (e) => {
+        if(e.key === "Enter") {
+             e.preventDefault();
+             // Update URL params without reloading page completely if desired, or just reload
+             const newUrl = new URL(window.location);
+             newUrl.searchParams.set('search', currentSearchTerm);
+             newUrl.searchParams.set('category', currentCategory);
+             window.history.pushState({}, '', newUrl);
+             input.blur();
+        }
+    });
 }
 
-// 6. Sort Logic (Same as before)
+// 7. Sort Logic (Standard)
 const sortBtn = document.querySelector(".sort-btn");
 const sortDropdown = document.getElementById("sort-dropdown");
 
-sortBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    sortDropdown.style.display = sortDropdown.style.display === "block" ? "none" : "block";
+if (sortBtn) {
+    sortBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        sortDropdown.style.display = sortDropdown.style.display === "block" ? "none" : "block";
+    });
+}
+document.addEventListener("click", () => {
+    if(sortDropdown) sortDropdown.style.display = "none";
 });
 
-document.addEventListener("click", () => sortDropdown.style.display = "none");
+if (sortDropdown) {
+    sortDropdown.addEventListener("click", (e) => {
+        const option = e.target.closest(".sort-option");
+        if (!option) return;
 
-sortDropdown.addEventListener("click", (e) => {
-    const option = e.target.closest(".sort-option");
-    if (!option) return;
+        const sortType = option.dataset.sort;
+        const isBid = bidContainer.style.display !== "none";
+        const container = isBid ? bidContainer : swapContainer;
+        
+        // Get only the item cards
+        const cards = Array.from(container.children).filter(c => c.classList.contains("bid-card") || c.classList.contains("swap-card"));
 
-    const sortType = option.dataset.sort;
-    const isBid = bidContainer.style.display !== "none";
-    const container = isBid ? bidContainer : swapContainer;
-    const cards = Array.from(container.children);
+        if (cards.length === 0) return;
 
-    if (sortType === "asc" || sortType === "desc") {
-        cards.sort((a, b) => {
-            const pA = parseFloat(a.dataset.price) || 0;
-            const pB = parseFloat(b.dataset.price) || 0;
-            return sortType === "asc" ? pA - pB : pB - pA;
-        });
-    } else {
-        cards.sort((a, b) => {
-            const tA = a.querySelector("h6").textContent.toLowerCase();
-            const tB = b.querySelector("h6").textContent.toLowerCase();
-            return sortType === "az" ? tA.localeCompare(tB) : tB.localeCompare(tA);
-        });
-    }
+        if (sortType === "asc" || sortType === "desc") {
+            cards.sort((a, b) => {
+                const pA = parseFloat(a.dataset.price) || 0;
+                const pB = parseFloat(b.dataset.price) || 0;
+                return sortType === "asc" ? pA - pB : pB - pA;
+            });
+        } else {
+            cards.sort((a, b) => {
+                const tA = a.querySelector("h6").textContent.toLowerCase();
+                const tB = b.querySelector("h6").textContent.toLowerCase();
+                return sortType === "az" ? tA.localeCompare(tB) : tB.localeCompare(tA);
+            });
+        }
 
-    container.innerHTML = "";
-    cards.forEach(card => container.appendChild(card));
-});
+        container.innerHTML = "";
+        cards.forEach(card => container.appendChild(card));
+    });
+}
 
-// 7. Helper Functions (Duplicated from Homepage for independence)
+// 8. Helper Functions
 function createBidCard(bid) {
     const card = document.createElement("div");
     card.classList.add("bid-card");
@@ -212,17 +307,4 @@ function formatEndDate(date) {
     if (!date) return 'No date';
     const end = new Date(date);
     return end <= new Date() ? 'Ended' : `Ends ${end.toLocaleDateString()}`;
-}
-
-// Search Functionality
-function initSearch() {
-    const input = document.querySelector(".header-search input");
-    if(!input) return;
-    input.addEventListener("input", () => {
-        const q = input.value.toLowerCase();
-        document.querySelectorAll(".bid-card, .swap-card").forEach(c => {
-            const txt = c.textContent.toLowerCase();
-            c.style.display = txt.includes(q) ? "" : "none";
-        });
-    });
 }
