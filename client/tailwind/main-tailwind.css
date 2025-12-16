@@ -60,26 +60,159 @@
 .text-center {
   text-align: center;
 }
-.outline {
-  outline-style: var(--tw-outline-style);
-  outline-width: 1px;
-}
 .filter {
   filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
 }
-.header-profile-link {
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: "Poppins", sans-serif;
+}
+.main-header {
   display: flex;
+  height: auto;
+  width: 100%;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-decoration: none;
+  padding-inline: 20px;
+  padding-block: 10px;
+  @media (width >= 64rem) {
+    min-height: 130px;
+  }
+  @media (width >= 64rem) {
+    width: 100%;
+  }
+  @media (width >= 64rem) {
+    flex-direction: row;
+  }
+  @media (width >= 64rem) {
+    flex-wrap: wrap;
+  }
+  @media (width >= 64rem) {
+    align-items: center;
+  }
+  @media (width >= 64rem) {
+    justify-content: space-between;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 40px;
+  }
+  @media (width >= 64rem) {
+    padding-block: 20px;
+  }
+  background: url("../../assets/images/HeaderBG.png") center/cover no-repeat;
+  border-bottom: 3px solid #ffe100;
 }
-.header-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid #ccc;
+.header-left {
+  display: flex;
+  align-items: center;
+}
+.slu-header-img {
+  height: 90px;
+  width: auto;
+}
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+.header-icons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+}
+.header-icons iconify-icon {
   cursor: pointer;
+  color: #000;
+}
+.header-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 15px;
+}
+.header-search {
+  display: flex;
+  align-items: center;
+  max-width: 450px;
+  width: auto;
+  height: 42px;
+  border: 2px solid #153b6d;
+  border-radius: 40px;
+  background: #fff;
+  overflow: hidden;
+  padding: 0 15px;
+}
+.header-search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  padding-left: 8px;
+}
+.header-search button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #153b6d;
+}
+.add-listing-btn {
+  background: #ffe100;
+  border: none;
+  border-radius: 40px;
+  padding: 10px 22px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #000;
+}
+.add-btn span {
+  font-size: 20px;
+  font-weight: 700;
+}
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: url("../../assets/images/HeaderBG.png") center/cover no-repeat;
+  border-bottom: 3px solid #ffe100;
+  height: 130px;
+  padding: 0 40px;
+}
+.admin-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 25px;
+}
+.admin-link {
+  font-weight: 700;
+  text-decoration: underline;
+  color: #000;
+  cursor: pointer;
+}
+.admin-link:hover {
+  opacity: 0.7;
+}
+.admin-header .header-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 15px;
+}
+.admin-header .header-bottom {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 }
 @font-face {
   font-family: 'Montserrat-Regular';
@@ -111,7 +244,6 @@ label {
   --primary: #073066;
   --primary-hover: #0a4ca4;
   --accent: #dcb000;
-  --yellow: #ffe100;
   --accent-hover: #c5a100;
   --dark-primary: #262626;
   --dark-secondary: #626262;
@@ -380,43 +512,22 @@ html {
   border-spacing: 0 10px;
 }
 .profile-listings-content .table-container table thead, .profile-bids-content .table-container table thead, .profile-swaps-content .table-container table thead {
+  top: 0;
+  position: sticky;
   z-index: 20;
   background-color: var(--primary-base);
 }
 .profile-listings-content .table-container table th, .profile-bids-content .table-container table th, .profile-swaps-content .table-container table th {
-  position: sticky;
-  top: 0;
   font-size: 1em;
   font-family: 'Montserrat-Bold', sans-serif;
   color: var(--primary);
   padding-bottom: 10px;
 }
-.profile-listings-content .table-container .listings-filter-container {
+.profile-listings-content .table-container table th.listings-filter, .profile-bids-content .table-container table th.bids-filter, .profile-swaps-content .table-container table th.swaps-filter {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
-}
-.listings-filter-container .filter-bid-btn, .listings-filter-container .filter-swap-btn {
-  padding: 5px 25px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid var(--primary);
-  border-radius: 20px;
-  color: var(--primary);
-  background-color: transparent;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: 0.3s ease-in;
-}
-.listings-filter-container .filter-bid-btn:hover, .listings-filter-container .filter-swap-btn:hover {
-  background-color: var(--primary);
-  color: var(--primary-white);
-}
-.listings-filter-container .filter-bid-btn.active, .listings-filter-container .filter-swap-btn.active {
-  background-color: var(--primary);
-  color: var(--primary-white);
+  gap: 10px;
 }
 .profile-listings-content .table-container table .listings-body-row, .profile-bids-content .table-container table .bids-body-row, .profile-swaps-content .table-container table .swaps-body-row {
   background-color: var(--primary-white);
@@ -451,6 +562,115 @@ html {
 }
 .profile-listings-content .table-container table .listings-body-row .status.sold-items {
   background-color: #8C8A8A;
+}
+.listings-filter-container, .bids-filter-container, .swaps-filter-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.listings-filter-btn, .bids-filter-btn, .swaps-filter-btn, .transactions {
+  padding: 3px 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  color: var(--primary);
+  background-color: transparent;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: 0.3s ease-in;
+}
+.listings-filter-btn:hover, .bids-filter-btn:hover, .swaps-filter-btn:hover {
+  background-color: var(--primary);
+  color: var(--primary-white);
+}
+.show-all {
+  font-size: 0.8em;
+  font-family: 'Montserrat-Regular', sans-serif;
+  cursor: pointer;
+  transition: 0.5s ease;
+  margin: 0;
+  justify-content: center;
+}
+.show-all:hover {
+  color: var(--primary-red);
+}
+.listings-filter-dropdown, .bids-filter-dropdown, .swaps-filter-dropdown {
+  position: absolute;
+  top: 28%;
+  left: 90%;
+  transform: translateX(-50%);
+  width: 250px;
+  background-color: var(--primary-white);
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: none;
+  flex-direction: column;
+  z-index: 9999;
+  max-height: 280px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+}
+.listings-filter-dropdown::-webkit-scrollbar, .bids-filter-dropdown::-webkit-scrollbar, .swaps-filter-dropdown::-webkit-scrollbar {
+  display: none;
+}
+.listings-filter-dropdown.active, .bids-filter-dropdown.active, .swaps-filter-dropdown.active {
+  display: flex;
+  animation: fadeIn 0.25s ease-in-out;
+}
+.dropdown-section .dropDown-header {
+  font-size: 1em;
+  font-family: 'Montserrat-Bold', sans-serif;
+  background-color: var(--primary-white);
+  padding: 8px 10px;
+  color: var(--primary);
+  margin: 0;
+  cursor: pointer;
+  border-top: 1px solid #eee;
+}
+.dropdown-section .dropDown-header:hover {
+  background-color: #eee;
+}
+.dropdown-section .dropDown-header.active {
+  background-color: var(--primary);
+  color: var(--primary-white);
+}
+.dropdown-section:first-child .dropDown-header {
+  border-top: none;
+}
+.sub-dropdown {
+  display: none;
+  flex-direction: column;
+  background-color: var(--primary-white);
+  border-top: 1px solid #eee;
+}
+.sub-dropdown .dropDown-item {
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 0.8em;
+  transition: background 0.2s ease;
+  color: black;
+  font-family: 'Montserrat-Regular', sans-serif;
+}
+.sub-dropdown .dropDown-item:hover {
+  background-color: #eee;
+}
+.sub-dropdown.show {
+  display: flex;
+  animation: fadeIn 0.25s ease-in-out;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .profile-listings-content table .listings-body-row td, .profile-bids-content table .bids-body-row td, .profile-swaps-content table .swaps-body-row td {
   color: var(--primary);
@@ -627,7 +847,6 @@ label {
   --primary: #073066;
   --primary-hover: #0a4ca4;
   --accent: #dcb000;
-  --yellow: #ffe100;
   --accent-hover: #c5a100;
   --dark-primary: #262626;
   --dark-secondary: #626262;
@@ -715,16 +934,6 @@ main {
   background-color: #D9D9D9;
   padding: 40px;
 }
-.homepage-section .no-card-text {
-  display: flex;
-  align-self: center;
-  justify-content: center;
-}
-.homepage-section .no-card-text h3 {
-  color: var(--dark-secondary);
-  font-size: 2em;
-  font-family: 'Montserrat-Regular',sans-serif;
-}
 .available-bids .available-bids-title, .available-swaps .available-swaps-title {
   width: 100%;
   padding-bottom: 20px;
@@ -780,17 +989,37 @@ main {
   position: relative;
   overflow: hidden;
 }
-.bid-cards-list .bid-card .img-container {
-  justify-content: center;
-  align-items: center;
-  background-color: #073066;
-  flex: 4;
-  overflow: hidden;
-}
-.bid-cards-list .bid-card .img-container img {
+.bid-cards-list .bid-card .top img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+.bid-cards-list .bid-card .top .heart-button-bid {
+  flex: 1;
+  padding: 5px;
+  border: 1px solid #073066;
+  color: #073066;
+  background: transparent;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 2%;
+  right: 2%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.bid-cards-list .bid-card .top .heart-button-bid.active {
+  color: #B41B1B;
+  background-color: #fff;
+  border: none;
+  transform: scale(1.1);
+}
+.bid-cards-list .bid-card .top .heart-button-bid:hover {
+  transition: 0.5s ease;
+  background-color: #fff;
+  border: none;
 }
 .bid-cards-list .bid-card .bottom {
   border-top: 1px solid #073066;
@@ -965,6 +1194,30 @@ main {
 .swap-cards-list .swap-card .button-container button:hover a {
   color: #073066;
 }
+.swap-cards-list .swap-card .button-container .heart-button-swap {
+  flex: 1;
+  padding: 5px;
+  background-color: #fff;
+  color: #073066;
+  border-radius: 15px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.swap-cards-list .swap-card .button-container .heart-button-swap:hover {
+  transition: 0.5s ease;
+  background: transparent;
+  border: 1px solid #073066;
+}
+.swap-cards-list .swap-card .button-container .heart-button-swap.active {
+  color: #B41B1B;
+  background-color: #fff;
+  border: none;
+  transform: scale(1.1);
+}
 .homepage-section .browse-category {
   display: flex;
   flex-direction: column;
@@ -1006,11 +1259,6 @@ main {
   color: #073066;
   text-decoration: none;
 }
-.browse-category .category-grid .category-card h6 {
-  font-size: 1.3em;
-  color: var(--primary);
-  font-family: 'Montserrat-Bold',sans-serif;
-}
 .browse-category .category-grid .category-card p {
   font-size: 1em;
   color: #8C8A8A;
@@ -1029,10 +1277,11 @@ main {
   background-color: #fff;
   font-family: 'Montserrat-Regular',sans-serif;
   padding-bottom: 140px;
+  padding-top: 140px;
 }
 .viewAll-section .top-nav {
   width: 100%;
-  position: sticky;
+  position: fixed;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1592,11 +1841,6 @@ main {
     padding: 10px;
   }
 }
-@property --tw-outline-style {
-  syntax: "*";
-  inherits: false;
-  initial-value: solid;
-}
 @property --tw-blur {
   syntax: "*";
   inherits: false;
@@ -1653,7 +1897,6 @@ main {
 @layer properties {
   @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
     *, ::before, ::after, ::backdrop {
-      --tw-outline-style: solid;
       --tw-blur: initial;
       --tw-brightness: initial;
       --tw-contrast: initial;
