@@ -242,10 +242,33 @@ function loadItemDetails() {
             itemData = data.item;
             bidIncrementPercent = parseFloat(itemData.bid_increment_percent || 0);
             
-            currentHighestBid = parseFloat(data.item.current_highest_bid || data.item.starting_price || 0);
+            const startingPrice = parseFloat(itemData.starting_price || 0);
+            currentHighestBid = parseFloat(data.item.current_highest_bid || data.item.startingPrice || 0);
             
             enableFeatures(); 
+
+            // Fill title/description/prices/etc.
             populateItemDetails(data);
+
+            // NEW: fill seller text + bind click to seller profile
+            const sellerNameEl  = document.querySelector('.seller-details h4');
+            const sellerEmailEl = document.querySelector('.seller-details p');
+            const sellerProfileLink = document.getElementById('sellerProfileLink');
+
+            if (sellerNameEl)  sellerNameEl.textContent  = data.item.seller_name  || 'Unknown Seller';
+            if (sellerEmailEl) sellerEmailEl.textContent = data.item.seller_email || 'No email';
+
+            if (sellerProfileLink && data.item.seller_id) {
+                sellerProfileLink.style.cursor = 'pointer';
+                sellerProfileLink.onclick = () => {
+                    console.log('CLICK sellerProfileLink → seller-profile.html for', data.item.seller_id);
+                    window.location.href =
+                        `seller-profile.html?seller_id=${encodeURIComponent(data.item.seller_id)}`;
+                };
+            } else {
+                console.warn('sellerProfileLink missing or no seller_id');
+            }
+
             updateMinimumBid();
             startCountdown(itemData.end_date);
             setupImageGallery(data.images);
@@ -256,6 +279,7 @@ function loadItemDetails() {
             alert('Failed to load item details: ' + error.message);
         });
 }
+
 
 function setupBackButton() {
     if (backToPreviousBtn) {
@@ -605,6 +629,38 @@ function updateTimerLabel(text) {
         timerLabel.textContent = text;
     }
 }
+
+function populateBidDetails(data) {
+    const item = data.item;
+
+    console.log('Populating bid details for:', item.title, 'seller_id:', item.seller_id);
+
+
+    const titleEl = document.querySelector('.item-title');
+    const descEl  = document.querySelector('.item-description');
+    if (titleEl) titleEl.textContent = item.title || 'No Title';
+    if (descEl)  descEl.textContent  = item.description || 'No description available.';
+
+
+    const sellerName  = document.querySelector('.seller-details h4');
+    const sellerEmail = document.querySelector('.seller-details p');
+    if (sellerName)  sellerName.textContent  = item.seller_name  || 'Unknown Seller';
+    if (sellerEmail) sellerEmail.textContent = item.seller_email || 'No email';
+
+    const sellerProfileLink = document.getElementById('sellerProfileLink');
+    if (sellerProfileLink && item.seller_id) {
+        sellerProfileLink.onclick = null; // clear old
+        sellerProfileLink.addEventListener('click', () => {
+            console.log('CLICK sellerProfileLink → going to seller-profile.html for', item.seller_id);
+            window.location.href =
+                `seller-profile.html?seller_id=${encodeURIComponent(item.seller_id)}`;
+        });
+    } else {
+        console.warn('sellerProfileLink missing or no seller_id');
+    }
+
+}
+
 
 window.addEventListener('load', () => {
     if (!itemId) {
