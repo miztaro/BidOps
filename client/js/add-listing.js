@@ -334,7 +334,7 @@ function initModalFormSubmission() {
             const start = new Date(startDate.value);
             const end = new Date(endDate.value);
             const now = new Date();
-            const oneHourFromNow = new Date(now.getTime() + 3600000);
+            const oneHourFromNow = new Date(now.getTime() + 600000);
 
             if (start < now)
                 return showMsg('Start date cannot be in the past.', 'error');
@@ -396,21 +396,20 @@ function showMsg(text, type) {
     }
 }
 
-
 // initialize modal
-function initAddListingModal() {
-    // --- CHANGED SECTION START ---
-    
-    // We use document.addEventListener because the header is loaded dynamically.
-    // By checking e.target.closest('#addItemBtn'), we capture clicks on ANY element
-    // with that ID, whether it's in the header or the body.
+
+// Make the function available globally so header.js can call it
+window.initAddListingModal = function() {
+    // Check if the modal actually exists in the DOM now
+    if (!document.getElementById('modalListingForm')) return;
+
+    // Use event delegation for the open button (since it might be inside the header)
     document.addEventListener('click', (e) => {
         if (e.target && e.target.closest('#addItemBtn')) {
             e.preventDefault();
             openAddListingModal();
         }
     });
-
 
     const closeBtn = el('modalClose');
     if (closeBtn) closeBtn.onclick = closeAddListingModal;
@@ -427,12 +426,12 @@ function initAddListingModal() {
         if (e.key === 'Escape') closeAddListingModal();
     });
 
+    // Re-initialize logic
     initListingTypeDropdown();
     initCharCounter();
     initBidIncrementSlider();
-    initModalFormSubmission();
+    initModalFormSubmission(); // <--- This attaches the submit event listener
     initImagePreview();
-}
-
-// run after DOM ready
-document.addEventListener('DOMContentLoaded', initAddListingModal);
+    
+    console.log("Add Listing Modal Initialized Successfully");
+};

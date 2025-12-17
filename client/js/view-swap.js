@@ -16,7 +16,6 @@ window.addEventListener('load', () => {
     
     // Call setup functions immediately
     setupBackButton();
-    loadHeader();
     disableAllButtons();
     loadSwapItemDetails();
 });
@@ -77,19 +76,7 @@ function setupBackButton() {
 
 // --- DATA LOADING & RENDERING ---
 
-function loadHeader() {
-    fetch("header.html")
-        .then(response => response.text())
-        .then(header => {
-            document.getElementById("header").innerHTML = header;
-            const script = document.createElement("script");
-            
-            script.src = "js/header.js";
-            script.defer = true;
-            document.body.appendChild(script);
-        })
-        .catch(error => console.error("Error loading header:", error));
-}
+
 
 function loadSwapItemDetails() {
     console.log('Loading swap item details for ID:', itemId);

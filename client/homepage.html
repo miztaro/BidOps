@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bid and Swap</title>
     <link rel="stylesheet" href="tailwind/main-tailwind.css">
-    <link rel="stylesheet" href="style/add-listing.css">
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     <script src="js/client-guard.js"></script>
 </head>
@@ -70,124 +69,12 @@
                 </div>
             </div>
         </section>
-
-        <!-- === Add Listing Modal (RESTORED HERE) === -->
-        <div class="modal-overlay" id="addListingModal" style="display:none;">
-            <div class="modal-container">
-                <div class="modal-header">
-                <h2>Add Listing</h2>
-                <button class="modal-close" id="modalClose">&times;</button>
-                </div>
-
-                <div class="listing-type-row">
-                <label for="listingTypeSelect" class="listing-type-label">Listing Type</label>
-                <select id="listingTypeSelect" class="listing-type-select" aria-label="Listing Type">
-                    <option value="bid">Bid</option>
-                    <option value="swap">Swap</option>
-                </select>
-                <input type="hidden" id="listingType" name="listingType" value="bid">
-                </div>
-
-                <div class="modal-body">
-                <form id="modalListingForm" enctype="multipart/form-data" novalidate>
-                    <div id="modalMessage"></div>
-
-                    <div class="form-container">
-                    <div class="panel-card">
-                        <div class="row two-cols">
-                        <div class="col">
-                            <label for="title">Item Title*</label>
-                            <input type="text" id="title" name="title" placeholder="Enter item title" maxlength="50" required>
-                            <div class="char-count"><span id="titleCount">0</span>/50</div>
-                        </div>
-
-                        <div class="col">
-                            <label for="category">Category*</label>
-                            <select id="category" name="category" required>
-                            <option value="">Select Category</option>
-                            <option value="Electronics">Electronics</option>
-                            <option value="Sports">Sports</option>
-                            <option value="Collectibles">Collectibles</option>
-                            <option value="Accessories">Accessories</option>
-                            <option value="Fashion">Fashion</option>
-                            <option value="Gaming">Gaming</option>
-                            <option value="Home">Home</option>
-                            <option value="Photography">Photography</option>
-                            <option value="Toys">Toys</option>
-                            </select>
-                        </div>
-                        </div>
-
-                        <div class="row full">
-                        <label for="description">Description*</label>
-                        <textarea id="description" name="description" rows="5" placeholder="Describe your item in detail..." required></textarea>
-                        </div>
-
-                        <div id="bidFields" class="bid-fields" style="display:block;">
-                        <div class="row three-cols">
-                            <div class="col">
-                            <label for="starting_price">Starting Price*</label>
-                            <div class="price-input">
-                                <span class="currency">₱</span>
-                                <input type="number" id="starting_price" name="starting_price" step="0.01" min="0" placeholder="0" required>
-                            </div>
-                            </div>
-
-                            <div class="col">
-                            <label for="start_date">Start Date*</label>
-                            <input type="datetime-local" id="start_date" name="start_date" required>
-                            </div>
-
-                            <div class="col">
-                            <label for="end_date">End Date*</label>
-                            <input type="datetime-local" id="end_date" name="end_date" required>
-                            </div>
-                        </div>
-
-                        <div class="row small-col">
-                            <div class="col">
-                            <label>Bid Increment: <span id="incrementValue">5%</span></label>
-                            <div class="increment-slider-container">
-                                <input type="range" id="bidIncrement" name="bid_increment_percent" min="1" max="20" value="5" step="1" class="increment-slider">
-                                <div class="slider-labels">
-                                <span>1%</span>
-                                <span>20%</span>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        </div>
-
-                        <!-- IMAGES -->
-                        <div class="row full">
-                        <label>Item Images</label>
-                        <div class="image-upload-area" id="imageUploadArea">
-                            <div id="imagePreview" class="image-preview"></div>
-
-                            <div class="upload-placeholder" id="uploadPlaceholder">
-                            <iconify-icon icon="bi:image" width="48" height="48"></iconify-icon>
-                            <p>Drag and drop images here, or click to select</p>
-                            <p class="upload-note">Maximum 5 images, up to 10MB each</p>
-                            </div>
-
-                            <input type="file" id="image" name="image" accept="image/*" multiple>
-                        </div>
-                        </div>
-
-                        <div class="form-actions">
-                        <button type="button" class="cancel-btn" id="modalCancelBtn">Cancel</button>
-                        <button type="submit" class="create-btn">Create Listing</button>
-                        </div>
-                    </div>
-                    </div>
-                </form>
-                </div>
-            </div>
-        </div>
     </main>
     <div id="footer"></div>
     <script src="js/header.js"></script>
     <script src="js/add-listing.js" defer></script>
+
+    
     <script src="js/homepage.js" defer></script>
 </body>
 </html>

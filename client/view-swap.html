@@ -129,33 +129,36 @@
         </div>
     </footer>
 
+<!-- Container for the Swap Modal (different from Add Listing Modal) -->
     <div id="swapModalContainer"></div>
 
+    <!-- SCRIPTS -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            fetch("../server/auth/get_role.php")
-            .then(response => response.json())
-            .then(data => {
-                const role = data.role; 
-                let headerFile = "";
+            // 1. Fetch Header HTML
+            fetch("header.html")
+                .then(response => response.text())
+                .then(headerHTML => {
+                    document.getElementById("header").innerHTML = headerHTML;
 
-                if (role === "admin") {
-                    headerFile = "admin_header.html";
-                } else {
-                    headerFile = "header.html";
-                }
-
-                fetch(headerFile)
-                    .then(response => response.text())
-                    .then(header => {
-                        document.getElementById("header").innerHTML = header;
-                    })
-                    .catch(error => console.error("Error loading header:", error));
-            })
-            .catch(error => console.error("Error determining role:", error));
+                    // 2. Load Header JS manually
+                    const script = document.createElement("script");
+                    script.src = "js/header.js";
+                    // Initialize logic once script is ready
+                    script.onload = function() {
+                        if (typeof initLogic === 'function') initLogic();
+                    };
+                    document.body.appendChild(script);
+                })
+                .catch(error => console.error("Error loading header:", error));
         });
     </script>
+    
+    <!-- Core Scripts -->
     <script src="js/view-swap.js"></script>
     <script src="js/chat.js"></script>
+    
+    <!-- Add Listing Script (Handles the popup globally) -->
+    <script src="js/add-listing.js"></script>
 </body>
 </html>

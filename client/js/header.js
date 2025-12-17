@@ -12,6 +12,9 @@ function loadHeaderAndWatch() {
             if(headerContainer) {
                 headerContainer.innerHTML = data;
                 initLogic();
+                if (typeof window.initAddListingModal === 'function') {
+                    window.initAddListingModal();
+                }                
             }
         })
         .catch(console.error);
@@ -20,6 +23,9 @@ function loadHeaderAndWatch() {
         const observer = new MutationObserver((mutations) => {
             // If the header HTML was wiped/changed, re-apply our logic
             initLogic();
+            if (typeof window.initAddListingModal === 'function') {
+                    window.initAddListingModal();
+            }
         });
         observer.observe(headerContainer, { childList: true });
     }
