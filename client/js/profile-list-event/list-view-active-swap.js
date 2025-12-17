@@ -217,7 +217,7 @@ window.handleSwapAction = function (swapId, action) {
             if (data.success) {
                 alert(data.message);
                 // Refresh the modal and listings
-                fetchSwapOffers(currentSwapItemId);
+                fetchSwapOffers(currentSwappingItemId);
                 if (typeof fetchListings === 'function') {
                     fetchListings();
                 }
