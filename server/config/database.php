@@ -19,7 +19,7 @@ class Database {
     private $port = 3306;
     private $db_name = "bidops";
     private $username = "root";
-    private $password = "";
+    private $password = "root";
     public $conn;
 
     public function getConnection() {
