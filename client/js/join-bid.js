@@ -156,7 +156,6 @@ function setupFavoritesButton() {
         });
     }
 }
-
 function setupPlaceBidButton() {
     let placeBidBtn = document.getElementById('placeBidBtn');
     const bidAmountInput = document.getElementById('bidAmount');
@@ -166,11 +165,13 @@ function setupPlaceBidButton() {
         return;
     }
     
+    // Reset button state
     placeBidBtn.disabled = false;
     placeBidBtn.style.opacity = '1';
     placeBidBtn.style.cursor = 'pointer';
     placeBidBtn.title = 'Place your bid now';
 
+    // Remove old listeners to prevent duplicates
     const newPlaceBidBtn = placeBidBtn.cloneNode(true);
     placeBidBtn.replaceWith(newPlaceBidBtn);
     placeBidBtn = newPlaceBidBtn;
@@ -179,17 +180,46 @@ function setupPlaceBidButton() {
         event.preventDefault();
         
         const bidAmount = parseFloat(bidAmountInput.value);
+        
+        // --- VALIDATION LOGIC START ---
+        
+        // 1. Get fresh values
+        const startingPrice = parseFloat(itemData.starting_price || 0);
+        // Check if there are ACTUAL active bids (not just declined ones)
+        const hasActiveBids = itemData.current_highest_bid && parseFloat(itemData.current_highest_bid) > 0;
+        let currentHighest = hasActiveBids ? parseFloat(itemData.current_highest_bid) : 0;
+        const incrementPercent = parseFloat(itemData.bid_increment_percent || 0);
+
+        // 2. Calculate Required Minimum
+        let requiredMinimum = 0;
+
+        if (!hasActiveBids) {
+            // SCENARIO A: First bid ever. Must be at least Starting Price.
+            requiredMinimum = startingPrice;
+        } else {
+            // SCENARIO B: Bidding war. Must be Highest + Increment.
+            const incrementAmount = currentHighest * (incrementPercent / 100);
+            requiredMinimum = currentHighest + incrementAmount;
+        }
+
+        // 3. Strict Checks
         if (isNaN(bidAmount) || bidAmount <= 0) {
             alert('Please enter a valid bid amount.');
             return;
         }
 
-        const minimumBid = parseFloat(bidAmountInput.min);
-        if (bidAmount < minimumBid) {
-            alert(`Bid must be at least ₱${minimumBid.toFixed(2)}`);
+     
+        // We use a small epsilon (0.001) to handle floating point math errors
+        if (bidAmount < (requiredMinimum - 0.001)) {
+            alert(`Bid too low! \n\nThe minimum required bid is ₱${requiredMinimum.toFixed(2)}`);
+            // Reset input to the valid minimum to help the user
+            bidAmountInput.value = requiredMinimum.toFixed(2); 
             return;
         }
+        
+        // --- VALIDATION LOGIC END ---
 
+        // Proceed with API Call
         fetch('../server/item/place_bid.php', {
             method: 'POST',
             credentials: 'include',
@@ -426,56 +456,42 @@ function populateItemDetails(data) {
         countElement.textContent = totalBids;
     }
 }
-
 function updateMinimumBid() {
+    const startingPrice = parseFloat(itemData?.starting_price || 0);
+    
     // Check if there are active bids
     const hasActiveBids = itemData && itemData.current_highest_bid && 
         parseFloat(itemData.current_highest_bid) > 0;
-    
-    const startingPrice = parseFloat(itemData?.starting_price || 0);
+        
+    const minBidTextElem = document.querySelector('.minimum-bid-text');
+    const bidAmountInput = document.getElementById('bidAmount');
     
     if (!hasActiveBids) {
-        // No active bids yet
-        const minBidTextElem = document.querySelector('.minimum-bid-text');
+        // CASE: No bids yet. Minimum is Starting Price.
         if (minBidTextElem) {
-            minBidTextElem.textContent = `Starting bid: ₱${startingPrice.toFixed(2)}`;
+            const initialIncrement = startingPrice * (bidIncrementPercent / 100);
+            minBidTextElem.textContent = 
+                `Starting bid: ₱${startingPrice.toFixed(2)} (Min. increment: ₱${initialIncrement.toFixed(2)})`;
         }
         
-        const bidAmountInput = document.getElementById('bidAmount');
         if (bidAmountInput) {
-            bidAmountInput.min = startingPrice;
+            bidAmountInput.min = startingPrice; // Browser validation
             bidAmountInput.placeholder = startingPrice.toFixed(2);
         }
-        
-        // Update current bid display if needed
-        const currentBidElem = document.querySelector('.bid-pricing .price-item.current-bid .price-value');
-        if (currentBidElem && currentBidElem.textContent !== 'N/A') {
-            currentBidElem.textContent = 'N/A';
-            currentBidElem.style.color = '#666';
-            currentBidElem.style.fontStyle = 'italic';
-        }
-        
-        return;
-    }
-    
-    // There are active bids, use normal calculation
-    const { minimumBid, incrementAmount } = calculateMinimumBid(currentHighestBid, bidIncrementPercent);
+    } else {
+        // CASE: Active bids exist. Minimum is Current + Increment.
+        const currentHighest = parseFloat(itemData.current_highest_bid);
+        const { minimumBid, incrementAmount } = calculateMinimumBid(currentHighest, bidIncrementPercent);
 
-    const minBidTextElem = document.querySelector('.minimum-bid-text');
-    if (minBidTextElem) {
-        minBidTextElem.textContent = 
-            `Minimum bid increment: ₱${incrementAmount.toFixed(2)} (Next minimum: ₱${minimumBid.toFixed(2)})`;
-    }
-    
-    const bidAmountInput = document.getElementById('bidAmount');
-    if (bidAmountInput) {
-        bidAmountInput.min = minimumBid;
-        if (minimumBid > 0) {
-            bidAmountInput.placeholder = minimumBid.toFixed(2);
-        } else if (itemData) {
-            bidAmountInput.placeholder = startingPrice.toFixed(2);
+        if (minBidTextElem) {
+            minBidTextElem.textContent = 
+                `Minimum bid increment: ₱${incrementAmount.toFixed(2)} (Next minimum: ₱${minimumBid.toFixed(2)})`;
         }
-        bidAmountInput.step = "1";
+        
+        if (bidAmountInput) {
+            bidAmountInput.min = minimumBid; // Browser validation
+            bidAmountInput.placeholder = minimumBid.toFixed(2);
+        }
     }
 }
 
