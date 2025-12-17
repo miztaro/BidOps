@@ -314,6 +314,14 @@ header {
     color: #B41B1B;
 }
 
+/* Declined note */
+.declined-note {
+    color: #e74c3c;
+    font-size: 0.7em;
+    font-family: 'Montserrat-Medium', sans-serif;
+    margin-left: 5px;
+}
+
 /* Countdown Timer */
 .countdown-timer {
     background: linear-gradient(135deg, #FFB6C1 0%, #FFA07A 100%);
@@ -483,7 +491,7 @@ header {
 .history-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
 }
 
 .history-item {
@@ -492,10 +500,36 @@ header {
     padding: 15px;
     background-color: #f4f4f9;
     border-radius: 10px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
 }
 
+/* Current highest bid */
 .history-item.current-high {
-    background-color: #d4edda;
+    background-color: #e8f5e9;
+    border-left: 3px solid #28a745;
+}
+
+/* Declined bid styling */
+/* .history-item.declined-bid {
+    opacity: 0.7;
+    background-color: #f8f8f8;
+    border-left: 3px solid #e74c3c;
+} */
+
+.history-item.current-high.declined-bid {
+    background-color: #fdeaea;
+    border-left: 3px solid #e74c3c;
+}
+
+.history-item.declined-bid .bidder-avatar {
+    filter: grayscale(80%);
+}
+
+.history-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .bidder-avatar {
@@ -503,6 +537,8 @@ header {
     height: 50px;
     border-radius: 50%;
     margin-right: 15px;
+    object-fit: cover;
+    border: 2px solid #e0e0e0;
 }
 
 .bidder-info {
@@ -513,6 +549,7 @@ header {
     font-family: 'Montserrat-SemiBold', sans-serif;
     font-size: 1em;
     color: #073066;
+    margin-bottom: 3px;
 }
 
 .bid-time {
@@ -524,6 +561,8 @@ header {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    gap: 5px;
+    min-width: 120px;
 }
 
 .bid-amount {
@@ -532,12 +571,36 @@ header {
     color: #073066;
 }
 
+.bid-amount.declined-amount {
+    text-decoration: line-through;
+    color: #95a5a6;
+    font-family: 'Montserrat-Medium', sans-serif;
+    font-size: 1.1em;
+}
+
 .current-high-badge {
     background-color: #28a745;
-    color: #fff;
-    padding: 3px 10px;
-    border-radius: 15px;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
     font-size: 0.75em;
+    font-family: 'Montserrat-SemiBold', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+.declined-badge {
+    background-color: #e74c3c;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-family: 'Montserrat-SemiBold', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
     margin-top: 5px;
 }
 

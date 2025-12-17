@@ -4,27 +4,21 @@ const placeBidBtn = document.getElementById('placeBidBtn');
 const itemId = urlParams.get('item_id');
 
 let itemData = null;
-let currentHighestBid = 0; // Will be set accurately in loadItemDetails
+let currentHighestBid = 0;
 let bidIncrementPercent = 0.00;
 let currentUserId = '0'; 
 
-// --- NEW HELPER FUNCTION FOR MINIMUM BID CALCULATION ---
-/**
- * Calculates the required minimum bid amount based on the current highest bid and the increment percentage.
- * @param {number} currentHighest - The current highest bid (or starting price if no bids).
- * @param {number} incrementPercent - The bid increment percentage (e.g., 5 for 5%).
- * @returns {{minimumBid: number, incrementAmount: number}} The calculated minimum bid and increment amount.
- */
-function calculateMinimumBid(currentHighest, incrementPercent) {
-    const safeHighest = parseFloat(currentHighest || 0);
+function calculateMinimumBid(currentHighest, incrementPercent, isHighestDeclined = false) {
+    let safeHighest = parseFloat(currentHighest || 0);
     const safeIncrement = parseFloat(incrementPercent || 0) / 100;
     
-    // Calculate the increment amount
+    // If the highest bid is declined, use starting price instead
+    if (isHighestDeclined && itemData) {
+        safeHighest = parseFloat(itemData.starting_price || 0);
+    }
+    
     const incrementAmount = safeHighest * safeIncrement;
-    
-    // The next minimum bid is Current Highest + Increment Amount
     const minimumBid = safeHighest + incrementAmount;
-    
 
     return { 
         minimumBid: minimumBid, 
@@ -32,13 +26,10 @@ function calculateMinimumBid(currentHighest, incrementPercent) {
     };
 }
 
-
-
 function disableAndUnbind(selector, title, defaultText, elementId = null) {
     const originalElement = elementId ? document.getElementById(elementId) : document.querySelector(selector);
     
     if (originalElement) {
-        // Clone and replace to remove all previous event listeners
         const newElement = originalElement.cloneNode(true); 
         
         newElement.disabled = true;
@@ -46,7 +37,6 @@ function disableAndUnbind(selector, title, defaultText, elementId = null) {
         newElement.style.cursor = 'not-allowed';
         newElement.title = title;
         
-        // Ensure the inner HTML is preserved for icons/text, otherwise use defaultText
         if (defaultText) {
              newElement.innerHTML = newElement.innerHTML.includes('iconify-icon') ? newElement.innerHTML : defaultText;
         }
@@ -61,12 +51,11 @@ function disableAllButtons(reason) {
     disableAndUnbind('#placeBidBtn', reason, '<iconify-icon icon="mdi:gavel"></iconify-icon> Place Bid', 'placeBidBtn');
     disableAndUnbind('.favorites-btn', reason, '<iconify-icon icon="mdi:heart"></iconify-icon> Add to Favorites');
     disableAndUnbind('.chat-btn', reason, '<iconify-icon icon="mdi:message"></iconify-icon> Chat with Seller');
-    setupReportButton(); // Report button is generally always enabled, but setup is called here.
+    setupReportButton();
 }
 
 function enableFeatures() {
     const isLoggedIn = currentUserId !== '0';
-    // Ensure itemData is loaded before checking seller_id
     const isSeller = itemData && itemData.seller_id === currentUserId && isLoggedIn; 
     const isEnded = isAuctionEnded();
 
@@ -77,30 +66,25 @@ function enableFeatures() {
     } else if (!isLoggedIn) {
         disableAllButtons('Please log in to bid or chat.');
     } else {
-        // User is logged in, is not the seller, and auction is active. ENABLE features.
         setupPlaceBidButton();
         setupFavoritesButton(); 
         setupChatButton();
     }
 }
 
-// FIX: Simplified button enabling to avoid complex title checks.
 function setupChatButton() {
     let chatBtn = document.querySelector('.chat-btn');
     
     if (chatBtn) {
-        // 1. Remove disabled state and styling applied by disableAllButtons
         chatBtn.disabled = false;
         chatBtn.style.opacity = '1';
         chatBtn.style.cursor = 'pointer';
         chatBtn.title = 'Start a conversation with the seller';
         
-        // 2. Clone and replace to remove all previous event listeners
         const newChatBtn = chatBtn.cloneNode(true);
         chatBtn.replaceWith(newChatBtn);
         chatBtn = newChatBtn;
         
-        // 3. Attach the new listener
         newChatBtn.addEventListener('click', () => {
             if (!itemData || !itemData.seller_id) {
                 alert("Cannot start chat: Seller details missing.");
@@ -139,30 +123,25 @@ function setupChatButton() {
     }
 }
 
-// FIX: Simplified button enabling
 function setupFavoritesButton() {
     let favoritesBtn = document.querySelector('.favorites-btn');
 
     if (favoritesBtn) {
-        // 1. Remove disabled state and styling applied by disableAllButtons
         favoritesBtn.disabled = false;
         favoritesBtn.style.opacity = '1';
         favoritesBtn.style.cursor = 'pointer';
         favoritesBtn.title = 'Add this item to your favorites';
         
-        // 2. Clone and replace to remove all previous event listeners
         const newFavoritesBtn = favoritesBtn.cloneNode(true);
         favoritesBtn.replaceWith(newFavoritesBtn);
         favoritesBtn = newFavoritesBtn;
         
-        // 3. Attach the new listener
         newFavoritesBtn.addEventListener('click', () => {
             alert('Favorites function is now enabled and ready to be implemented!');
         });
     }
 }
 
-// FIX: Simplified button enabling and IMPROVED bid handling
 function setupPlaceBidButton() {
     let placeBidBtn = document.getElementById('placeBidBtn');
     const bidAmountInput = document.getElementById('bidAmount');
@@ -172,18 +151,15 @@ function setupPlaceBidButton() {
         return;
     }
     
-    // 1. Remove disabled state and styling applied by disableAllButtons
     placeBidBtn.disabled = false;
     placeBidBtn.style.opacity = '1';
     placeBidBtn.style.cursor = 'pointer';
     placeBidBtn.title = 'Place your bid now';
 
-    // 2. Clone and replace to remove all previous event listeners
     const newPlaceBidBtn = placeBidBtn.cloneNode(true);
     placeBidBtn.replaceWith(newPlaceBidBtn);
     placeBidBtn = newPlaceBidBtn;
     
-    // 3. Attach the new listener
     newPlaceBidBtn.addEventListener('click', function(event) {
         event.preventDefault();
         
@@ -194,8 +170,6 @@ function setupPlaceBidButton() {
         }
 
         const minimumBid = parseFloat(bidAmountInput.min);
-        // Note: The minimum bid validation is duplicated here and on the server (place_bid.php).
-        // This is good practice for immediate UX feedback.
         if (bidAmount < minimumBid) {
             alert(`Bid must be at least ₱${minimumBid.toFixed(2)}`);
             return;
@@ -216,16 +190,7 @@ function setupPlaceBidButton() {
         .then(data => {
             if (data.success) {
                 alert('Bid placed successfully!');
-                
-                // CRITICAL FIX: Update the global variable and minimum bid display instantly
-                // before or during loadItemDetails(). 
-                // The API should return the new highest bid for instant update. 
-                // Since the PHP doesn't return the new bid, we rely on loadItemDetails, 
-                // but we clear the input now.
-                
                 bidAmountInput.value = '';
-                
-                // Reload data to get the new current highest bid and bidding history
                 loadItemDetails(); 
             } else {
                 alert(data.message || 'Failed to place bid');
@@ -239,7 +204,6 @@ function setupPlaceBidButton() {
 }
 
 function loadHeader() {
-    // Original logic for dynamic header loading
     fetch("header.html")
         .then(response => response.text())
         .then(header => {
@@ -255,54 +219,37 @@ function loadHeader() {
 }
 
 function loadItemDetails() {
-    console.log('Loading item details for ID:', itemId);
-    
     fetch(`../server/item/get_item_details.php?item_id=${itemId}`)
         .then(response => {
-            console.log('Response status:', response.status);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
-            console.log('Received data:', data);
-            
             if (!data.success) {
-                console.error('Server error:', data.message);
                 alert('Error: ' + data.message);
                 window.location.href = 'homepage.html';
                 return;
             }
             
             if (!data.item) {
-                console.error('No item data received');
                 alert('No item data found');
                 return;
             }
 
             currentUserId = data.current_user_id || '0'; 
-            console.log('User ID from API (String):', currentUserId);
-            
-            console.log('Successfully loaded item:', data.item.title);
             itemData = data.item;
             bidIncrementPercent = parseFloat(itemData.bid_increment_percent || 0);
             
-            // CRITICAL FIX 1: Set currentHighestBid immediately before UI updates
-            const startingPrice = parseFloat(itemData.starting_price || 0);
-            currentHighestBid = parseFloat(data.item.current_highest_bid || startingPrice);
+            currentHighestBid = parseFloat(data.item.current_highest_bid || data.item.starting_price || 0);
             
             enableFeatures(); 
-
-            // CRITICAL FIX 2: Call functions in the correct order, 
-            // relying on the globally updated `currentHighestBid`.
             populateItemDetails(data);
-            updateMinimumBid(); // Uses the newly set currentHighestBid
+            updateMinimumBid();
             startCountdown(itemData.end_date);
             setupImageGallery(data.images);
             displayBiddingHistory(data.bidding_history);
-            
-            // REMOVED: Redundant setting of currentHighestBid here.
         })
         .catch(error => {
             console.error('Error loading item:', error);
@@ -335,19 +282,46 @@ function populateItemDetails(data) {
         viewProfileBtn.href = `profile.html?user_id=${item.seller_id}`;
     }
 
-    const startingPrice = parseFloat(item.starting_price || 0);
-    // Use the global currentHighestBid variable, which was set in loadItemDetails
-    const currentHighest = currentHighestBid; 
+    currentHighestBid = parseFloat(item.current_highest_bid || item.starting_price || 0);
     
-    // Use the new helper function for calculation
-    const { minimumBid, incrementAmount } = calculateMinimumBid(currentHighest, bidIncrementPercent);
+    const { minimumBid, incrementAmount } = calculateMinimumBid(currentHighestBid, bidIncrementPercent);
     
     const startingPriceElem = document.querySelector('.bid-pricing .price-item:first-child .price-value');
     const currentBidElem = document.querySelector('.bid-pricing .price-item.current-bid .price-value');
     
+    const startingPrice = parseFloat(item.starting_price || 0);
     if (startingPriceElem) startingPriceElem.textContent = `₱${startingPrice.toFixed(2)}`;
-    // Update the current bid display using the currentHighestBid
-    if (currentBidElem) currentBidElem.textContent = `₱${currentHighest.toFixed(2)}`;
+    
+    if (currentBidElem) {
+        currentBidElem.textContent = `₱${currentHighestBid.toFixed(2)}`;
+        
+        // Check if the current highest bid is inactive
+        const history = data.bidding_history || [];
+        const highestBid = history.find(bid => 
+            parseFloat(bid.bid_amount) === currentHighestBid && 
+            (bid.bid_status === 'declined' || bid.bid_status === 'outbid' || !bid.bid_status || bid.bid_status === '')
+        );
+        
+        if (highestBid) {
+            // Remove any existing note
+            const existingNote = currentBidElem.querySelector('.declined-note');
+            if (existingNote) {
+                existingNote.remove();
+            }
+            
+            // Add the note
+            const noteElem = document.createElement('span');
+            noteElem.className = 'declined-note';
+            noteElem.textContent = ' (Declined)';
+            currentBidElem.appendChild(noteElem);
+            
+            // Change color to red
+            currentBidElem.style.color = '#e74c3c';
+        } else {
+            // Reset color
+            currentBidElem.style.color = '#B41B1B';
+        }
+    }
     
     const minBidTextElem = document.querySelector('.minimum-bid-text');
     if (minBidTextElem) {
@@ -358,11 +332,10 @@ function populateItemDetails(data) {
     const bidAmountInput = document.getElementById('bidAmount');
     if (bidAmountInput) {
         bidAmountInput.min = minimumBid;
-        // Adjust placeholder for better UX when the minimum bid is 0 (first bid scenario)
         if (minimumBid > 0) {
             bidAmountInput.placeholder = minimumBid.toFixed(2);
         } else {
-             bidAmountInput.placeholder = startingPrice.toFixed(2);
+            bidAmountInput.placeholder = startingPrice.toFixed(2);
         }
         bidAmountInput.step = "1";
     }
@@ -374,10 +347,7 @@ function populateItemDetails(data) {
     }
 }
 
-// MODIFIED: updateMinimumBid now relies on the global currentHighestBid variable 
-// which is updated in loadItemDetails (or should be updated on successful bid response)
 function updateMinimumBid() {
-    // Recalculate based on current state variables
     const { minimumBid, incrementAmount } = calculateMinimumBid(currentHighestBid, bidIncrementPercent);
 
     const minBidTextElem = document.querySelector('.minimum-bid-text');
@@ -392,7 +362,6 @@ function updateMinimumBid() {
         if (minimumBid > 0) {
             bidAmountInput.placeholder = minimumBid.toFixed(2);
         } else if (itemData) {
-             // Fallback to starting price if the calculated minimum is 0 (first bid)
              bidAmountInput.placeholder = parseFloat(itemData.starting_price || 0).toFixed(2);
         }
         bidAmountInput.step = "1";
@@ -439,7 +408,6 @@ function setupReportButton() {
 
 function setupImageGallery(images) {
     if (!images || images.length === 0) {
-        console.log('No images available, using default');
         setupDefaultImage();
         return;
     }
@@ -454,11 +422,9 @@ function setupImageGallery(images) {
     
     const firstImage = images[0];
     const imagePath = firstImage.image_path;
-    console.log('Setting main image:', imagePath);
     mainImage.src = imagePath;
     
     mainImage.onerror = function() {
-        console.error('Failed to load main image:', imagePath);
         mainImage.src = '../assets/images/default-item.jpg';
     };
     
@@ -473,7 +439,6 @@ function setupImageGallery(images) {
             thumbnail.dataset.image = thumbPath;
             
             thumbnail.onerror = function() {
-                console.error('Failed to load thumbnail:', thumbPath);
                 thumbnail.src = '../assets/images/default-item.jpg';
             };
             
@@ -499,8 +464,6 @@ function setupDefaultImage() {
     if (thumbnailContainer) {
         thumbnailContainer.innerHTML = '';
     }
-    
-    console.log('Using default image');
 }
 
 function displayBiddingHistory(history) {
@@ -519,18 +482,44 @@ function displayBiddingHistory(history) {
     
     const auctionEnded = isAuctionEnded();
     
-    history.forEach((bid, index) => {
+    // Sort bids by amount (highest first)
+    const sortedHistory = [...history].sort((a, b) => {
+        if (parseFloat(b.bid_amount) !== parseFloat(a.bid_amount)) {
+            return parseFloat(b.bid_amount) - parseFloat(a.bid_amount);
+        }
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+    
+    // Find the absolute highest bid
+    const absoluteHighestBid = sortedHistory.length > 0 ? 
+        parseFloat(sortedHistory[0].bid_amount) : 0;
+    
+    sortedHistory.forEach((bid, index) => {
         const historyItem = document.createElement('div');
         historyItem.classList.add('history-item');
         
-        // Use history index to identify the current highest bid (which is always the first one returned by API)
-        if (index === 0) {
+        // Check if bid is inactive
+        const isDeclined = bid.bid_status === 'declined';
+        const isOutbid = bid.bid_status === 'outbid';
+        const isInactive = isDeclined || isOutbid || !bid.bid_status || bid.bid_status === '';
+        
+        if (isInactive) {
+            historyItem.classList.add('declined-bid');
+        }
+        
+        // Check if this is the absolute highest bid
+        const isAbsoluteHighest = parseFloat(bid.bid_amount) === absoluteHighestBid;
+        if (isAbsoluteHighest) {
             historyItem.classList.add('current-high');
         }
         
         let badgeText = '';
-        if (index === 0) {
-            badgeText = auctionEnded ? 'Highest Bidder' : 'Current Highest Bid';
+        if (isAbsoluteHighest) {
+            if (isInactive) {
+                badgeText = 'Current Highest: Declined';
+            } else {
+                badgeText = 'Current Highest';
+            }
         }
         
         historyItem.innerHTML = `
@@ -540,8 +529,8 @@ function displayBiddingHistory(history) {
                 <span class="bid-time">${bid.time_ago || 'Recently'}</span>
             </div>
             <div class="bid-amount-container">
-                <span class="bid-amount">₱${parseFloat(bid.bid_amount).toFixed(2)}</span>
-                ${index === 0 ? `<span class="current-high-badge">${badgeText}</span>` : ''}
+                <span class="bid-amount ${isInactive ? 'declined-amount' : ''}">₱${parseFloat(bid.bid_amount).toFixed(2)}</span>
+                ${badgeText ? `<span class="${isInactive ? 'declined-badge' : 'current-high-badge'}">${badgeText}</span>` : ''}
             </div>
         `;
         
@@ -580,7 +569,6 @@ function startCountdown(endDate) {
             updateTimerDisplay('00', '00', '00', '00');
             updateTimerLabel('Auction Ended');
             
-            // Re-run enableFeatures to disable the bid button and chat button
             enableFeatures(); 
             return;
         }
@@ -625,9 +613,7 @@ window.addEventListener('load', () => {
         return;
     }
     
-    // Disable buttons initially while loading
     disableAllButtons('Loading item details...'); 
-
     loadHeader();
     loadItemDetails();
 });

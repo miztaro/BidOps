@@ -9,7 +9,6 @@ if (session_status() == PHP_SESSION_NONE) {
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
-// --- FUNCTION DEFINITION ---
 function getTimeAgo($datetime) {
     $now = new DateTime();
     $ago = new DateTime($datetime);
@@ -38,8 +37,6 @@ if (!file_exists($database_path)) {
 }
 require_once $database_path; 
 
-
-// Use the globally available current_user_id variable for comparison
 $current_user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '0';
 
 if (!isset($_GET['item_id'])) {
@@ -65,7 +62,7 @@ try {
             bi.end_date,
             bi.bid_increment_percent,
             (SELECT COUNT(*) FROM bidoffer WHERE item_id = i.item_id AND bid_status = 'active') as total_bids,
-            (SELECT MAX(bid_amount) FROM bidoffer WHERE item_id = i.item_id AND bid_status = 'active') as current_highest_bid
+            (SELECT MAX(bid_amount) FROM bidoffer WHERE item_id = i.item_id) as current_highest_bid
         FROM item i
         LEFT JOIN user u ON i.seller_id = u.user_id
         LEFT JOIN biditem bi ON i.item_id = bi.item_id
@@ -84,25 +81,19 @@ try {
         exit;
     }
 
-    // --- START: FIX FOR IMAGE PATH RETRIEVAL ---
+    // Get images
     $stmt = $db->prepare("SELECT image_path FROM itemimage WHERE item_id = ? ORDER BY image_id");
     $stmt->bind_param("i", $item_id);
     $stmt->execute();
     $raw_images = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     
-    // FIX: Point to the folder where images actually live, relative to the public HTML file
     $base_path = '../server/item/uploads/'; 
-
     $images = array_map(function($img) use ($base_path) {
-        // Strip any existing path junk from the DB value so we just get 'filename.jpg'
         $filename = basename($img['image_path']);
-        
         return [
-            // Combine our correct base path with the clean filename
             'image_path' => $base_path . $filename
         ];
     }, $raw_images);
-    // --- END: FIX FOR IMAGE PATH RETRIEVAL ---
 
     $bidding_history = [];
 
@@ -111,9 +102,11 @@ try {
             SELECT 
                 bo.bid_amount,
                 bo.created_at,
-                bo.bidder_id
+                bo.bidder_id,
+                bo.bid_status,
+                bo.bid_id
             FROM bidoffer bo
-            WHERE bo.item_id = ? AND bo.bid_status = 'active'
+            WHERE bo.item_id = ?
             ORDER BY bo.bid_amount DESC, bo.created_at DESC
         ");
         
@@ -129,7 +122,6 @@ try {
             $in = str_repeat('?,', count($bidder_ids) - 1) . '?';
             
             $stmt_users = $db->prepare("SELECT user_id, username FROM user WHERE user_id IN ($in)");
-            // We use 's' for simplicity and safety across user ID types.
             $stmt_users->bind_param(str_repeat('s', count($bidder_ids)), ...$bidder_ids);
             $stmt_users->execute();
             $user_results = $stmt_users->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -140,10 +132,8 @@ try {
             $counter = 1;
             foreach ($raw_history as $bid) {
                 
-                // Get the real name (or fallback)
                 $bidder_name = $user_names[$bid['bidder_id']] ?? "Bidder #" . $counter;
                 
-                // ANONYMITY CHECK: Compare the bidder's ID to the current user's ID
                 if (strval($bid['bidder_id']) !== $current_user_id) { 
                     $bidder_name = "Anonymous Bidder"; 
                 }
@@ -152,13 +142,14 @@ try {
                     "bidder_name" => $bidder_name,
                     "bid_amount" => $bid["bid_amount"],
                     "created_at" => $bid["created_at"],
-                    "time_ago" => getTimeAgo($bid["created_at"])
+                    "time_ago" => getTimeAgo($bid["created_at"]),
+                    "bid_status" => $bid["bid_status"],
+                    "bid_id" => $bid["bid_id"]
                 ];
                 $counter++;
             }
         }
     }
-
 
     echo json_encode([
         'success' => true,
