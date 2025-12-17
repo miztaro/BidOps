@@ -1,149 +1,174 @@
-document.addEventListener("DOMContentLoaded", function () {
-    loadHeaderAndWatch();
-});
+/* 
+   SAFE HEADER SCRIPT (Final Fixed Version)
+   - Uses Event Delegation for Search (Fixes Message Page issues)
+   - Uses IIFE for safety
+*/
+(() => {
+    console.log("header.js loaded safely");
 
-function loadHeaderAndWatch() {
-    const headerContainer = document.getElementById("header");
-
-    // 1. Load Header normally
-    fetch("header.html")
-        .then(res => res.text())
-        .then(data => {
-            if(headerContainer) {
-                headerContainer.innerHTML = data;
-                initLogic();
-                if (typeof window.initAddListingModal === 'function') {
-                    window.initAddListingModal();
-                }                
-            }
-        })
-        .catch(console.error);
-
-    if (headerContainer) {
-        const observer = new MutationObserver((mutations) => {
-            // If the header HTML was wiped/changed, re-apply our logic
-            initLogic();
-            if (typeof window.initAddListingModal === 'function') {
-                    window.initAddListingModal();
-            }
-        });
-        observer.observe(headerContainer, { childList: true });
-    }
-}
-
-function initLogic() {
-    initHeaderClicks();
-    ensureHeaderUserData();
-    initSearchLogic();
-}
-
-function initHeaderClicks() {
-    const logo = document.getElementById("header-logo");
-    if (logo) {
-        logo.parentElement.addEventListener("click", (e) => {
-            e.preventDefault();
-            window.location.href = "homepage.html";
-        });
-    }
-    // Note: The <a> tag around the profile icon handles the click automatically
-}
-
-async function ensureHeaderUserData() {
-    let userInfo = JSON.parse(localStorage.getItem("userInfo"));
-
-    // If no user info, try to fetch it
-    if (!userInfo) {
-        try {
-            const response = await fetch("../server/user/get_user_info.php", {
-                method: "GET",
-                credentials: "include"
-            });
-            const data = await response.json();
-            if (data.success) {
-                userInfo = {
-                    user_id: data.user.user_id,
-                    username: data.user.username,
-                    email: data.user.email
-                };
-                localStorage.setItem("userInfo", JSON.stringify(userInfo));
-            }
-        } catch (e) {
-            console.error("Header: Fetch failed", e);
-        }
-    }
-
-    // Apply Avatar if we have data
-    if (userInfo && userInfo.username) {
-        applyHeaderAvatar(userInfo.username);
-    }
-}
-
-function applyHeaderAvatar(username) {
-    // Generate Avatar
-    const size = 100;
-    const letter = username.charAt(0).toUpperCase();
-    const canvas = document.createElement("canvas");
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext("2d");
-
-    let hash = 0;
-    for (let i = 0; i < username.length; i++) {
-        hash = username.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const color = `hsl(${hash % 360}, 65%, 45%)`;
-
-    ctx.fillStyle = color;
-    ctx.fillRect(0, 0, size, size);
+    // === 1. CONFIG & HELPERS ===
     
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `bold ${size * 0.5}px Arial`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(letter, size / 2, size / 2 + (size * 0.08));
+    // Determine the correct path to browse-items.html
+    // If you are deep in folders, this relative path might need to be '/pages/browse-items.html'
+    const BROWSE_PAGE_URL = "browse-items.html"; 
 
-    const avatarUrl = canvas.toDataURL("image/png");
-
-    // Apply to Image Tag
-
-    const headerImg = document.getElementById("user-header-profile-icon");
-    if (headerImg) {
-        headerImg.src = avatarUrl;
-    }
-}
-
-//search
-function initSearchLogic() {
-    // Select the input and button inside the header
-    const searchContainer = document.querySelector('.header-search');
-    if (!searchContainer) return;
-
-    const input = searchContainer.querySelector('input');
-    const button = searchContainer.querySelector('button');
-
-    const performSearch = () => {
-        const query = input.value.trim();
-        if (query) {
-            // Redirect to browse-items.html with the search query in the URL
-            window.location.href = `browse-items.html?search=${encodeURIComponent(query)}`;
+    function performSearch(query) {
+        const cleanQuery = query.trim();
+        if (cleanQuery) {
+            window.location.href = `${BROWSE_PAGE_URL}?search=${encodeURIComponent(cleanQuery)}`;
         }
-    };
-
-    // 1. Handle Click on Magnifying Glass
-    if (button) {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            performSearch();
-        });
     }
 
-    // 2. Handle "Enter" key in input box
-    if (input) {
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
+    // === 2. MAIN LOAD LOGIC ===
+    function loadHeaderAndWatch() {
+        const headerContainer = document.getElementById("header");
+
+        // Load Header HTML
+        fetch("header.html")
+            .then(res => res.text())
+            .then(data => {
+                if(headerContainer) {
+                    headerContainer.innerHTML = data;
+                    // We only need to init user data and logo. 
+                    // Search is now handled globally below.
+                    initHeaderUserData();
+                    initLogoClick(); 
+                }
+            })
+            .catch(err => console.error("Header load failed:", err));
+
+        // Watch for DOM changes (in case header is wiped/reloaded)
+        if (headerContainer) {
+            const observer = new MutationObserver(() => {
+                // If header is re-rendered, we just re-apply the avatar/logo logic.
+                // Search logic DOES NOT need re-applying because it is on the document body.
+                initHeaderUserData();
+                initLogoClick();
+            });
+            observer.observe(headerContainer, { childList: true });
+        }
+    }
+
+    // === 3. NAVIGATION LOGIC ===
+    function initLogoClick() {
+        // We use delegation here too just to be safe
+        const logo = document.getElementById("header-logo");
+        if (logo) {
+            // Find the anchor tag parent
+            const link = logo.closest('a');
+            if (link) {
+                // Ensure it goes where we want, or let default HTML handle it
+                // If you want to force JS redirection:
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    window.location.href = "homepage.html";
+                };
+            }
+        }
+    }
+
+    // === 4. USER PROFILE / AVATAR LOGIC ===
+    async function initHeaderUserData() {
+        let userInfo = null;
+
+        try {
+            const stored = localStorage.getItem("userInfo");
+            if (stored) userInfo = JSON.parse(stored);
+        } catch (e) {
+            console.error("Error parsing user info", e);
+        }
+
+        // Fetch if missing
+        if (!userInfo) {
+            try {
+                const response = await fetch("../server/user/get_user_info.php", {
+                    method: "GET",
+                    credentials: "include"
+                });
+                const data = await response.json();
+                if (data.success) {
+                    userInfo = {
+                        user_id: data.user.user_id,
+                        username: data.user.username,
+                        email: data.user.email
+                    };
+                    localStorage.setItem("userInfo", JSON.stringify(userInfo));
+                }
+            } catch (e) { /* silent fail */ }
+        }
+
+        if (userInfo && userInfo.username) {
+            generateAndApplyAvatar(userInfo.username);
+        }
+    }
+
+    function generateAndApplyAvatar(username) {
+        const headerImg = document.getElementById("user-header-profile-icon");
+        if (!headerImg) return;
+
+        const size = 100;
+        const letter = username.charAt(0).toUpperCase();
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+
+        let hash = 0;
+        for (let i = 0; i < username.length; i++) {
+            hash = username.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const color = `hsl(${hash % 360}, 65%, 45%)`;
+
+        ctx.fillStyle = color;
+        ctx.fillRect(0, 0, size, size);
+        
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `bold ${size * 0.5}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(letter, size / 2, size / 2 + (size * 0.08));
+
+        headerImg.src = canvas.toDataURL("image/png");
+    }
+
+    // === 5. GLOBAL SEARCH LOGIC (THE FIX) ===
+    // We attach this ONCE to the document. It works even if the header is deleted and recreated.
+    function initGlobalSearchListeners() {
+        
+        // 1. Handle CLICK on the Search Button (Magnifying Glass)
+        document.body.addEventListener('click', (e) => {
+            // Check if we clicked inside the header search button
+            const btn = e.target.closest('.header-search button');
+            if (btn) {
                 e.preventDefault();
-                performSearch();
+                // Find the input *next* to this button
+                const container = btn.closest('.header-search');
+                const input = container ? container.querySelector('input') : null;
+                if (input) {
+                    performSearch(input.value);
+                }
+            }
+        });
+
+        // 2. Handle ENTER KEY on the Search Input
+        document.body.addEventListener('keypress', (e) => {
+            // Check if the target is the header search input
+            if (e.target.matches('.header-search input') && e.key === 'Enter') {
+                e.preventDefault();
+                performSearch(e.target.value);
             }
         });
     }
-}
+
+    // === 6. INITIALIZE ===
+    if (document.readyState === 'loading') {
+        document.addEventListener("DOMContentLoaded", () => {
+            loadHeaderAndWatch();
+            initGlobalSearchListeners(); // Attach listeners immediately
+        });
+    } else {
+        loadHeaderAndWatch();
+        initGlobalSearchListeners(); // Attach listeners immediately
+    }
+
+})();

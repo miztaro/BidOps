@@ -14,3 +14,160 @@
     border: 1px solid #ccc;
     cursor: pointer;
 }
+@reference "tailwindcss";
+
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+/* ===== HEADER ===== */
+.main-header {
+  /* Default: mobile */
+  @apply flex flex-col items-center justify-center w-full h-auto px-[20px] py-[10px];
+
+  /* Large screens */
+  @apply lg:flex-row lg:flex-wrap lg:items-center lg:justify-between lg:px-[40px] lg:py-[20px] lg:w-full lg:min-h-[130px];
+
+  background: url("../../assets/images/HeaderBG.png") center/cover no-repeat;
+  border-bottom: 3px solid #ffe100;
+}
+
+/* ----- LEFT: Logo ----- */
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.slu-header-img {
+  height: 90px;
+  width: auto;
+}
+
+/* ----- RIGHT: Two-tier section ----- */
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+/* Top row: icons */
+.header-icons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+}
+
+.header-icons iconify-icon {
+  cursor: pointer;
+  color: #000;
+}
+
+/* Bottom row: search bar + add listing */
+.header-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+/* Search Bar */
+.header-search {
+  display: flex;
+  align-items: center;
+  max-width: 450px;
+  width: auto;
+  height: 42px;
+  border: 2px solid #153b6d;
+  border-radius: 40px;
+  background: #fff;
+  overflow: hidden;
+  padding: 0 15px;
+}
+
+.header-search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  padding-left: 8px;
+}
+
+.header-search button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #153b6d;
+}
+
+/* Add Listing Button */
+.add-listing-btn {
+  background: #ffe100;
+  border: none;
+  border-radius: 40px;
+  padding: 10px 22px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #000;
+}
+
+.add-btn span {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ===== ADMIN HEADER ===== */
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: url("../../assets/images/HeaderBG.png") center/cover no-repeat;
+  border-bottom: 3px solid #ffe100;
+  height: 130px;
+  padding: 0 40px;
+}
+
+/* Admin Links Row */
+.admin-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 25px;
+}
+
+/* navigation links */
+.admin-link {
+  font-weight: 700;
+  text-decoration: underline;
+  color: #000;
+  cursor: pointer;
+}
+
+.admin-link:hover {
+  opacity: 0.7;
+}
+
+.admin-header .header-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: flex-end;
+  gap: 15px;
+}
+
+.admin-header .header-bottom {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
