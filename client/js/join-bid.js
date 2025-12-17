@@ -9,6 +9,21 @@ let bidIncrementPercent = 0.00;
 let currentUserId = '0'; 
 
 function calculateMinimumBid(currentHighest, incrementPercent, isHighestDeclined = false) {
+    // If no current highest bid (N/A scenario), we should use starting price
+    if (!currentHighest || currentHighest === 0) {
+        if (itemData && itemData.starting_price) {
+            const startingPrice = parseFloat(itemData.starting_price || 0);
+            const safeIncrement = parseFloat(incrementPercent || 0) / 100;
+            const incrementAmount = startingPrice * safeIncrement;
+            
+            return { 
+                minimumBid: startingPrice, 
+                incrementAmount: incrementAmount 
+            };
+        }
+        return { minimumBid: 0, incrementAmount: 0 };
+    }
+    
     let safeHighest = parseFloat(currentHighest || 0);
     const safeIncrement = parseFloat(incrementPercent || 0) / 100;
     
@@ -242,9 +257,19 @@ function loadItemDetails() {
             itemData = data.item;
             bidIncrementPercent = parseFloat(itemData.bid_increment_percent || 0);
             
-            const startingPrice = parseFloat(itemData.starting_price || 0);
-            currentHighestBid = parseFloat(data.item.current_highest_bid || data.item.startingPrice || 0);
+            const hasActiveBids = data.bidding_history && 
+                data.bidding_history.some(bid => 
+                    bid.bid_status === 'active' || 
+                    !bid.bid_status || 
+                    bid.bid_status === ''
+                );
             
+            if (hasActiveBids && itemData.current_highest_bid) {
+                currentHighestBid = parseFloat(itemData.current_highest_bid);
+            } else {
+                currentHighestBid = 0;
+            }
+
             enableFeatures(); 
 
             // Fill title/description/prices/etc.
@@ -306,60 +331,91 @@ function populateItemDetails(data) {
         viewProfileBtn.href = `profile.html?user_id=${item.seller_id}`;
     }
 
-    currentHighestBid = parseFloat(item.current_highest_bid || item.starting_price || 0);
+    // FIX: Check if current_highest_bid is NULL or 0
+    const hasActiveBids = data.bidding_history && 
+        data.bidding_history.some(bid => 
+            bid.bid_status === 'active' || 
+            !bid.bid_status || 
+            bid.bid_status === ''
+        );
     
-    const { minimumBid, incrementAmount } = calculateMinimumBid(currentHighestBid, bidIncrementPercent);
+    currentHighestBid = hasActiveBids && item.current_highest_bid ? 
+        parseFloat(item.current_highest_bid) : 0;
+    
+    const startingPrice = parseFloat(item.starting_price || 0);
+    const { minimumBid, incrementAmount } = calculateMinimumBid(
+        currentHighestBid || startingPrice, 
+        bidIncrementPercent
+    );
     
     const startingPriceElem = document.querySelector('.bid-pricing .price-item:first-child .price-value');
     const currentBidElem = document.querySelector('.bid-pricing .price-item.current-bid .price-value');
     
-    const startingPrice = parseFloat(item.starting_price || 0);
     if (startingPriceElem) startingPriceElem.textContent = `₱${startingPrice.toFixed(2)}`;
     
     if (currentBidElem) {
-        currentBidElem.textContent = `₱${currentHighestBid.toFixed(2)}`;
-        
-        // Check if the current highest bid is inactive
-        const history = data.bidding_history || [];
-        const highestBid = history.find(bid => 
-            parseFloat(bid.bid_amount) === currentHighestBid && 
-            (bid.bid_status === 'declined' || bid.bid_status === 'outbid' || !bid.bid_status || bid.bid_status === '')
-        );
-        
-        if (highestBid) {
+        if (!hasActiveBids) {
+            currentBidElem.textContent = 'N/A';
+            currentBidElem.style.color = '#666';
+            currentBidElem.style.fontStyle = 'italic';
+            
             // Remove any existing note
             const existingNote = currentBidElem.querySelector('.declined-note');
             if (existingNote) {
                 existingNote.remove();
             }
-            
-            // Add the note
-            const noteElem = document.createElement('span');
-            noteElem.className = 'declined-note';
-            noteElem.textContent = ' (Declined)';
-            currentBidElem.appendChild(noteElem);
-            
-            // Change color to red
-            currentBidElem.style.color = '#e74c3c';
         } else {
-            // Reset color
-            currentBidElem.style.color = '#B41B1B';
+            currentBidElem.textContent = `₱${currentHighestBid.toFixed(2)}`;
+            currentBidElem.style.fontStyle = 'normal';
+            
+            // Check if the current highest bid is inactive
+            const history = data.bidding_history || [];
+            const highestBid = history.find(bid => 
+                parseFloat(bid.bid_amount) === currentHighestBid && 
+                (bid.bid_status === 'declined' || bid.bid_status === 'outbid')
+            );
+            
+            if (highestBid) {
+                // Remove any existing note
+                const existingNote = currentBidElem.querySelector('.declined-note');
+                if (existingNote) {
+                    existingNote.remove();
+                }
+                
+                // Add the note
+                const noteElem = document.createElement('span');
+                noteElem.className = 'declined-note';
+                noteElem.textContent = ' (Declined)';
+                currentBidElem.appendChild(noteElem);
+                
+                // Change color to red
+                currentBidElem.style.color = '#e74c3c';
+            } else {
+                // Reset color to normal
+                currentBidElem.style.color = '#B41B1B';
+            }
         }
     }
     
     const minBidTextElem = document.querySelector('.minimum-bid-text');
     if (minBidTextElem) {
-        minBidTextElem.textContent = 
-            `Minimum bid increment: ₱${incrementAmount.toFixed(2)} (Next minimum: ₱${minimumBid.toFixed(2)})`;
+        if (!hasActiveBids) {
+            minBidTextElem.textContent = 
+                `Starting bid: ₱${startingPrice.toFixed(2)}`;
+        } else {
+            minBidTextElem.textContent = 
+                `Minimum bid increment: ₱${incrementAmount.toFixed(2)} (Next minimum: ₱${minimumBid.toFixed(2)})`;
+        }
     }
     
     const bidAmountInput = document.getElementById('bidAmount');
     if (bidAmountInput) {
-        bidAmountInput.min = minimumBid;
-        if (minimumBid > 0) {
-            bidAmountInput.placeholder = minimumBid.toFixed(2);
-        } else {
+        if (!hasActiveBids) {
+            bidAmountInput.min = startingPrice;
             bidAmountInput.placeholder = startingPrice.toFixed(2);
+        } else {
+            bidAmountInput.min = minimumBid;
+            bidAmountInput.placeholder = minimumBid.toFixed(2);
         }
         bidAmountInput.step = "1";
     }
@@ -372,6 +428,37 @@ function populateItemDetails(data) {
 }
 
 function updateMinimumBid() {
+    // Check if there are active bids
+    const hasActiveBids = itemData && itemData.current_highest_bid && 
+        parseFloat(itemData.current_highest_bid) > 0;
+    
+    const startingPrice = parseFloat(itemData?.starting_price || 0);
+    
+    if (!hasActiveBids) {
+        // No active bids yet
+        const minBidTextElem = document.querySelector('.minimum-bid-text');
+        if (minBidTextElem) {
+            minBidTextElem.textContent = `Starting bid: ₱${startingPrice.toFixed(2)}`;
+        }
+        
+        const bidAmountInput = document.getElementById('bidAmount');
+        if (bidAmountInput) {
+            bidAmountInput.min = startingPrice;
+            bidAmountInput.placeholder = startingPrice.toFixed(2);
+        }
+        
+        // Update current bid display if needed
+        const currentBidElem = document.querySelector('.bid-pricing .price-item.current-bid .price-value');
+        if (currentBidElem && currentBidElem.textContent !== 'N/A') {
+            currentBidElem.textContent = 'N/A';
+            currentBidElem.style.color = '#666';
+            currentBidElem.style.fontStyle = 'italic';
+        }
+        
+        return;
+    }
+    
+    // There are active bids, use normal calculation
     const { minimumBid, incrementAmount } = calculateMinimumBid(currentHighestBid, bidIncrementPercent);
 
     const minBidTextElem = document.querySelector('.minimum-bid-text');
@@ -386,7 +473,7 @@ function updateMinimumBid() {
         if (minimumBid > 0) {
             bidAmountInput.placeholder = minimumBid.toFixed(2);
         } else if (itemData) {
-             bidAmountInput.placeholder = parseFloat(itemData.starting_price || 0).toFixed(2);
+            bidAmountInput.placeholder = startingPrice.toFixed(2);
         }
         bidAmountInput.step = "1";
     }

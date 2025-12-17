@@ -91,6 +91,57 @@ try {
         throw new Exception("Swap offer insertion failed: " . $stmt->error);
     }
 
+    /* ----------------------------------------------------
+        D. SEND OPTIONAL MESSAGE TO SELLER (Chat Message)
+    -----------------------------------------------------*/
+    if (!empty($message)) {
+        // 1. Get the seller_id for the requested item
+        $seller_query = $db->prepare("SELECT seller_id FROM item WHERE item_id = ?");
+        $seller_query->bind_param("i", $requested_item_id);
+        $seller_query->execute();
+        $seller_res = $seller_query->get_result();
+        
+        if ($seller_res->num_rows > 0) {
+            $row = $seller_res->fetch_assoc();
+            $seller_id = $row['seller_id'];
+            $buyer_id = $offerer_user_id;
+
+            // Only send if not chatting with self depending on logic, but typically allowed for testing
+            // Check for existing chat
+            $chat_query = $db->prepare("
+                SELECT chat_id 
+                FROM chat 
+                WHERE item_id = ? 
+                  AND ((buyer_id = ? AND seller_id = ?) OR (buyer_id = ? AND seller_id = ?))
+                LIMIT 1
+            ");
+            $chat_query->bind_param("issss", $requested_item_id, $buyer_id, $seller_id, $seller_id, $buyer_id);
+            $chat_query->execute();
+            $chat_res = $chat_query->get_result();
+            
+            $chat_id = null;
+            
+            if ($chat_res->num_rows > 0) {
+                $chat_row = $chat_res->fetch_assoc();
+                $chat_id = $chat_row['chat_id'];
+            } else {
+                // Create new chat
+                $new_chat = $db->prepare("INSERT INTO chat (item_id, buyer_id, seller_id, created_at) VALUES (?, ?, ?, NOW())");
+                $new_chat->bind_param("iss", $requested_item_id, $buyer_id, $seller_id);
+                if ($new_chat->execute()) {
+                    $chat_id = $db->insert_id;
+                }
+            }
+
+            // Insert the message if we have a valid chat_id
+            if ($chat_id) {
+                $msg_insert = $db->prepare("INSERT INTO message (chat_id, user_id, message, sent_at) VALUES (?, ?, ?, NOW())");
+                $msg_insert->bind_param("iss", $chat_id, $offerer_user_id, $message);
+                $msg_insert->execute();
+            }
+        }
+    }
+
     $db->commit();
 
     echo json_encode([
