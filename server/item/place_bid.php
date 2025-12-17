@@ -128,16 +128,16 @@ try {
     $stmt->close();
 
     // Send notification to seller
-    $notification_id = 'NOTIF_' . uniqid();
-    $notification_message = "New bid placed on your item '{$item_data['title']}': ₱" . number_format($bid_amount, 2);
+    // $notification_id = 'NOTIF_' . uniqid();
+    // $notification_message = "New bid placed on your item '{$item_data['title']}': ₱" . number_format($bid_amount, 2);
     
-    $stmt = $db->prepare("
-        INSERT INTO notification (notification_id, user_id, message, created_at, is_read)
-        VALUES (?, ?, ?, NOW(), 0)
-    ");
-    $stmt->bind_param("sss", $notification_id, $seller_data['seller_id'], $notification_message);
-    $stmt->execute();
-    $stmt->close();
+    // $stmt = $db->prepare("
+    //     INSERT INTO notification (notification_id, user_id, message, created_at, is_read)
+    //     VALUES (?, ?, ?, NOW(), 0)
+    // ");
+    // $stmt->bind_param("sss", $notification_id, $seller_data['seller_id'], $notification_message);
+    // $stmt->execute();
+    // $stmt->close();
 
     $db->commit();
 
