@@ -6,6 +6,7 @@ const backToPreviousBtn = document.getElementById('backToPrevious');
 const placeSwapBtn = document.getElementById('placeSwapBtn');
 const itemId = urlParams.get('item_id');
 let swapItemData = null;
+let currentUserId = '0';
 
 // --- INITIALIZATION ---
 window.addEventListener('load', () => {
@@ -47,6 +48,18 @@ function disableAllButtons() {
         
         // Remove the click event listener
         favoritesBtn.replaceWith(favoritesBtn.cloneNode(true));
+    }
+
+    // Disable Chat button
+    const chatBtn = document.querySelector('.chat-btn');
+    if (chatBtn) {
+        chatBtn.disabled = true;
+        chatBtn.style.opacity = '0.6';
+        chatBtn.style.cursor = 'not-allowed';
+        chatBtn.title = 'Loading...';
+        // Remove any existing listeners (especially from chat.js)
+        const newChatBtn = chatBtn.cloneNode(true);
+        chatBtn.replaceWith(newChatBtn);
     }
 }
 
@@ -138,8 +151,11 @@ function loadSwapItemDetails() {
 
             console.log('Successfully loaded item:', data.item.title);
             swapItemData = data.item;
+            currentUserId = data.current_user_id || '0';
+
             console.log('About to call populateSwapItemDetails with:', data);
             populateSwapItemDetails(data);
+            setupChatButton();
 
             // Bind click to seller profile
             const sellerProfileLink = document.getElementById('sellerProfileLink');
@@ -170,6 +186,85 @@ function loadSwapItemDetails() {
             console.error('Fetch error:', error);
             alert('Failed to load swap item details. Check console for details.');
         });
+}
+
+
+function setupChatButton() {
+    let chatBtn = document.querySelector('.chat-btn');
+    
+    if (chatBtn) {
+        const isLoggedIn = currentUserId !== '0';
+        const isSeller = swapItemData && swapItemData.seller_id === currentUserId;
+
+        chatBtn.disabled = false;
+        
+        // Handle different states
+        if (isSeller) {
+             chatBtn.disabled = true;
+             chatBtn.style.opacity = '0.6';
+             chatBtn.style.cursor = 'not-allowed';
+             chatBtn.title = 'You are the seller of this item.';
+             return;
+        }
+
+        if (!isLoggedIn) {
+             chatBtn.style.opacity = '0.6'; // Visual cue but maybe allow click to prompt login? 
+             // For now, let's allow click but server will reject or we prompt. 
+             // Actually join-bid.js disables it for non-logged in users. Let's start with enabled but check logic on click.
+        }
+
+        chatBtn.style.opacity = '1';
+        chatBtn.style.cursor = 'pointer';
+        chatBtn.title = 'Start a conversation with the seller';
+        
+        // Replace to ensure clean slate
+        const newChatBtn = chatBtn.cloneNode(true);
+        chatBtn.replaceWith(newChatBtn);
+        chatBtn = newChatBtn;
+        
+        newChatBtn.addEventListener('click', () => {
+             if (currentUserId === '0') {
+                 alert('Please log in to chat with the seller.');
+                 window.location.href = 'login.html';
+                 return;
+             }
+
+            if (!swapItemData || !swapItemData.seller_id) {
+                alert("Cannot start chat: Seller details missing.");
+                return;
+            }
+
+            // Call start_chat.php
+            fetch('../server/message/start_chat.php', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    item_id: itemId,
+                    seller_id: swapItemData.seller_id
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => { throw new Error(data.message || `HTTP error! status: ${response.status}`); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success && data.chat_id) {
+                    window.location.href = `messages.html?chat_id=${data.chat_id}`;
+                } else {
+                    alert(data.message || 'Failed to start chat.');
+                }
+            })
+            .catch(error => {
+                console.error('Error starting chat:', error);
+                alert('Error starting chat: ' + error.message);
+            });
+        });
+    }
 }
 
 

@@ -12,6 +12,15 @@ if (!isset($_GET['item_id'])) {
 
 $item_id = $_GET['item_id'];
 
+// Start session to get current user ID
+if (session_status() == PHP_SESSION_NONE) {
+    if (!headers_sent()) {
+        session_start();
+    }
+}
+
+$current_user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '0';
+
 try {
     $database = new Database();
     $db = $database->getConnection();
@@ -61,6 +70,7 @@ try {
     ------------------------------*/
     echo json_encode([
         'success' => true,
+        'current_user_id' => $current_user_id,
         'item' => $item,
         'images' => $images
     ]);
