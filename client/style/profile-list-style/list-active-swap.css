@@ -1,0 +1,352 @@
+/* ==========================================
+   Swapping HISTORY MODAL STYLES
+========================================== */
+
+.swapping-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+
+.swapping-modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.swapping-modal-container {
+    background-color: var(--primary-white);
+    border-radius: 20px;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow: hidden;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+}
+
+.swapping-modal-overlay.active .swapping-modal-container {
+    transform: scale(1);
+}
+
+.swapping-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: var(--primary);
+    color: var(--primary-white);
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: 0.3s ease;
+}
+
+.swapping-modal-close:hover {
+    background-color: var(--primary-red);
+    transform: rotate(90deg);
+}
+
+.swapping-modal-content {
+    display: flex;
+    height: 90vh;
+    max-height: 800px;
+}
+
+/* Left Side - Item Details */
+.swapping-modal-left {
+    flex: 1.5;
+    padding: 40px;
+    overflow-y: auto;
+    border-right: 1px solid #e0e0e0;
+}
+
+.swapping-item{
+    background-color: var(--primary-white);
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: 0.2s ease;
+    position: relative;
+}
+
+.swapping-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.swapping-item-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.swapper-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.swapping-item-details h2 {
+    font-size: 2em;
+    font-family: 'Montserrat-Bold', sans-serif;
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.swapping-item-category {
+    font-size: 1em;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.swapping-item-category strong {
+    color: var(--primary);
+}
+
+.swapping-item-description {
+    font-size: 0.95em;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+}
+
+.swapping-item-body{
+    display: block;
+}
+
+.swapping-item-body .offered-item-title{
+    font-size: 1.2em;
+    font-family: 'Montserrat-SemiBold', sans-serif;
+    color: var(--primary);
+}
+
+.swapping-item-body p{
+    font-size: 1em;
+    font-family: 'Montserrat-Regular', sans-serif;
+    color: var(--dark-secondary);
+}
+/* Right Side - Swapping History */
+.swapping-modal-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+.swapping-history-header {
+    padding: 30px 30px 20px 30px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.swapping-history-header h3 {
+    font-size: 1.8em;
+    font-family: 'Montserrat-Bold', sans-serif;
+    color: var(--primary);
+    margin-bottom: 5px;
+}
+
+.total-swappings {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.swapping-history-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 30px;
+}
+
+.swapping-offer-card {
+    background-color: var(--primary-white);
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: 0.2s ease;
+    position: relative;
+}
+
+.swapping-offer-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.swapping-offer-card.highest {
+    border: 2px solid var(--accent-hover);
+    background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
+}
+
+.swapping-offer-card.highest::before {
+    content: "🏆 Highest Offer";
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background-color: var(--accent-hover);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75em;
+    font-family: 'Montserrat-Bold', sans-serif;
+}
+
+.swapping-offer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.swapper-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.swapper-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent-hover) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Montserrat-Bold', sans-serif;
+    font-size: 1.1em;
+}
+
+.swapper-details h4 {
+    font-size: 1em;
+    font-family: 'Montserrat-Bold', sans-serif;
+    color: var(--primary);
+    margin-bottom: 2px;
+}
+
+.swapper-details p {
+    font-size: 0.8em;
+    color: #888;
+}
+
+.swapping-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.swapping-actions button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Montserrat-SemiBold', sans-serif;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-accept {
+    background-color: var(--primary-green);
+    color: white;
+}
+
+.btn-accept:hover {
+    background-color: #0a5c04;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(13, 77, 6, 0.3);
+}
+
+.btn-decline {
+    background-color: var(--primary-red);
+    color: white;
+}
+
+.btn-decline:hover {
+    background-color: #b30000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(204, 0, 0, 0.3);
+}
+
+.swapping-status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-family: 'Montserrat-SemiBold', sans-serif;
+    margin-top: 10px;
+}
+
+.swapping-status-badge.accepted {
+    background-color: var(--primary-green);
+    color: white;
+}
+
+.swapping-status-badge.declined {
+    background-color: #ccc;
+    color: #666;
+}
+
+/* Empty State */
+.swapping-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.swapping-empty-state iconify-icon {
+    font-size: 4em;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.swapping-empty-state p {
+    font-size: 1.1em;
+}
+
+/* Scrollbar Styling */
+.swapping-modal-left::-webkit-scrollbar,
+.swapping-history-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.swapping-modal-left::-webkit-scrollbar-track,
+.swapping-history-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.swapping-modal-left::-webkit-scrollbar-thumb,
+.swapping-history-list::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+.swapping-modal-left::-webkit-scrollbar-thumb:hover,
+.swapping-history-list::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-hover);
+}

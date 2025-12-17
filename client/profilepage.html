@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="tailwind/main-tailwind.css">
     <link rel="stylesheet" href="style/profile-list-style/list-edit-item.css">
     <link rel="stylesheet" href="style/profile-list-style/list-view-item.css">
+    <link rel="stylesheet" href="style/profile-list-style/list-active-bid.css">
+    <link rel="stylesheet" href="style/profile-list-style/list-active-swap.css">
     <link rel="stylesheet" href="style/profile-bids-style/bids-view-item.css">
     <link rel="stylesheet" href="style/profile-swaps-style/swaps-view-item.css">
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
@@ -469,7 +471,7 @@
                     <div class="bid-modal-right">
                         <div class="bid-history-header">
                             <h3>Bidding History</h3>
-                            <p class="total-bids" id="total-bids">0 Bids</p>
+                            <p class="total-bids" id="total-bids">No Bid Offers</p>
                         </div>
 
                         <div class="bid-history-list" id="bid-history-list">
@@ -479,6 +481,56 @@
                 </div>
             </div>
         </section>
+
+
+        <!-- Swapping History Modal -->
+        <section class="swapping-modal-overlay" id="swapping-modal-overlay">
+            <div class="swapping-modal-container">
+                <!-- Close Button -->
+                <button class="swapping-modal-close" id="swapping-modal-close">
+                    <iconify-icon icon="material-symbols:close" width="32" height="32"></iconify-icon>
+                </button>
+
+                <!-- Modal Content -->
+                <div class="swapping-modal-content">
+                    <!-- Left Side: Item Details -->
+                    <div class="swapping-modal-left">
+                        <div class="swapping-item-images">
+                            <div class="main-image-container">
+                                <img id="swapping-main-image" src="" alt="Item Image">
+                            </div>
+                            <div class="thumbnail-container" id="swapping-thumbnails">
+                                <!-- Thumbnails will be inserted here -->
+                            </div>
+                        </div>
+
+                        <div class="swapping-item-details">
+                            <h2 id="swapping-item-title">Item Title</h2>
+                            <p class="swapping-item-category">
+                                <strong>Category:</strong>
+                                <span id="swapping-item-category">-</span>
+                            </p>
+                            <p class="swapping-item-description" id="swapping-item-description">
+                                Item description goes here...
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Swapping History -->
+                    <div class="swapping-modal-right">
+                        <div class="swapping-history-header">
+                            <h3>Swapping Offers</h3>
+                            <p class="total-swappings" id="total-swappings">No Swapping Offers</p>
+                        </div>
+
+                        <div class="swapping-history-list" id="swapping-history-list">
+                            <!-- Swapping history items will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
 
         <section class="bids-view-overlay" id="bids-view-overlay">
             <div class="bids-view-container">

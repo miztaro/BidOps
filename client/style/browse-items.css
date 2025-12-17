@@ -26,3 +26,11 @@
     z-index: 20;
     display: block !important;
 }
+
+.bid-cards-list,
+.swap-cards-list{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 30px;
+    justify-content: start; 
+}
