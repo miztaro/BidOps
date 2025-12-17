@@ -42,14 +42,14 @@
                 <p class="item-description">Loading item details...</p>
 
                 <!-- Seller Info -->
-                <div class="seller-info">
+                <div class="seller-info" id="sellerProfileLink" style="cursor: pointer;">
                     <img src="../assets/images/profile-placeholder.png" alt="Seller" class="seller-avatar">
                     <div class="seller-details">
                         <h4>Loading...</h4>
                         <p>email@slu.edu.ph</p>
                     </div>
-                    <!-- <a href="#" class="view-profile-btn">View Profile</a> -->
                 </div>
+
 
                 <!-- Swap Information -->
                 <div class="swap-info-box">
@@ -135,16 +135,13 @@
     <!-- SCRIPTS -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // 1. Fetch Header HTML
             fetch("header.html")
                 .then(response => response.text())
                 .then(headerHTML => {
                     document.getElementById("header").innerHTML = headerHTML;
 
-                    // 2. Load Header JS manually
                     const script = document.createElement("script");
                     script.src = "js/header.js";
-                    // Initialize logic once script is ready
                     script.onload = function() {
                         if (typeof initLogic === 'function') initLogic();
                     };

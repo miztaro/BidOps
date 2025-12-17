@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Profile - Swap and Bid</title>
+    <link rel="stylesheet" href="style/join-bid.css">
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+    <script src="js/client-guard.js"></script>
+</head>
+<body>
+    <div id="header"></div>
+
+    <div class="top-nav">
+        <button class="back-home" id="backToPrevious">
+            <iconify-icon icon="line-md:arrow-left" width="24" height="24"></iconify-icon>
+            Back
+        </button>
+    </div>
+
+    <main class="bid-details-container">
+        <div class="content-wrapper">
+            <div class="image-section">
+                <div class="main-image-container">
+                    <img src="../assets/images/profile-placeholder.png" alt="Seller" id="sellerMainAvatar">
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h2 class="item-title" id="sellerName">Seller Name</h2>
+                <p class="item-description" id="sellerEmail">seller@email…
+
+                </p>
+
+                <section class="swap-info-box">
+                    <h3>Seller Listings</h3>
+                    <p class="swap-description">
+                        This section will show all active and recent listings from this seller.
+                    </p>
+                    <div id="sellerListingsPlaceholder">
+                    </div>
+                </section>
+
+                <section class="place-bid-section">
+                    <h3>Seller Feedback</h3>
+                    <p style="margin-bottom: 15px; color: #555;">
+                        This section will display feedback and ratings about this seller.
+                    </p>
+                    <div id="sellerFeedbackPlaceholder">
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="footer-top">
+            <h2>Your Campus, Your Marketplace.</h2>
+            <p>Post your items, make a deal, and connect<br>with SLU students today!</p>
+            <p class="footer-description">
+                A safe, student-powered platform to buy, sell, and trade academic resources and campus essentials.
+            </p>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-left">
+                <img src="../assets/images/slu-logo.png" alt="SLU Logo" class="footer-logo">
+                <div class="footer-text">
+                    <h3>Swap and Bid</h3>
+                    <p>Campus Marketplace</p>
+                    <span>SAINT LOUIS UNIVERSITY</span>
+                    <small>Baguio City, Philippines</small>
+                </div>
+            </div>
+
+            <div class="footer-center">
+                <p class="footer-tagline">
+                    The official trading platform for Saint Louis University. Buy, sell, and swap academic resources safely.
+                </p>
+            </div>
+
+            <div class="footer-right">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="#"><iconify-icon icon="mdi:facebook"></iconify-icon></a>
+                    <a href="#"><iconify-icon icon="mdi:twitter"></iconify-icon></a>
+                    <a href="#"><iconify-icon icon="mdi:instagram"></iconify-icon></a>
+                </div>
+                <p class="support-email">
+                    <iconify-icon icon="mdi:email"></iconify-icon>
+                    support@sluswapbid.edu.ph
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-copyright">
+            <p>© 2025 SLU Trade - Bid. All rights reserved. | Saint Louis University Initiative</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch("header.html")
+                .then(response => response.text())
+                .then(headerHTML => {
+                    document.getElementById("header").innerHTML = headerHTML;
+
+                    const script = document.createElement("script");
+                    script.src = "js/header.js";
+                    script.onload = function() {
+                        if (typeof initLogic === 'function') initLogic();
+                    };
+                    document.body.appendChild(script);
+                })
+                .catch(error => console.error("Error loading header:", error));
+
+            const backBtn = document.getElementById('backToPrevious');
+            if (backBtn) {
+                backBtn.addEventListener('click', () => window.history.back());
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const sellerId = params.get('seller_id');
+            if (sellerId) {
+                document.getElementById('sellerName').textContent = `Seller ${sellerId}`;
+                document.getElementById('sellerEmail').textContent = 'Email will be loaded later.';
+            }
+        });
+    </script>
+
+    <script src="js/add-listing.js"></script>
+</body>
+</html>

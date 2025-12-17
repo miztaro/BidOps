@@ -1,4 +1,5 @@
 // js/view-swap.js
+console.log('view-swap.js loaded');
 
 const urlParams = new URLSearchParams(window.location.search);
 const backToPreviousBtn = document.getElementById('backToPrevious');
@@ -76,11 +77,47 @@ function setupBackButton() {
 
 // --- DATA LOADING & RENDERING ---
 
+function populateSwapItemDetails(data) {
+    const item = data.item;
+
+    console.log('Populating details for:', item.title, 'seller_id:', item.seller_id);
+
+    const titleElement = document.querySelector('.item-title');
+    const descElement = document.querySelector('.item-description');
+
+    if (titleElement) titleElement.textContent = item.title || 'No Title';
+    if (descElement) descElement.textContent = item.description || 'No description available.';
+
+    const sellerName = document.querySelector('.seller-details h4');
+    const sellerEmail = document.querySelector('.seller-details p');
+    const sellerProfileLink = document.getElementById('sellerProfileLink');
+
+    if (sellerName) sellerName.textContent = item.seller_name || 'Unknown Seller';
+    if (sellerEmail) sellerEmail.textContent = item.seller_email || 'No email';
+
+    if (sellerProfileLink) {
+        sellerProfileLink.style.cursor = 'pointer';
+        sellerProfileLink.onclick = null;
+
+        if (item.seller_id) {
+            sellerProfileLink.addEventListener('click', () => {
+                console.log('CLICK sellerProfileLink → going to seller-profile.html for', item.seller_id);
+                window.location.href = `seller-profile.html?seller_id=${encodeURIComponent(item.seller_id)}`;
+            });
+        } else {
+            console.warn('No seller_id on item, cannot navigate');
+        }
+    }
+
+    console.log('Details populated successfully');
+}
+
+
 
 
 function loadSwapItemDetails() {
     console.log('Loading swap item details for ID:', itemId);
-    
+
     fetch(`../server/item/get_swap_details.php?item_id=${itemId}`)
         .then(response => {
             console.log('Response status:', response.status);
@@ -91,31 +128,42 @@ function loadSwapItemDetails() {
         })
         .then(data => {
             console.log('Received data:', data);
-            
-            if (!data.success) {
-                console.error('Server error:', data.message);
-                alert('Error: ' + data.message);
+
+            if (!data.success || !data.item) {
+                console.error('Server error or missing item:', data.message);
+                alert('Error: ' + (data.message || 'No item data'));
                 window.location.href = 'homepage.html';
                 return;
             }
-            
-            if (!data.item) {
-                console.error('No item data received');
-                alert('No item data found');
-                return;
-            }
-            
+
             console.log('Successfully loaded item:', data.item.title);
             swapItemData = data.item;
+            console.log('About to call populateSwapItemDetails with:', data);
             populateSwapItemDetails(data);
-            
+
+            // Bind click to seller profile
+            const sellerProfileLink = document.getElementById('sellerProfileLink');
+            if (sellerProfileLink && data.item.seller_id) {
+                console.log('Binding click in loadSwapItemDetails for seller_id:', data.item.seller_id);
+                sellerProfileLink.onclick = () => {
+                    console.log(
+                        'CLICK in loadSwapItemDetails → going to seller-profile.html for',
+                        data.item.seller_id
+                    );
+                    window.location.href =
+                        `seller-profile.html?seller_id=${encodeURIComponent(data.item.seller_id)}`;
+                };
+            } else {
+                console.warn('sellerProfileLink missing or no seller_id');
+            }
+
+            // Images
             if (data.images && data.images.length > 0) {
                 setupImageGallery(data.images);
             } else {
-                console.log('No images found for this item');
                 setupDefaultImage();
             }
-            
+
             enableSwapOffer();
         })
         .catch(error => {
@@ -123,6 +171,7 @@ function loadSwapItemDetails() {
             alert('Failed to load swap item details. Check console for details.');
         });
 }
+
 
 function setupDefaultImage() {
     const mainImage = document.getElementById('mainImage');
@@ -286,3 +335,9 @@ function submitSwapOffer(itemName, itemDescription, itemCategory, itemImage, mes
         submitBtn.textContent = 'Submit Swap Offer';
     });
 }
+
+document.addEventListener('click', (e) => {
+    if (e.target.closest('#sellerProfileLink')) {
+        console.log('GLOBAL: click reached #sellerProfileLink');
+    }
+});
