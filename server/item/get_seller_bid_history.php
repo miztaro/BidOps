@@ -5,6 +5,9 @@ header('Access-Control-Allow-Origin: *');
 
 include_once '../config/database.php';
 
+// Set the default timezone to Philippines to prevent the 7-8 hour offset
+date_default_timezone_set('Asia/Manila');
+
 if (!isset($_GET['item_id'])) {
     echo json_encode(['success' => false, 'message' => 'Item ID is required']);
     exit;
@@ -19,7 +22,6 @@ try {
     /* -----------------------------
         FETCH ITEM DETAILS
     ------------------------------*/
-
     $query = "
         SELECT 
             i.*,
@@ -50,10 +52,8 @@ try {
     }
 
     /* -----------------------------
-        FETCH IMAGES - *** FIXED COLUMN SELECTION ***
+        FETCH IMAGES
     ------------------------------*/
-
-    // CHANGE: Explicitly select 'image_path' to ensure consistency with client-side JavaScript
     $stmt = $db->prepare("SELECT image_path FROM itemimage WHERE item_id = ? ORDER BY image_id");
     $stmt->bind_param("i", $item_id);
     $stmt->execute();
@@ -61,11 +61,8 @@ try {
 
     /* -----------------------------
         FETCH BIDDING HISTORY
-        (WITH BIDDER NAMES - For Seller View)
     ------------------------------*/
-
     $bidding_history = [];
-
     if ($item['item_type'] === 'bid') {
         $stmt = $db->prepare("
              SELECT 
@@ -80,44 +77,41 @@ try {
            INNER JOIN user u ON bo.bidder_id = u.user_id
            WHERE bo.item_id = ?
            ORDER BY bo.bid_amount DESC, bo.created_at DESC
-    ");
-
+        ");
 
         $stmt->bind_param("i", $item_id);
         $stmt->execute();
         $bidding_history = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-        // Add time_ago for each bid
         foreach ($bidding_history as &$bid) {
             $bid['time_ago'] = getTimeAgo($bid['created_at']);
         }
     }
 
     /* -----------------------------
-        CALCULATE TIME REMAINING
+        CALCULATE TIME REMAINING (FIXED)
     ------------------------------*/
-
     $time_remaining = null;
-    if ($item['item_type'] === 'bid' && $item['end_date']) {
-        $now = new DateTime();
+    if ($item['item_type'] === 'bid' && !empty($item['end_date'])) {
+        $now = new DateTime(); 
         $end = new DateTime($item['end_date']);
         
-        if ($end > $now) {
+        // Calculate the absolute difference in seconds
+        $seconds_diff = $end->getTimestamp() - $now->getTimestamp();
+
+        if ($seconds_diff > 0) {
             $diff = $now->diff($end);
             $time_remaining = [
-                'days' => $diff->d,
+                'days' => $diff->days,
                 'hours' => $diff->h,
                 'minutes' => $diff->i,
                 'seconds' => $diff->s,
-                'total_seconds' => ($diff->days * 86400) + ($diff->h * 3600) + ($diff->i * 60) + $diff->s,
+                'total_seconds' => $seconds_diff,
                 'is_active' => true
             ];
         } else {
             $time_remaining = [
-                'days' => 0,
-                'hours' => 0,
-                'minutes' => 0,
-                'seconds' => 0,
+                'days' => 0, 'hours' => 0, 'minutes' => 0, 'seconds' => 0,
                 'total_seconds' => 0,
                 'is_active' => false
             ];
@@ -140,12 +134,12 @@ try {
 }
 
 /* -----------------------------
-    TIME AGO FUNCTION
+    TIME AGO FUNCTION (FIXED)
 ------------------------------*/
-
 function getTimeAgo($datetime) {
-    $now = new DateTime();
-    $ago = new DateTime($datetime);
+    $timezone = new DateTimeZone('Asia/Manila');
+    $now = new DateTime('now', $timezone);
+    $ago = new DateTime($datetime, $timezone);
     $diff = $now->diff($ago);
     
     if ($diff->d > 0) {
