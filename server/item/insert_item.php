@@ -3,18 +3,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    header("Access-Control-Allow-Origin: *");
-    header("Access-Control-Allow-Methods: POST, OPTIONS");
-    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-    http_response_code(200);
-    exit();
-}
-
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 include_once '../config/database.php';
 session_start();
@@ -223,7 +211,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             http_response_code(201);
             echo json_encode([
-                "message" => "Item created successfully!",
+                "message" => "Item now pending for approval",
                 "item_id" => $item_id
             ]);
 

@@ -6,7 +6,12 @@ const db = require('./database'); // Uses the database.js we created
 const app = express();
 const PORT = 3000;
 
-app.use(cors());
+app.use(cors({
+    origin: true,        // <--- This tells Node to say "Yes" to whoever is asking
+    credentials: true,   // <--- Allows cookies/sessions to pass through
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -184,10 +189,21 @@ app.post('/api/dismiss-report', async (req, res) => {
 // F. VIEW ITEM DETAILS
 app.get('/api/item/:id', async (req, res) => {
     try {
+        // *** UPDATED QUERY ***
+        // We added: LEFT JOIN biditem bi ON ...
+        // We added: bi.starting_price, bi.end_date, etc.
         const [items] = await db.query(`
-            SELECT i.*, u.username as seller_name, u.email as seller_email 
+            SELECT 
+                i.*, 
+                u.username as seller_name, 
+                u.email as seller_email,
+                bi.starting_price,
+                bi.start_date,
+                bi.end_date,
+                bi.bid_increment_percent
             FROM item i 
             LEFT JOIN user u ON i.seller_id = u.user_id 
+            LEFT JOIN biditem bi ON i.item_id = bi.item_id 
             WHERE i.item_id = ?`, [req.params.id]);
         
         if (items.length === 0) return res.status(404).json({ success: false, message: 'Item not found' });
