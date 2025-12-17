@@ -1,6 +1,22 @@
 <?php
 // server/auth/google-login.php
+// 1. Allow ANY computer to connect (Dynamic Origin)
+if (isset($_SERVER['HTTP_ORIGIN'])) {
+    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Max-Age: 86400');    // Cache for 1 day
+}
 
+// 2. Handle Browser "Pre-check" (OPTIONS request)
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+    
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
+        header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+    
+    exit(0);
+}
 // 1. SILENCE HTML ERRORS
 error_reporting(E_ALL);
 ini_set('display_errors', 0); 
@@ -12,11 +28,11 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST");
 
-// 3. LOAD DEPENDENCIES (MUST BE OUTSIDE TRY BLOCK)
+// 3. LOAD DEPENDENCIES
 require __DIR__ . '/../../vendor/autoload.php'; 
 require __DIR__ . '/../config/database.php'; 
 
-// 4. USE STATEMENTS (MUST BE HERE, NOT INSIDE TRY)
+// 4. USE STATEMENTS
 use Firebase\JWT\JWT;
 use Firebase\JWT\JWK;
 
@@ -60,8 +76,14 @@ try {
             exit();
         }
 
+        // *** CHANGE: Updated Deleted Check to return flags ***
         if ($user['is_deleted'] == 1) {
-            echo json_encode(["success" => false, "message" => "Account deleted."]);
+            echo json_encode([
+                "success" => false, 
+                "message" => "Account is deleted.",
+                "is_deleted" => true,        // Logic Trigger
+                "user_id" => $user['user_id'] // ID for Reactivation
+            ]);
             exit();
         }
 
