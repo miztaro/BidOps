@@ -1,8 +1,8 @@
 // client/js/messages.js
 
-const chatListContainer = document.getElementById('chatListContainer'); // Container for list on the left
-const chatWindowHeader = document.querySelector('.chat-window-header'); // Area showing the recipient's name/profile
-const messageContainer = document.getElementById('messagesContent'); // Main message history
+const chatListContainer = document.getElementById('chatListContainer');
+const chatWindowHeader = document.querySelector('.chat-window-header');
+const messageContainer = document.getElementById('messagesContent');
 const messageInput = document.getElementById('messageInput');
 const sendMessageBtn = document.getElementById('sendMessageBtn');
 const urlParams = new URLSearchParams(window.location.search);
@@ -10,8 +10,9 @@ const urlParams = new URLSearchParams(window.location.search);
 let currentChatId = urlParams.get('chat_id');
 let currentRecipientId = null;
 let currentRecipientName = null;
+let currentUserId = null;
+let messagesPollInterval = null;
 
-// Helper to get time in a readable format
 function formatTime(timestamp) {
     const date = new Date(timestamp);
     const hours = date.getHours() % 12 || 12;
@@ -45,8 +46,7 @@ function displayChatList(chats) {
     chats.forEach(chat => {
         const isSelected = chat.chat_id == currentChatId;
         const chatItem = document.createElement('div');
-        // NOTE: If you use .chat-item in your CSS, change .chat-list-item below
-        chatItem.className = 'chat-list-item ' + (isSelected ? 'active' : ''); 
+        chatItem.className = 'chat-list-item ' + (isSelected ? 'active' : '');
         chatItem.dataset.chatId = chat.chat_id;
         chatItem.dataset.recipientId = chat.recipient_id;
         chatItem.dataset.recipientName = chat.recipient_name;
@@ -55,7 +55,7 @@ function displayChatList(chats) {
             currentRecipientId = chat.recipient_id;
             currentRecipientName = chat.recipient_name;
             updateChatHeader(chat.recipient_name);
-            loadMessages(chat.chat_id);
+            openChat(chat.chat_id); // use polling-aware openChat
         }
 
         chatItem.innerHTML = `
@@ -70,15 +70,15 @@ function displayChatList(chats) {
         chatItem.addEventListener('click', () => {
             document.querySelectorAll('.chat-list-item').forEach(el => el.classList.remove('active'));
             chatItem.classList.add('active');
-            
+
             history.pushState(null, '', `messages.html?chat_id=${chat.chat_id}`);
-            
+
             currentChatId = chat.chat_id;
             currentRecipientId = chat.recipient_id;
             currentRecipientName = chat.recipient_name;
-            
+
             updateChatHeader(currentRecipientName);
-            loadMessages(currentChatId);
+            openChat(currentChatId);
         });
 
         chatListContainer.appendChild(chatItem);
@@ -98,22 +98,44 @@ function updateChatHeader(name) {
     }
 }
 
-function loadMessages(chatId) {
+function openChat(chatId) {
+    if (!chatId) return;
+
+    // clear old interval
+    if (messagesPollInterval) {
+        clearInterval(messagesPollInterval);
+        messagesPollInterval = null;
+    }
+
+    // load immediately
+    loadMessages(chatId, true);
+
+    // start polling every 5 seconds
+    messagesPollInterval = setInterval(() => {
+        loadMessages(chatId, false);
+    }, 5000);
+}
+
+function loadMessages(chatId, scrollToBottom = true) {
     if (!chatId) {
         messageContainer.innerHTML = '<p class="text-center p-5">Select a chat to view messages.</p>';
         return;
     }
 
-    messageContainer.innerHTML = '<p class="text-center p-5">Loading messages...</p>';
+    // Only show loading text on first load (scrollToBottom true)
+    if (scrollToBottom) {
+        messageContainer.innerHTML = '<p class="text-center p-5">Loading messages...</p>';
+    }
 
-    fetch(`../server/message/get_messages.php?chat_id=${chatId}`, {
+    fetch(`../server/message/get_messages.php?chat_id=${encodeURIComponent(chatId)}`, {
         method: 'GET',
         credentials: 'include'
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            displayMessages(data.messages, data.current_user_id);
+            currentUserId = data.current_user_id;
+            displayMessages(data.messages, data.current_user_id, scrollToBottom);
         } else {
             messageContainer.innerHTML = `<p class="text-center p-5">Error: ${data.message}</p>`;
         }
@@ -121,33 +143,33 @@ function loadMessages(chatId) {
     .catch(error => console.error('Error loading messages:', error));
 }
 
-function displayMessages(messages, currentUserId) {
+function displayMessages(messages, currentUserId, scrollToBottom) {
     messageContainer.innerHTML = '';
-    
-    if (messages.length === 0) {
+
+    if (!messages || messages.length === 0) {
         messageContainer.innerHTML = '<p class="text-center p-5">No messages yet. Start the conversation!</p>';
         return;
     }
 
     messages.forEach(msg => {
-        const isSender = msg.user_id === currentUserId; 
+        const isSender = msg.user_id === currentUserId;
         const messageEl = document.createElement('div');
-        
-        // **FIXED: Uses '.message' and '.bubble' classes for correct CSS rendering**
-        messageEl.className = 'message ' + (isSender ? 'sent' : 'received'); 
-        
+
+        messageEl.className = 'message ' + (isSender ? 'sent' : 'received');
+
         messageEl.innerHTML = `
-            <div class="bubble"> 
-                <p>${msg.message}</p> 
+            <div class="bubble">
+                <p>${msg.message}</p>
                 <span class="time">${formatTime(msg.sent_at)}</span>
             </div>
         `;
         messageContainer.appendChild(messageEl);
     });
 
-    messageContainer.scrollTop = messageContainer.scrollHeight;
+    if (scrollToBottom) {
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
 }
-
 
 // ----------------------------------------------------------------------
 // C. SEND MESSAGE LOGIC
@@ -155,7 +177,7 @@ function displayMessages(messages, currentUserId) {
 
 function sendMessage() {
     const content = messageInput.value.trim();
-    
+
     if (!content || !currentChatId) return;
 
     fetch('../server/message/send_message.php', {
@@ -173,8 +195,9 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            messageInput.value = ''; // Clear input
-            loadMessages(currentChatId); 
+            messageInput.value = '';
+            // Refresh immediately after sending
+            loadMessages(currentChatId, true);
         } else {
             alert('Failed to send message: ' + (data.message || 'Server error.'));
         }
@@ -185,8 +208,6 @@ function sendMessage() {
     });
 }
 
-
-// Event listeners
 if (sendMessageBtn) {
     sendMessageBtn.addEventListener('click', sendMessage);
 }
@@ -202,4 +223,8 @@ if (messageInput) {
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
     loadChatList();
+    // If URL already had chat_id, start polling for it
+    if (currentChatId) {
+        openChat(currentChatId);
+    }
 });
