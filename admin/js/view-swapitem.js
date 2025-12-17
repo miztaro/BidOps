@@ -25,9 +25,23 @@ document.addEventListener("DOMContentLoaded", function() {
             if(item.seller_name) document.getElementById('sellerName').textContent = item.seller_name;
 
             if(data.images.length > 0) {
-                 // Remove relative path if exists in DB to use Node static route
-                const imgPath = data.images[0].image_path.replace('BidOps/server/item/uploads/', '');
-                document.getElementById('mainImage').src = `BidOps/server/item/uploads/${imgPath}`;
+                // 1. POINT TO PHP SERVER (Port 80/Apache), NOT Node (Port 3000)
+                // Make sure 'BidOps' matches your actual folder name in htdocs
+                const phpServer = 'http://localhost/BidOps/server'; 
+
+                // 2. CLEAN THE PATH
+                // Your DB likely has "uploads/item_...png"
+                // We strip "uploads/" so we don't get the "uploads/uploads/" error
+                const rawPath = data.images[0].image_path;
+                const cleanFilename = rawPath.replace('uploads/', '');
+
+                // 3. SET THE SOURCE
+                document.getElementById('mainImage').src = `${phpServer}/item/uploads/${cleanFilename}`;
+                
+                // Optional: Handle broken images
+                document.getElementById('mainImage').onerror = function() {
+                    this.src = '../assets/images/placeholder.png'; 
+                };
             }
         });
     }
@@ -41,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(res => res.json())
         .then(data => {
             alert(data.message);
-            window.location.href = 'manage-listing.html';
+            window.location.href = 'manage-listings.html';
         });
     };
 });

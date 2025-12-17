@@ -3,31 +3,22 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// 1. CORS Headers
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    $allowed_origins = ['http://localhost', 'http://localhost:8000', 'http://127.0.0.1:5500', 'http://127.0.0.1:8000'];
-    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-    
-    if (in_array($origin, $allowed_origins)) {
-        header("Access-Control-Allow-Origin: $origin");
-    } else {
-        header("Access-Control-Allow-Origin: http://localhost:8000");
-    }
-    
-    header("Access-Control-Allow-Methods: POST, OPTIONS");
-    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-    header("Access-Control-Allow-Credentials: true");
-    http_response_code(200);
-    exit();
+// 1. Allow ANY computer to connect (Dynamic Origin)
+if (isset($_SERVER['HTTP_ORIGIN'])) {
+    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Max-Age: 86400');    // Cache for 1 day
 }
 
-$allowed_origins = ['http://localhost', 'http://localhost:8000', 'http://127.0.0.1:5500', 'http://127.0.0.1:8000'];
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-
-if (in_array($origin, $allowed_origins)) {
-    header("Access-Control-Allow-Origin: $origin");
-} else {
-    header("Access-Control-Allow-Origin: http://localhost:8000");
+// 2. Handle Browser "Pre-check" (OPTIONS request)
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+    
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
+        header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+    
+    exit(0);
 }
 
 header("Content-Type: application/json; charset=UTF-8");
@@ -61,16 +52,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
         }
 
-        //Get MySQLi connection
+        // Get MySQLi connection
         $database = new Database();
         $db = $database->getConnection();
 
-        //CHECK USER LOGIN
-        
+    
+        // CHECK USER LOGIN
 
-        $queryUser = "SELECT user_id, username, email, password, is_banned 
+        // We need to find them even if deleted to verify password first.
+        $queryUser = "SELECT user_id, username, email, password, is_banned, is_deleted 
                       FROM user
-                      WHERE username = ? AND is_deleted = 0";
+                      WHERE username = ?";
 
         $stmtUser = $db->prepare($queryUser);
         $stmtUser->bind_param("s", $data->username);
@@ -82,23 +74,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($resultUser->num_rows > 0) {
             $user = $resultUser->fetch_assoc();
             
-            if ($user['is_banned']) {
-                echo json_encode([
-                    "success" => false,
-                    "message" => "Your account has been banned. Please contact BidOps support."
-                ]);
-                exit();
-            }
-
-        
-            // We check:
-            // 1. Is it a Hash? (password_verify) - For NEW account
-            // 2. Is it Plain Text? (===) - For OLD dummy accounts (u1-u15)
+            // *** CHANGE 2: Verify Password FIRST ***
+            // We check password before checking ban/delete status for security
             $input_password = $data->password;
             $stored_password = $user['password'];
 
             if (password_verify($input_password, $stored_password) || $input_password === $stored_password) {
                 
+                // Password is CORRECT. Now check status.
+
+                // A. CHECK BANNED
+                if ($user['is_banned'] == 1) {
+                    echo json_encode([
+                        "success" => false,
+                        "message" => "Your account has been banned. Please contact BidOps support."
+                    ]);
+                    exit();
+                }
+
+                // B. CHECK DELETED 
+                if ($user['is_deleted'] == 1) {
+                    echo json_encode([
+                        "success" => false,
+                        "message" => "Account is deleted.",
+                        "is_deleted" => true,       // Signal for Frontend
+                        "user_id" => $user['user_id'] // ID for Reactivation
+                    ]);
+                    exit();
+                }
+
+                // C. SUCCESSFUL LOGIN
                 session_regenerate_id(true);
 
                 $_SESSION['role'] = 'user';
@@ -120,11 +125,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     "message" => "Login successful!"
                 ]);
                 exit();
-            }
-           
+            } 
+            // If password wrong, $found remains false, falls through to Admin check
         }
 
-        //CHECK ADMIN LOGIN
+    
+        // CHECK ADMIN LOGIN
+    
         if (!$found) {
             $queryAdmin = "SELECT admin_id, username, password FROM admin WHERE username = ?";
             $stmtAdmin = $db->prepare($queryAdmin);
@@ -135,8 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($resultAdmin->num_rows > 0) {
                 $admin = $resultAdmin->fetch_assoc();
 
-                // Admin  keeps plain text 
-        
+                // Admin keeps plain text 
                 if ($data->password === $admin['password']) {
                     session_regenerate_id(true);
 
@@ -160,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        // INVALID LOGIN
+        // INVALID LOGIN (User not found, password wrong, or Admin not found)
         echo json_encode([
             "success" => false,
             "message" => "Invalid username or password!"

@@ -1,142 +1,146 @@
 ==============================================================================
-PROJECT NAME: SLU Bid and Swap
+PROJECT NAME: SLU Swap and Bid (BidOps)
 TEAM NAME:    312Team-BidOps
 DATE:         December 2025
 ==============================================================================
 
-PREREQUISITES
-- Virtual Box
-- Ubuntu Server ISO (LTS 24.04.3)
-
 1. SYSTEM OVERVIEW
 ------------------------------------------------------------------------------
-This web application is a hybrid system built for an Ubuntu Server environment 
-hosted on VirtualBox. It integrates:
-1. PHP Module (User/Client Side) - Hosted on Apache (Port 80)
-2. NodeJS Module (Admin Side)    - Hosted on Express (Port 3000)
-3. Database                      - MySQL Server
+This is a Hybrid Web Application running on an Ubuntu Server (VirtualBox).
+It consists of three parts:
+1. CLIENT SIDE (PHP/Apache):    Port 80   (http://<IP>/BidOps/client)
+2. ADMIN SIDE (Node.js/Express): Port 3000 (http://<IP>:3000)
+3. DATABASE (MySQL):            Port 3306
 
-2. VIRTUALBOX ENVIRONMENT SETUP
+2. PREREQUISITES
 ------------------------------------------------------------------------------
-To replicate the development environment, please configure your Virtual Machine 
-as follows:
+- VirtualBox installed on Host Machine.
+- Ubuntu Server 24.04 LTS ISO.
+- Internet connection on the VM (Bridged Adapter recommended).
 
-A. VM Configuration
-   - OS: Ubuntu Server (LTS 24.04.3)
-   - RAM: 2048 MB (Minimum)
-   - Network Adapter: BRIDGED ADAPTER (Crucial)
-     * Select the specific network card your Host PC is using for internet (WiFi/LAN).
-
-B. Finding Your IP Address
-   Since we are using Bridged Adapter, the VM will get its own IP address.
-   1. Login to Ubuntu.
-   2. Run command: $ ip a
-   3. Look for the IP address (e.g., 192.168.1.xxx) under `enp0s3` or similar.
-   4. Note this IP. You will use it to access the site.
-
-3. SOFTWARE INSTALLATION (Inside Ubuntu)
+3. SOFTWARE INSTALLATION (Run inside Ubuntu)
 ------------------------------------------------------------------------------
-Run the following commands to install Apache, MySQL, PHP, and Node.js.
+Update the system and install required packages:
 
-1. Update System:
-   $ sudo apt update
+$ sudo apt update
+$ sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql php-mysqli git unzip nodejs npm -y
 
-2. Install the PHP/Apache Stack:
-   $ sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql php-mysqli git unzip -y
+Verify versions:
+$ node -v  (Should be v12+)
+$ npm -v
+$ php -v
 
-3. Install Node.js and NPM:
-   $ sudo apt install nodejs npm -y
-   
-   *Verify installation:*
-   $ node -v
-   $ npm -v
-
-4. DEPLOYMENT GUIDE
+4. PROJECT DEPLOYMENT
 ------------------------------------------------------------------------------
-Follow these steps to deploy the application code and database.
-
-STEP 1: DEPLOY CODE TO APACHE PHP (USER MODULE)
-   1. Create the project directory:
-      $ sudo mkdir -p /var/www/html/
-      
-   2. Go to the project directory:
-      $ cd /var/www/html/
-   3. Clone the repo (or copy files):
-      $ sudo git clone -b finals https://github.com/miztaro/BidOps.git   
-
-   3. Set Permissions (Crucial for file uploads):
+STEP 1: SETUP WEB DIRECTORY
+   1. Create directory and set permissions:
+      $ sudo mkdir -p /var/www/html/BidOps
       $ sudo chown -R $USER:$USER /var/www/html/BidOps
-      $ sudo chown -R www-data:www-data /var/www/html/BidOps
-      $ sudo chmod -R 755 /var/www/html/BidOps
+
+   2. Move your project files into this folder. 
+      (You can use Git Clone or FTP to transfer files from Windows).
+      Target Path: /var/www/html/BidOps/
+
+   3. Set permissions for File Uploads:
       $ sudo chmod -R 777 /var/www/html/BidOps/server/item/uploads
 
-
-STEP 2: DATABASE SETUP
-   1. Start MySQL and enable it:
+STEP 2: DATABASE CONFIGURATION (Crucial)
+   1. Start MySQL:
       $ sudo systemctl start mysql
-      $ sudo systemctl enable mysql
 
-   2. Create the Database and Import Data:
-      $ sudo mysql -u root < /var/www/html/BidOps/database/bidops.sql
+   2. Configure Root Password to 'root':
+      $ sudo mysql
+      
+      (Run these SQL commands inside MySQL):
+      ------------------------------------------------------------------
+      ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
+      FLUSH PRIVILEGES;
+      EXIT;
+      ------------------------------------------------------------------
 
-   3. Configure Database Password (If needed):
-      Ensure /var/www/html/BidOps/server/config/database.php matches your 
-      Ubuntu MySQL credentials (default is often no password or 'root').
+   3. Import the Database:
+      $ sudo mysql -u root -p bidops < /var/www/html/BidOps/database/bidops.sql
+      (Enter password 'root' when prompted).
 
-STEP 3: START THE NODE.JS SERVER (ADMIN MODULE)
-   *Note: This must be done in the 'admin-server' folder where package.json exists.*
+STEP 3: TAILWIND CSS SETUP (Styling)
+   If the CSS is missing or you need to recompile styles:
 
+   1. Navigate to the Client folder (where tailwind.config.js is located):
+      $ cd /var/www/html/BidOps/client
+
+   2. Install Node Dependencies for Tailwind:
+      $ npm install
+
+   3. Build the CSS file:
+      $ npx tailwindcss -i ./styles/input.css -o ./styles/output.css
+   
+   (Note: Ensure your HTML files link to the generated 'output.css').
+
+STEP 4: START THE ADMIN SERVER (Node.js)
    1. Navigate to the Admin Server folder:
       $ cd /var/www/html/BidOps/admin-server
 
-   2. Install Dependencies (Installs Express, MySQL2, etc.):
-      $ sudo npm install
+   2. Install Dependencies:
+      $ npm install
       $ sudo npm install -g nodemon
 
-      (This might take a moment. If it hangs, ensure VM has internet).
-
-   3. Open the Firewall for Port 3000:
+   3. Allow Port 3000 through Firewall:
       $ sudo ufw allow 3000/tcp
       $ sudo ufw reload
 
    4. Start the Server:
-      $ node server.js 
-      or
-      $ nodemon server.js 
+      $ node server.js
       
-   (Keep this terminal open, or use 'nohup node server.js &' to run in background).
+   (Keep this terminal open to keep the Admin Panel running).
 
-4. TESTING GUIDE
+5. CONFIGURATION FILES CHECKLIST
 ------------------------------------------------------------------------------
-Use your Host Machine (Windows) or Phone connected to the same WiFi.
-Replace <UBUNTU_IP> with the address found using `ip a`.
+Ensure your code connects using the password 'root'.
 
-TEST SCENARIO A: USER MODULE (PHP)
-   1. URL: http://<UBUNTU_IP>/BidOps/client/login.html
-   2. Action: Log in using Standard User credentials.
-   3. Verification: Ensure you can browse items.
+1. PHP Config: /server/config/database.php
+   ---------------------------------------
+   private $username = "root";
+   private $password = "root"; 
+   ---------------------------------------
 
-TEST SCENARIO B: ADMIN MODULE (NodeJS)
-   1. URL: http://<UBUNTU_IP>:3000/homepage.html
-   2. Action: Log in (or access directly via PHP redirect).
-   3. Verification: Check that the dashboard loads.
+2. Node Config: /admin-server/database.js
+   ---------------------------------------
+   user: 'root',
+   password: 'root',
+   ---------------------------------------
 
-5. CREDENTIALS
+6. HOW TO ACCESS (TESTING)
+------------------------------------------------------------------------------
+1. Find your Ubuntu IP Address:
+   $ ip a
+   (Look for 'inet' under enp0s3, e.g., 192.168.1.15).
+
+2. Access Client (PHP) on Windows Browser:
+   http://192.168.1.15/BidOps/client/login.html
+
+3. Access Admin (Node) on Windows Browser:
+   http://192.168.1.15/BidOps/client/login.html
+   (Login as Admin -> System will redirect to Port 3000 Dashboard).
+
+7. CREDENTIALS
 ------------------------------------------------------------------------------
 [ STANDARD USER ]
-- Username:    John
-- Password:    pass123
+Username: John
+Password: pass123
 
-[ ADMINISTRATOR ]
-- Username:    superadmin  
-- Password:    adminpass (Update based on your DB)
+[ ADMIN USER ]
+Username: superadmin
+Password: adminpass
 
-6. TROUBLESHOOTING
+8. TROUBLESHOOTING
 ------------------------------------------------------------------------------
-- "Cannot GET /": Check if you are accessing port 3000.
-- Node Modules Missing: Run `npm install` specifically inside the `admin-server` folder.
-- Connection Timed Out: Check Firewall ($ sudo ufw status) and ensure Ports 80 and 3000 are ALLOWED.
+- "Connection Refused": 
+  Check if variables in database.js match the SQL command in Step 2.
+  
+- "Styles not loading": 
+  Run the Tailwind build command in Step 3.
 
-==============================================================================
-END OF README
+- "Images not showing":
+  Check if /server/item/uploads has 777 permissions.
+
 ==============================================================================

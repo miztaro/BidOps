@@ -8,8 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("click", (event) => {
         const viewItemBtn = event.target.closest('.bids-view-btn');
         if (!viewItemBtn || !viewItemOverlay) return;
-
-        // Reset display to hide any previously loaded data
+e
         const overlayBody = document.querySelector("#bids-view-overlay .bids-body-sec");
         if (overlayBody) {
             overlayBody.querySelector(".left-side").innerHTML = '<div style="text-align: center; padding: 20px;">Loading images...</div>';
@@ -59,8 +58,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-
-// Removed loadImages() as it used hardcoded data and is no longer needed.
 
 function openRateOverlay() {
     const bidsViewOverlay = document.getElementById("bids-view-overlay");
@@ -168,9 +165,6 @@ async function fetchBidItem(bidId) {
     }
 }
 
-// ** IMPORTANT: The path is corrected here to use the image_paths from the database **
-const IMAGE_BASE_URL = '../server/item/';
-
 function populateBidsOverlay(bidItem) {
     const overlayBody = document.querySelector("#bids-view-overlay .bids-body-sec");
     if (!overlayBody) return;
@@ -186,14 +180,6 @@ function populateBidsOverlay(bidItem) {
     const mainImageDiv = document.createElement("div");
     mainImageDiv.classList.add("main-image");
 
-    // const mainImg = document.createElement("img");
-    // const defaultImgPath = 'uploads/default.jpg';
-    // const mainImgSrc = bidItem.main_image ? `${IMAGE_BASE_URL}${bidItem.main_image}` : `${IMAGE_BASE_URL}${defaultImgPath}`;
-
-    // mainImg.src = mainImgSrc;
-    // mainImg.alt = bidItem.item_name || "Item Image";
-    // mainImageDiv.appendChild(mainImg);
-
     const mainImg = document.createElement("img");
     mainImg.src = `../server/item/uploads/${bidItem.main_image || 'default.jpg'}`;
     mainImg.alt = bidItem.item_name || "Item Image";
@@ -202,34 +188,9 @@ function populateBidsOverlay(bidItem) {
     const previewDiv = document.createElement("div");
     previewDiv.classList.add("images-preview");
 
-    // Use the images array from the fetched data
     const previewImages = bidItem.images && bidItem.images.length > 0
         ? bidItem.images
         : [bidItem.main_image || "default.jpg"];
-
-    // Check if the main image is in the list of images, if not, add it for consistency
-    // const uniquePreviewImages = Array.from(new Set(previewImages));
-
-    // uniquePreviewImages.forEach(src => {
-    //     const img = document.createElement("img");
-    //     // 2. Corrected path for thumbnails
-    //     img.src = `${IMAGE_BASE_URL}${src}`; 
-    //     img.alt = "Preview";
-
-    //     // Add active class if it's the main image
-    //     if (img.src === mainImgSrc) {
-    //         img.classList.add('active');
-    //     }
-
-    //     img.addEventListener("click", () => {
-    //         mainImg.src = img.src;
-    //         // Highlight active thumbnail
-    //         previewDiv.querySelectorAll('img').forEach(t => t.classList.remove('active'));
-    //         img.classList.add('active');
-    //     });
-    //     previewDiv.appendChild(img);
-    // });
-
     previewImages.forEach(src => {
         const img = document.createElement("img");
         img.src = `../server/item/uploads/${src}`;
@@ -243,7 +204,6 @@ function populateBidsOverlay(bidItem) {
     leftSide.appendChild(mainImageDiv);
     leftSide.appendChild(previewDiv);
 
-    // Ensure winning_bid is formatted (P150.00)
     const formattedWinningBid = `P${bidItem.winning_bid}`;
     rightSide.innerHTML = `
         <div class="name-category-con">

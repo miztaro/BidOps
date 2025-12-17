@@ -5,19 +5,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Add headers for CORS if needed, though often better handled by web server config
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    header("Access-Control-Allow-Origin: *");
-    header("Access-Control-Allow-Methods: GET, OPTIONS");
-    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-    http_response_code(200);
-    exit();
-}
-
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: http://localhost");
-header("Access-Control-Allow-Credentials: true");
 
 include_once '../config/database.php';
 

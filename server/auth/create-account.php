@@ -3,6 +3,23 @@
 session_start();
 require __DIR__ . '/../config/database.php'; 
 
+// 1. Allow ANY computer to connect (Dynamic Origin)
+if (isset($_SERVER['HTTP_ORIGIN'])) {
+    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Max-Age: 86400');    // Cache for 1 day
+}
+
+// 2. Handle Browser "Pre-check" (OPTIONS request)
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+    
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
+        header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+    
+    exit(0);
+}
 // 1. Security: Make sure they came from Google Registration
 if (!isset($_SESSION['google_register'])) {
     header("Location: ../../client/register.html");

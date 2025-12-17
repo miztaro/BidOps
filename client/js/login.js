@@ -59,6 +59,12 @@ function handleGoogleLoginResponse(response) {
             alert("Login successful!");
             window.location.href = 'homepage.html';
         } else {
+             // *** NEW: Check for is_deleted flag ***
+            if (data.is_deleted && data.user_id) {
+                handleReactivation(data.user_id);
+                return; // Stop further execution
+            }
+            //standard error
             alert(data.message);
             if (data.redirect) {
                 window.location.href = data.redirect;
@@ -178,7 +184,12 @@ function handleFormLogin(event) {
             }
 
         } else {
-            alert(data.message || 'Login failed, please try again!');
+            // *** NEW: Check for is_deleted flag ***
+            if (data.is_deleted && data.user_id) {
+                handleReactivation(data.user_id);
+            } else {
+                alert(data.message || 'Login failed, please try again!');
+            }
         }
     })
     .catch(error => {
@@ -190,4 +201,26 @@ function handleFormLogin(event) {
         loginBtn.disabled = false;
     });
 }
-
+function handleReactivation(userId) {
+    if (confirm("This account is currently deleted/deactivated. Do you want to reactivate it?")) {
+        // Send request to reactivate
+        fetch('../server/auth/reactivate-account.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert("Account reactivated successfully! Please login again.");
+                window.location.reload();
+            } else {
+                alert(data.message || "Failed to reactivate account.");
+            }
+        })
+        .catch(err => {
+            console.error("Reactivation error:", err);
+            alert("An error occurred while reactivating.");
+        });
+    }
+}
