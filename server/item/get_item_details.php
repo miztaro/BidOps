@@ -78,7 +78,11 @@ try {
             bi.end_date,
             bi.bid_increment_percent,
             (SELECT COUNT(*) FROM bidoffer WHERE item_id = i.item_id AND bid_status = 'active') as total_bids,
-            (SELECT MAX(bid_amount) FROM bidoffer WHERE item_id = i.item_id) as current_highest_bid
+            CASE 
+                WHEN EXISTS (SELECT 1 FROM bidoffer WHERE item_id = i.item_id AND bid_status = 'active') 
+                THEN (SELECT MAX(bid_amount) FROM bidoffer WHERE item_id = i.item_id AND bid_status = 'active')
+                ELSE NULL
+            END as current_highest_bid
         FROM item i
         LEFT JOIN user u ON i.seller_id = u.user_id
         LEFT JOIN biditem bi ON i.item_id = bi.item_id
