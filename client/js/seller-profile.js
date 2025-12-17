@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fallback name until we have username
     document.getElementById('sellerName').textContent = 'Seller ' + sellerId;
-    document.getElementById('sellerEmail').textContent = 'Email will be loaded later.';
 
     // Fetch ratings ABOUT this seller
     fetch(`../server/ratings/get_ratings_for_user.php?user_id=${encodeURIComponent(sellerId)}`)

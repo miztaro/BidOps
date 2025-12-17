@@ -1,3 +1,6 @@
+.seller-profile-wrapper {
+    display: block;
+}
 
 .bid-details-container {
     max-width: 1100px;
@@ -5,21 +8,9 @@
     padding: 20px 16px 40px;
 }
 
-.image-section .main-image-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 16px;
-}
+/* No image-section/main-image/ avatar anymore */
 
-#sellerMainAvatar {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #e5e7eb;
-}
-
+/* Header info */
 .details-section #sellerName {
     margin-bottom: 4px;
 }
@@ -30,6 +21,7 @@
     color: #6b7280;
 }
 
+/* Sections */
 .swap-info-box,
 .place-bid-section {
     margin-bottom: 24px;
@@ -46,7 +38,6 @@
 }
 
 /* Listings */
-
 .seller-listings {
     display: flex;
     flex-direction: column;
@@ -59,7 +50,6 @@
     border-radius: 10px;
     border: 1px solid #e5e7eb;
     background: #ffffff;
-    cursor: pointer;
     transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
 }
 
@@ -105,7 +95,6 @@
 }
 
 /* Feedbacks */
-
 .feedback-list {
     display: flex;
     flex-direction: column;
@@ -150,6 +139,7 @@
     color: #6b7280;
 }
 
+/* Mobile */
 @media (max-width: 768px) {
     .bid-details-container {
         padding: 16px 12px 32px;
@@ -158,9 +148,5 @@
     .content-wrapper {
         flex-direction: column;
         gap: 16px;
-    }
-
-    .image-section .main-image-container {
-        padding-bottom: 0;
     }
 }

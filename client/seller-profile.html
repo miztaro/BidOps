@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seller Profile - Swap and Bid</title>
     <link rel="stylesheet" href="style/join-bid.css">
-    <link rel="stylesheet" href="../client/style/seller-profile.css">
+    <link rel="stylesheet" href="style/seller-profile.css">
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     <script src="js/client-guard.js"></script>
 </head>
@@ -20,26 +20,17 @@
     </div>
 
     <main class="bid-details-container">
-        <div class="content-wrapper">
-            <div class="image-section">
-                <div class="main-image-container">
-                    <img src="../assets/images/profile-placeholder.png" alt="Seller" id="sellerMainAvatar">
-                </div>
-            </div>
-
+        <div class="content-wrapper seller-profile-wrapper">
             <div class="details-section">
                 <h2 class="item-title" id="sellerName">Seller Name</h2>
-                <p class="item-description" id="sellerEmail">seller@email…
-
-                </p>
+                <p class="item-description" id="sellerEmail"></p>
 
                 <section class="swap-info-box">
                     <h3>Seller Listings</h3>
                     <p class="swap-description">
                         This section will show all active and recent listings from this seller.
                     </p>
-                    <div id="sellerListingsPlaceholder">
-                    </div>
+                    <div id="sellerListingsPlaceholder"></div>
                 </section>
 
                 <section class="place-bid-section">
@@ -47,12 +38,12 @@
                     <p style="margin-bottom: 15px; color: #555;">
                         This section will display feedback and ratings about this seller.
                     </p>
-                    <div id="sellerFeedbackPlaceholder">
-                    </div>
+                    <div id="sellerFeedbackPlaceholder"></div>
                 </section>
             </div>
         </div>
     </main>
+
     <footer>
         <div class="footer-top">
             <h2>Your Campus, Your Marketplace.</h2>
@@ -98,37 +89,6 @@
         </div>
     </footer>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch("header.html")
-                .then(response => response.text())
-                .then(headerHTML => {
-                    document.getElementById("header").innerHTML = headerHTML;
-
-                    const script = document.createElement("script");
-                    script.src = "js/header.js";
-                    script.onload = function() {
-                        if (typeof initLogic === 'function') initLogic();
-                    };
-                    document.body.appendChild(script);
-                })
-                .catch(error => console.error("Error loading header:", error));
-
-            const backBtn = document.getElementById('backToPrevious');
-            if (backBtn) {
-                backBtn.addEventListener('click', () => window.history.back());
-            }
-
-            const params = new URLSearchParams(window.location.search);
-            const sellerId = params.get('seller_id');
-            if (sellerId) {
-                document.getElementById('sellerName').textContent = `Seller ${sellerId}`;
-                document.getElementById('sellerEmail').textContent = 'Email will be loaded later.';
-            }
-        });
-    </script>
-
-    <script src="js/add-listing.js"></script>
     <script src="js/seller-profile.js"></script>
     <script src="js/add-listing.js"></script>
 </body>
