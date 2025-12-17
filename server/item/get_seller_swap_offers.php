@@ -39,7 +39,7 @@ try {
     ";
 
     $stmt = $db->prepare($query);
-    $stmt->bind_param("ii", $item_id, $current_user_id); // Check if current user is the seller
+    $stmt->bind_param("is", $item_id, $current_user_id); // Check if current user is the seller
     $stmt->execute();
     $result = $stmt->get_result();
     $item = $result->fetch_assoc();

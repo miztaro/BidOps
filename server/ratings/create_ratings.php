@@ -17,6 +17,10 @@ if (!isset($_SESSION['user_id'])) {
 
 $rater_id = $_SESSION['user_id']; 
 
+include_once '../config/database.php';
+$database = new Database();
+$conn = $database->getConnection();
+
 $input = json_decode(file_get_contents('php://input'), true);
 
 $rating_id = isset($input['rating_id']) ? intval($input['rating_id']) : 0;
@@ -32,13 +36,6 @@ if (!$transaction_id || $rating < 1 || $rating > 5) {
     exit;
 }
 
-$host = 'localhost';
-$user = 'root';
-$pass = '';
-$db = 'bidops';
-
-$conn = new mysqli($host, $user, $pass, $db);
-
 if ($conn->connect_error) {
     http_response_code(500);
     echo json_encode([
@@ -50,88 +47,71 @@ if ($conn->connect_error) {
 
 $conn->set_charset('utf8mb4');
 
+try {
+    if ($rating_id > 0) {
+        $sql = "UPDATE userrating 
+                SET rating = ?, comment = ? 
+                WHERE rating_id = ? AND rater_id = ?";
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) throw new Exception("Prepare failed: " . $conn->error);
 
-if ($rating_id > 0) {
+        $stmt->bind_param('sssi', $rating, $comment, $rater_id, $rating_id);
 
-    $sql = "
-        UPDATE userrating 
-        SET rating = ?, comment = ? 
-        WHERE rating_id = ? AND rater_id = ?
-    ";
+        if ($stmt->execute()) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Rating updated successfully'
+            ]);
+        } else {
+            throw new Exception("Update failed: " . $stmt->error);
+        }
 
-    $stmt = $conn->prepare($sql);
-    if (!$stmt) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Prepare failed: ' . $conn->error
-        ]);
-        exit;
-    }
-
-    $stmt->bind_param('isis', $rating, $comment, $rating_id, $rater_id);
-
-    if ($stmt->execute()) {
-        echo json_encode([
-            'success' => true,
-            'message' => 'Rating updated successfully'
-        ]);
+        $stmt->close();
     } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Update failed: ' . $stmt->error
-        ]);
-    }
+        $stmtCheck = $conn->prepare(
+            'SELECT rating_id FROM userrating WHERE transaction_id = ? AND rater_id = ?'
+        );
+        if (!$stmtCheck) throw new Exception("Prepare failed: " . $conn->error);
 
-    $stmt->close();
+        $stmtCheck->bind_param('is', $transaction_id, $rater_id);
+        $stmtCheck->execute();
+        $stmtCheck->store_result();
 
-} else {
-
-    $stmtCheck = $conn->prepare(
-        'SELECT rating_id FROM userrating WHERE transaction_id = ? AND rater_id = ?'
-    );
-    $stmtCheck->bind_param('is', $transaction_id, $rater_id);
-    $stmtCheck->execute();
-    $stmtCheck->store_result();
-
-    if ($stmtCheck->num_rows > 0) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Rating already exists for this transaction'
-        ]);
+        if ($stmtCheck->num_rows > 0) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Rating already exists for this transaction'
+            ]);
+            $stmtCheck->close();
+            $conn->close();
+            exit;
+        }
         $stmtCheck->close();
-        $conn->close();
-        exit;
+
+        // Insert new rating
+        $stmt = $conn->prepare(
+            'INSERT INTO userrating (rating, comment, rater_id, transaction_id) VALUES (?, ?, ?, ?)'
+        );
+        if (!$stmt) throw new Exception("Prepare failed: " . $conn->error);
+
+        $stmt->bind_param('sssi', $rating, $comment, $rater_id, $transaction_id);
+
+        if ($stmt->execute()) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Rating created successfully'
+            ]);
+        } else {
+            throw new Exception("Insert failed: " . $stmt->error);
+        }
+
+        $stmt->close();
     }
-    $stmtCheck->close();
-
-
-    $stmt = $conn->prepare(
-        'INSERT INTO userrating (rating, comment, rater_id, transaction_id) VALUES (?, ?, ?, ?)'
-    );
-
-    if (!$stmt) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Prepare failed: ' . $conn->error
-        ]);
-        exit;
-    }
-
-    $stmt->bind_param('isis', $rating, $comment, $rater_id, $transaction_id);
-
-    if ($stmt->execute()) {
-        echo json_encode([
-            'success' => true,
-            'message' => 'Rating created successfully'
-        ]);
-    } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Insert failed: ' . $stmt->error
-        ]);
-    }
-
-    $stmt->close();
+} catch (Exception $e) {
+    echo json_encode([
+        'success' => false,
+        'message' => $e->getMessage()
+    ]);
 }
 
 $conn->close();

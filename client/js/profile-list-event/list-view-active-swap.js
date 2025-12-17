@@ -100,7 +100,7 @@ function populateSwapModal(data) {
         images.forEach((img, index) => {
             const thumb = document.createElement('img');
             thumb.src = `../server/item/${img.image_path}`;
-            thumb.classList.add(index === 0 ? 'active' : '');
+            if (index === 0) thumb.classList.add('active');
             thumb.addEventListener('click', () => {
                 mainImage.src = thumb.src;
                 thumbnailContainer.querySelectorAll('img').forEach(t => t.classList.remove('active'));
@@ -114,7 +114,7 @@ function populateSwapModal(data) {
     const offersList = document.getElementById('swapping-history-list');
     const totalOffersEl = document.getElementById('total-swappings');
 
-    totalOffersEl.textContent = offers.length === 0 
+    totalOffersEl.textContent = offers.length === 0
         ? 'No Swapping Offers'
         : `${offers.length} Offer${offers.length !== 1 ? 's' : ''}`;
 
@@ -129,7 +129,7 @@ function populateSwapModal(data) {
     } else {
         offersList.innerHTML = '';
         offers.forEach(offer => {
-            const offerCard = createSwapOfferCard(offer); 
+            const offerCard = createSwapOfferCard(offer);
             offersList.appendChild(offerCard);
         });
     }
@@ -140,7 +140,7 @@ function createSwapOfferCard(offer) {
     swapItem.classList.add('swapping-item');
 
     // Add a special class if the offer is still pending
-    if (offer.swapping_status === 'pending') swapItem.classList.add('pending-swap');
+    if (offer.swap_status === 'pending') swapItem.classList.add('pending-swap');
 
     const initials = offer.offerer_name.charAt(0).toUpperCase();
 

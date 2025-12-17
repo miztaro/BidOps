@@ -17,7 +17,6 @@
     transition: opacity 0.3s ease;
 }
 
-
 .swapping-modal-overlay.active {
     display: flex;
     opacity: 1;

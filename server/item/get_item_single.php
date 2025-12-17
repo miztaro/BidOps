@@ -1,5 +1,6 @@
 <?php
-// Enable errors for debugging (remove in production)
+session_start();
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -14,6 +15,16 @@ if ($conn->connect_error) {
     exit();
 }
 
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'User not logged in'
+    ]);
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+
 header('Content-Type: application/json');
 
 // Validate ID
@@ -25,11 +36,19 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $item_id = intval($_GET['id']);
 
 // Fetch item
-$stmt_item = $conn->prepare("SELECT * FROM item WHERE item_id=?");
-$stmt_item->bind_param("i", $item_id);
+$stmt_item = $conn->prepare("SELECT * FROM item WHERE item_id = ? AND seller_id = ?");
+$stmt_item->bind_param("is", $item_id, $user_id);
 $stmt_item->execute();
 $item_result = $stmt_item->get_result();
 $item = $item_result->fetch_assoc();
+
+if (!$item) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Item not found or access denied'
+    ]);
+    exit;
+}
 
 // Fetch bid
 $stmt_bid = $conn->prepare("SELECT * FROM biditem WHERE item_id=?");
@@ -58,7 +77,8 @@ while($row = $cat_result->fetch_assoc()){
 
 // Return JSON
 echo json_encode([
-    "item" => $item ?: null,
+    "success"=> true,
+    "item" => $item,
     "bid" => $bid ?: null,
     "images" => $images,
     "categories" => $categories

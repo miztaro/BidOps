@@ -160,6 +160,8 @@ try {
             LEFT JOIN biditem bi ON i.item_id = bi.item_id 
             LEFT JOIN itemimage ii ON i.item_id = ii.item_id 
             WHERE i.seller_id = ?
+                AND i.status IS NOT NULL 
+                AND i.status <> ''
             GROUP BY i.item_id 
             ORDER BY i.created_date DESC
         "; 

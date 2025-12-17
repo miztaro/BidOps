@@ -24,7 +24,7 @@
     padding: 30px;
     max-width: 50%;
     width: auto;
-    height: auto;
+    max-height: 90vh;
     background-color: var(--primary-white);
     border-radius: 20px;
     border: none;

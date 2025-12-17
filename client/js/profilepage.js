@@ -316,7 +316,6 @@ document.addEventListener('DOMContentLoaded', function () {
       <td>
         <div class="actions-container">
           <button class="lists-view-btn" 
-            onclick="${listing.mode.toLowerCase() === 'swap' ? `window.openSwapModal(${listing.id})` : ''}"
             data-id="${listing.id}"
             data-type="${listing.mode}"
             data-status="${listing.status.toLowerCase()}">

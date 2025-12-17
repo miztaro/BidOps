@@ -81,8 +81,7 @@
         <section class="right-side">
             <div id="profile-user-info-content" class="profile-user-info-content">
                 <div class="user-img-container">
-                    <img id="profilePicture" class="profile-avatar" src="../server/item/uploads/placeholder-profile.jpg"
-                        alt="">
+                    <img id="profilePicture" class="profile-avatar">
                 </div>
 
                 <div class="user-info-container">
@@ -280,7 +279,7 @@
 
                 <section class="description-field">
                     <label>Description</label>
-                    <textarea name="description" id="description" rows="2"></textarea>
+                    <textarea name="description" id="description" class="description" rows="2"></textarea>
                 </section>
 
                 <section class="price-field">
@@ -398,8 +397,6 @@
                                 <p>User Id</p>
                             </div>
                         </div>
-
-                        <button type="button" class="remove-btn">Remove</button>
                     </section>
                 </section>
             </form>
@@ -545,8 +542,6 @@
                         <h3>Winning Bid</h3>
                     </div>
                     <div class="buttons-side">
-                        <button class="rate-btn">Rate <iconify-icon icon="ic:round-star" width="24"
-                                height="24"></iconify-icon></button>
                         <button class="message-btn">Message <iconify-icon icon="ic:baseline-message" width="24"
                                 height="24"></iconify-icon></button>
                     </div>
@@ -564,27 +559,6 @@
             </div>
         </section>
 
-        <section class="bids-rate-overlay" id="bids-rate-overlay">
-            <div class="bids-rate-container">
-                <section class="head-section">
-                    <h3>Rate Swapper</h3>
-                </section>
-
-                <section class="body-sec">
-                    <div class="star-con" id="bids-star-rating">
-                        <input type="hidden" id="rating-value" value="0">
-                    </div>
-                    <div class="comment-con">
-                        <h6>Comment</h6>
-                        <textarea name="" id="" placeholder="Write your comment here.."></textarea>
-                    </div>
-                    <div class="buttons-con">
-                        <button class="submit-rate-btn">Submit</button>
-                        <button class="cancel-rate-btn">Cancel</button>
-                    </div>
-                </section>
-            </div>
-        </section>
 
         <section class="swaps-view-overlay" id="swaps-view-overlay">
             <div class="swaps-view-container">
@@ -599,8 +573,6 @@
                         <h3>Swapped Item</h3>
                     </div>
                     <div class="buttons-side">
-                        <button class="rate-btn">Rate <iconify-icon icon="ic:round-star" width="24"
-                                height="24"></iconify-icon></button>
                         <button class="message-btn">Message <iconify-icon icon="ic:baseline-message" width="24"
                                 height="24"></iconify-icon></button>
                     </div>
@@ -614,28 +586,6 @@
                     <section class="right-side">
 
                     </section>
-                </section>
-            </div>
-        </section>
-
-        <section class="swaps-rate-overlay" id="swaps-rate-overlay">
-            <div class="swaps-rate-container">
-                <section class="head-section">
-                    <h3>Rate Swapper</h3>
-                </section>
-
-                <section class="body-sec">
-                    <div class="star-con" id="swaps-star-rating">
-                        <input type="hidden" id="rating-value" value="0">
-                    </div>
-                    <div class="comment-con">
-                        <h6>Comment</h6>
-                        <textarea name="" id="" placeholder="Write your comment here.."></textarea>
-                    </div>
-                    <div class="buttons-con">
-                        <button class="submit-rate-btn">Submit</button>
-                        <button class="cancel-rate-btn">Cancel</button>
-                    </div>
                 </section>
             </div>
         </section>

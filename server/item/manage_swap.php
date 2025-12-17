@@ -75,6 +75,7 @@ try {
         $stmt = $db->prepare("UPDATE swapoffer SET swap_status = 'completed' WHERE swap_id = ?");
         $stmt->bind_param("i", $swap_id);
         $stmt->execute();
+        $stmt->close();
 
         // 2. Decline all other PENDING swap offers for the requested item
         $stmt = $db->prepare("
@@ -84,21 +85,48 @@ try {
         ");
         $stmt->bind_param("ii", $requested_item_id, $swap_id);
         $stmt->execute();
+        $stmt->close();
 
         // 3. Mark the seller's original item as 'swapped'
         $stmt = $db->prepare("UPDATE item SET status = 'swapped' WHERE item_id = ?");
         $stmt->bind_param("i", $requested_item_id);
         $stmt->execute();
+        $stmt->close();
         
         // 4. Mark the buyer's offered item as 'swapped' 
         // This prevents the buyer from offering the item again.
         $stmt = $db->prepare("UPDATE item SET status = 'swapped' WHERE item_id = ?");
         $stmt->bind_param("i", $offered_item_id);
         $stmt->execute();
+        $stmt->close();
 
+        $stmt = $db->prepare("SELECT user_id FROM swapoffer WHERE swap_id = ?");
+        $stmt->bind_param("s", $swap_id);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $buyer_id = $result['user_id']; // this is the actual buyer
+        $stmt->close();
+
+        $seller_id = $current_user_id;
+
+        // 5. INSERT into transactionreceipt so it shows up in transactions
+        $stmt = $db->prepare("
+            INSERT INTO transactionreceipt 
+            (status, completed_at, item_id, buyer_id, seller_id, swap_id)
+            VALUES ('successful', NOW(), ?, ?, ?, ?)
+        ");
+        $stmt->bind_param("issi",
+            $requested_item_id,  // item_id
+            $buyer_id,           // buyer_id from swapoffer
+            $seller_id,          // seller_id = current user
+            $swap_id
+        );
+
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to record transaction receipt: " . $db->error);
+        }
 
         $db->commit();
-
         echo json_encode([
             'success' => true,
             'message' => 'Swap accepted! Both items are marked as swapped.',

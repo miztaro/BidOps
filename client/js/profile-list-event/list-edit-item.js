@@ -12,10 +12,11 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      fetchItemData(itemId);
       editOverlay.classList.add("active");
+      fetchItemData(itemId);    
     }
   });
+  
 
   document.querySelector(".form-container").addEventListener("submit", async function (e) {
     e.preventDefault();
@@ -100,13 +101,14 @@ document.addEventListener('DOMContentLoaded', function () {
     editOverlay.classList.remove("active");
   });
 
-  function fetchItemData(itemId) {
-    fetch(`../server/item/get_item_single.php?id=${itemId}`)
-      .then(response => response.json())
-      .then(data => {
-        populateForm(data);
-      })
-      .catch(error => console.error("Error fetching item data:", error));
+  async function fetchItemData(itemId) {
+    try {
+      const response = await fetch(`../server/item/get_item_single.php?id=${itemId}`);
+      const data = await response.json();
+      populateForm(data);
+    } catch (error) {
+      console.error("Error fetching item data:", error);
+    }
   }
 
   function getStatusClass(status) {
@@ -136,8 +138,6 @@ document.addEventListener('DOMContentLoaded', function () {
     ];
 
     removedImages = [];
-    //newFiles = [];
-
     const imageContainer = document.getElementById('image-container');
     imageContainer.dataset.originalImages = JSON.stringify(existingImages);
     renderImages();
@@ -145,8 +145,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Inputs
     const itemIdInput = document.getElementById('item-id');
     const itemNameInput = document.getElementById('item-name');
-    const categoryInput = document.getElementById('category');
-    const descriptionInput = document.getElementById('description');
+    const categoryInput = document.querySelector('.item-info-field .category-sec .category');
+    const descriptionInput = document.querySelector('.description-field .description');
     const statusHiddenInput = document.getElementById('status-hidden');
     const startPriceInput = document.getElementById('start-price');
     const startDateInput = document.getElementById('start-date');
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Set values
     itemIdInput.value = item.item_id;
     itemNameInput.value = item.title;
-    categoryInput.value = item.category_type;
+    // categoryInput.value = item.category_type;
     descriptionInput.value = item.description;
     statusDisplayDiv.textContent = item.status;
     statusDisplayDiv.className = `status-display ${statusClass}`;

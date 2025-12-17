@@ -216,7 +216,6 @@ function initRatingModal() {
         body: JSON.stringify({
           rating_id: ratingId,
           transaction_id: ratingTransactionId,
-          rater_id: 'u1', //  Get from login session, do after login implementation!!
           rating: currentRating,
           comment: comment,
           rated_user_id: ratingPartnerId
