@@ -141,7 +141,7 @@ try {
         ------------------------------*/
 
         // Update the specific swap status to 'declined' (not cancelled, to distinguish)
-        $stmt = $db->prepare("UPDATE swapoffer SET swap_status = 'declined' WHERE swap_id = ?");
+        $stmt = $db->prepare("UPDATE swapoffer SET swap_status = 'lost' WHERE swap_id = ?");
         $stmt->bind_param("i", $swap_id);
         $stmt->execute();
 
