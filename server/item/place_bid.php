@@ -114,7 +114,7 @@ try {
     $stmt->close();
 
     // Insert new bid
-    $bid_id = 'BID_' . uniqid();
+    $bid_id = uniqid();
     $stmt = $db->prepare("
         INSERT INTO bidoffer (bid_id, item_id, bidder_id, bid_amount, bid_status, created_at)
         VALUES (?, ?, ?, ?, 'active', NOW())
