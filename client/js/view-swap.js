@@ -88,6 +88,44 @@ function setupBackButton() {
     }
 }
 
+function setupReportButton() {
+    const reportBtn = document.getElementById('reportBtn');
+
+    if (reportBtn) {
+        const newReportBtn = reportBtn.cloneNode(true);
+        reportBtn.replaceWith(newReportBtn);
+        
+        newReportBtn.addEventListener('click', () => {
+            const reportReason = prompt('Please enter the reason for reporting this item:');
+            
+            if (reportReason && reportReason.trim() !== '') {
+                fetch('../server/item/report_item.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        item_id: itemId,
+                        reason: reportReason
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Thank you for your report. We will review this item shortly.');
+                    } else {
+                        alert(data.message || 'Failed to submit report');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting report:', error);
+                    alert('Failed to submit report. Please try again.');
+                });
+            }
+        });
+    }
+}
+
 // --- DATA LOADING & RENDERING ---
 
 function populateSwapItemDetails(data) {
