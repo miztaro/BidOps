@@ -93,14 +93,13 @@ try {
         // Removed 'item_type' field and placeholder from the query
         $stmt = $db->prepare("
             INSERT INTO transactionreceipt 
-            (transaction_id, status, completed_at, item_id, buyer_id, seller_id, bid_id) 
+            (status, completed_at, item_id, buyer_id, seller_id, bid_id) 
             VALUES (?, 'successful', NOW(), ?, ?, ?, ?)
         ");
 
         // The parameters are: (transactionId, item_id, buyer_id, seller_id, bid_id)
         // Binding all IDs as strings (s) for maximum compatibility.
-        $stmt->bind_param("sssss", 
-            $transactionId, 
+        $stmt->bind_param("ssss", 
             $item_id, 
             $buyer_id, 
             $seller_id, 
