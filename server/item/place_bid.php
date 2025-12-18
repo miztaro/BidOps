@@ -113,20 +113,27 @@ try {
     $stmt->execute();
     $stmt->close();
 
-    // Insert new bid
+    / Insert new bid
+    // We do NOT generate a 'bid_id' here. The database does it automatically.
     
     $stmt = $db->prepare("
-        INSERT INTO bidoffer ( item_id, bidder_id, bid_amount, bid_status, created_at)
-        VALUES (?, ?, ?, ?, 'active', NOW())
+        INSERT INTO bidoffer (item_id, bidder_id, bid_amount, bid_status, created_at)
+        VALUES (?, ?, ?, 'active', NOW())
     ");
     
-    $stmt->bind_param("sisd", $item_id, $user_id, $bid_amount);
+    // Bind parameters: 
+    // i = integer (item_id)
+    // s = string  (bidder_id/user_id)
+    // d = double  (bid_amount)
+    $stmt->bind_param("isd", $item_id, $user_id, $bid_amount);
     
     if (!$stmt->execute()) {
         throw new Exception("Execute failed: " . $stmt->error);
     }
-    $stmt->close();
+    
+    // $new_bid_id = $stmt->insert_id; 
 
+    $stmt->close();
     // Send notification to seller
     // $notification_id = 'NOTIF_' . uniqid();
     // $notification_message = "New bid placed on your item '{$item_data['title']}': ₱" . number_format($bid_amount, 2);
