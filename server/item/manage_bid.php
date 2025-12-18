@@ -57,11 +57,9 @@ try {
     $buyer_id = $bid['bidder_id']; // The bidder is the buyer (Kate)
 
     if ($action === 'accept') {
-        /* -----------------------------
-            ACCEPT BID LOGIC
-        ------------------------------*/
+        // ACCEPT BID LOGIC
 
-        // 1. Update bid status to 'accepted'
+        // 1. Update bid status to 'won'
         $stmt = $db->prepare("UPDATE bidoffer SET bid_status = 'won' WHERE bid_id = ?");
         $stmt->bind_param("i", $bid_id);
         if (!$stmt->execute()) {
@@ -87,19 +85,16 @@ try {
         }
         $stmt->close();
         
-        // 4. CRITICAL FIX: Insert transaction receipt (No 'item_type' column)
-        
-        
-        // Removed 'item_type' field and placeholder from the query
+        // 4. Insert transaction receipt
         $stmt = $db->prepare("
             INSERT INTO transactionreceipt 
             (status, completed_at, item_id, buyer_id, seller_id, bid_id) 
-            VALUES (?, 'successful', NOW(), ?, ?, ?, ?)
+            VALUES ('successful', NOW(), ?, ?, ?, ?)
         ");
 
-        // The parameters are: (transactionId, item_id, buyer_id, seller_id, bid_id)
-        // Binding all IDs as strings (s) for maximum compatibility.
-        $stmt->bind_param("ssss", 
+        // Binding the 4 placeholders (?) 
+        // Types: i=int, s=string, s=string, i=int
+        $stmt->bind_param("issi", 
             $item_id, 
             $buyer_id, 
             $seller_id, 
@@ -123,7 +118,7 @@ try {
         /* -----------------------------
             DECLINE BID LOGIC
         ------------------------------*/
-        // Update bid status to 'declined'
+        // Update bid status to 'lost'
         $stmt = $db->prepare("UPDATE bidoffer SET bid_status = 'lost' WHERE bid_id = ?");
         $stmt->bind_param("i", $bid_id);
         $stmt->execute();
