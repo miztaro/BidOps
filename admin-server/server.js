@@ -150,28 +150,51 @@ app.get('/api/reports', async (req, res) => {
     } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
-// D. BAN API
+// D. BAN API (Updated to remove all user items upon banning)
 app.post('/api/ban', async (req, res) => {
     const { report_id, target_id, target_type } = req.body;
     const conn = await db.getConnection();
+    
     try {
         await conn.beginTransaction();
 
+        let userIdToBan = null;
+
         if (target_type === 'item') {
-            await conn.query("UPDATE item SET status = 'approval_rejected' WHERE item_id = ?", [target_id]);
+            // 1. Get the seller_id from the reported item
             const [rows] = await conn.query("SELECT seller_id FROM item WHERE item_id = ?", [target_id]);
-            if(rows.length > 0) await conn.query("UPDATE user SET is_banned = 1 WHERE user_id = ?", [rows[0].seller_id]);
-        } 
-        else if (target_type === 'user') {
-            await conn.query("UPDATE user SET is_banned = 1 WHERE user_id = ?", [target_id]);
+            
+            if (rows.length > 0) {
+                userIdToBan = rows[0].seller_id;
+            }
+        } else if (target_type === 'user') {
+            // target_id is already the user_id
+            userIdToBan = target_id;
         }
 
-        if(report_id) await conn.query("UPDATE report SET status = 'resolved' WHERE report_id = ?", [report_id]);
+        if (userIdToBan) {
+            // 2. Ban the user
+            await conn.query("UPDATE user SET is_banned = 1 WHERE user_id = ?", [userIdToBan]);
+
+            // 3. NEW: Set ALL items by this user to 'approval_rejected' 
+            // This effectively "deletes" them from the public marketplace
+            await conn.query(
+                "UPDATE item SET status = 'approval_rejected' WHERE seller_id = ?", 
+                [userIdToBan]
+            );
+        }
+
+        // 4. Resolve the report
+        if (report_id) {
+            await conn.query("UPDATE report SET status = 'resolved' WHERE report_id = ?", [report_id]);
+        }
 
         await conn.commit();
-        res.json({ success: true, message: 'Banned successfully' });
+        res.json({ success: true, message: 'User banned and all listings removed successfully' });
+        
     } catch (err) {
         await conn.rollback();
+        console.error("Ban Error:", err);
         res.status(500).json({ success: false, message: err.message });
     } finally {
         conn.release();
