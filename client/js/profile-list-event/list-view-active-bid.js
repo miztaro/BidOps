@@ -100,7 +100,8 @@ function populateBidModal(data) {
         images.forEach((img, index) => {
             const thumb = document.createElement('img');
             thumb.src = `${IMAGE_BASE_URL}${img[imageProperty]}`;
-            thumb.classList.add(index === 0 ? 'active' : '');
+            // thumb.classList.add(index === 0 ? 'active' : '');
+            if (index === 0) thumb.classList.add('active');
             
             thumb.addEventListener('click', () => {
                 mainImage.src = thumb.src;

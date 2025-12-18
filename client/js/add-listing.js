@@ -9,7 +9,7 @@
     let fileListDT = new DataTransfer();
     let previewObjectURLs = [];
     let previewContainerEl = null;
-    
+
     // Config
     const MAX_FILES = 5;
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -49,7 +49,7 @@
 
     // Clear images and reset file input
     function clearImagePreviews() {
-        previewObjectURLs.forEach(u => { try { URL.revokeObjectURL(u); } catch (e) {} });
+        previewObjectURLs.forEach(u => { try { URL.revokeObjectURL(u); } catch (e) { } });
         previewObjectURLs = [];
         fileListDT = new DataTransfer();
 
@@ -126,7 +126,7 @@
         const bidIncrement = el('bidIncrement');
         const incrementValue = el('incrementValue');
         if (bidIncrement && incrementValue) {
-            bidIncrement.value = 5; 
+            bidIncrement.value = 5;
             incrementValue.textContent = "5%";
             // Recalculate slider background
             const percent = (5 - bidIncrement.min) * 100 / (bidIncrement.max - bidIncrement.min);
@@ -155,7 +155,7 @@
     function closeAddListingModal() {
         const overlay = el('addListingModal');
         if (overlay) overlay.style.display = 'none';
-        resetModalForm(); 
+        resetModalForm();
     }
 
     // === 4. COMPONENT INITIALIZATIONS ===
@@ -181,8 +181,8 @@
             titleCount.textContent = len;
             titleCount.style.color =
                 len >= 50 ? '#d32f2f' :
-                len >= 40 ? '#f57c00' :
-                '#757575';
+                    len >= 40 ? '#f57c00' :
+                        '#757575';
         });
     }
 
@@ -305,7 +305,7 @@
             const startDate = el('start_date');
             const endDate = el('end_date');
             const files = imageInput.files;
-            
+
             // --- Validation ---
             const titleLength = title ? title.value.replace(/\s/g, '').length : 0;
             if (!title || titleLength < 3) return showMsg('Title must be at least 3 characters.', 'error');
@@ -336,13 +336,13 @@
             // --- Submission ---
             const formData = new FormData(this);
             if (hiddenType) formData.set('listingType', hiddenType.value);
-            
+
             // Re-append files from our DataTransfer object
             // (Note: standard FormData(form) usually grabs the input files, 
             // but manually appending ensures our DT sync is respected)
-            formData.delete('image'); 
+            formData.delete('images[]');
             for (let f of files) {
-                formData.append('image', f);
+                formData.append('images[]', f);
             }
 
             const submitBtn = form.querySelector('.create-btn');
@@ -354,37 +354,38 @@
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(data => {
-                const message = data?.message || 'Unknown response';
-                const success = message.toLowerCase().includes('success');
-                showMsg(message, success ? 'success' : 'error');
+                .then(res => res.json())
+                .then(data => {
+                    const message = data?.message || 'Unknown response';
+                    // const success = message.toLowerCase().includes('success');
+                    const success = data?.success === true;
+                    showMsg(message, success ? 'success' : 'error');
 
-                if (success) {
-                    setTimeout(() => {
-                        closeAddListingModal();
-                        // Optional: Refresh items if on a listing page
-                        if (typeof fetchItems === 'function') {
-                            fetchItems();
-                        } else {
-                            location.reload();
-                        }
-                    }, 1500);
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                showMsg('Error connecting to server.', 'error');
-            })
-            .finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-            });
+                    if (success) {
+                        setTimeout(() => {
+                            closeAddListingModal();
+                            // Optional: Refresh items if on a listing page
+                            if (typeof fetchItems === 'function') {
+                                fetchItems();
+                            } else {
+                                location.reload();
+                            }
+                        }, 1500);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showMsg('Error connecting to server.', 'error');
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
         };
     }
 
     // === 6. MAIN INIT FUNCTION ===
-    
+
     function initAddListingModal() {
         // Check if modal exists in DOM
         if (!document.getElementById('modalListingForm')) {

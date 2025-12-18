@@ -211,18 +211,28 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             http_response_code(201);
             echo json_encode([
+                "success" => true,
                 "message" => "Item now pending for approval",
                 "item_id" => $item_id
             ]);
 
         } catch (Exception $e) {
             $db->rollback();
-            throw $e;
+            http_response_code(500);
+            echo json_encode([
+                "success" => false,
+                "message" => "Error creating item: " . $e->getMessage()
+            ]);
+            exit;
         }
 
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(["message" => "Error creating item: " . $e->getMessage()]);
+            echo json_encode([
+                "success" => false,
+                "message" => "Error creating item: " . $e->getMessage()
+        ]);
+        exit;
     }
 } else {
     http_response_code(405);
