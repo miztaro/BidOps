@@ -43,7 +43,7 @@ try {
 
     // Get item details including starting price
     $stmt = $db->prepare("
-        SELECT i.title, bi.starting_price, bi.bid_increment_percent 
+        SELECT i.title, i.seller_id, bi.starting_price, bi.bid_increment_percent 
         FROM item i 
         LEFT JOIN biditem bi ON i.item_id = bi.item_id 
         WHERE i.item_id = ?
@@ -80,7 +80,8 @@ try {
     $minimum_required_bid = $absolute_highest_bid + $increment_amount;
 
     // Check if bid is higher than absolute highest bid + increment
-    if ($bid_amount < $minimum_required_bid) {
+    // Note: We use a small epsilon for float comparison to avoid precision errors
+    if ($bid_amount < ($minimum_required_bid - 0.001)) {
         echo json_encode([
             'success' => false, 
             'message' => "Bid must be at least ₱" . number_format($minimum_required_bid, 2) . 
@@ -91,14 +92,7 @@ try {
     }
 
     // Check if user is the seller
-    $stmt = $db->prepare("SELECT seller_id FROM item WHERE item_id = ?");
-    $stmt->bind_param("i", $item_id);
-    $stmt->execute();
-    $seller_result = $stmt->get_result();
-    $seller_data = $seller_result->fetch_assoc();
-    $stmt->close();
-
-    if ($seller_data && $seller_data['seller_id'] === $user_id) {
+    if ($item_data['seller_id'] === $user_id) {
         echo json_encode(['success' => false, 'message' => 'You cannot bid on your own item']);
         exit;
     }
@@ -113,9 +107,8 @@ try {
     $stmt->execute();
     $stmt->close();
 
-    / Insert new bid
-    // We do NOT generate a 'bid_id' here. The database does it automatically.
-    
+    // Insert new bid
+    // We do NOT generate a 'bid_id' here. The database handles AUTO_INCREMENT.
     $stmt = $db->prepare("
         INSERT INTO bidoffer (item_id, bidder_id, bid_amount, bid_status, created_at)
         VALUES (?, ?, ?, 'active', NOW())
@@ -131,18 +124,14 @@ try {
         throw new Exception("Execute failed: " . $stmt->error);
     }
     
-    // $new_bid_id = $stmt->insert_id; 
-
+    // If you need the new ID, you can get it here: $new_bid_id = $stmt->insert_id;
     $stmt->close();
-    // Send notification to seller
+
+    // --- Notification Logic (Commented out as per request) ---
     // $notification_id = 'NOTIF_' . uniqid();
     // $notification_message = "New bid placed on your item '{$item_data['title']}': ₱" . number_format($bid_amount, 2);
-    
-    // $stmt = $db->prepare("
-    //     INSERT INTO notification (notification_id, user_id, message, created_at, is_read)
-    //     VALUES (?, ?, ?, NOW(), 0)
-    // ");
-    // $stmt->bind_param("sss", $notification_id, $seller_data['seller_id'], $notification_message);
+    // $stmt = $db->prepare("INSERT INTO notification (notification_id, user_id, message, created_at, is_read) VALUES (?, ?, ?, NOW(), 0)");
+    // $stmt->bind_param("sss", $notification_id, $item_data['seller_id'], $notification_message);
     // $stmt->execute();
     // $stmt->close();
 
