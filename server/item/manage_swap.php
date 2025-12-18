@@ -80,7 +80,7 @@ try {
         // 2. Decline all other PENDING swap offers for the requested item
         $stmt = $db->prepare("
             UPDATE swapoffer 
-            SET swap_status = 'declined' 
+            SET swap_status = 'lost' 
             WHERE requested_item_id = ? AND swap_id != ? AND swap_status = 'pending'
         ");
         $stmt->bind_param("ii", $requested_item_id, $swap_id);
