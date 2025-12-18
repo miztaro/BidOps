@@ -185,6 +185,8 @@ header {
 }
 
 .report-btn {
+    background: transparent;
+    border: none;
     position: absolute;
     top: 10px;
     right: 10px;
@@ -245,14 +247,51 @@ header {
     line-height: 1.6;
 }
 
-/* Seller Info */
 .seller-info {
     display: flex;
     align-items: center;
+    justify-content: space-between; /* This pushes the button to the far right */
     gap: 15px;
-    padding: 15px;
+    padding: 15px 20px; 
     background-color: #f4f4f9;
     border-radius: 10px;
+    width: 100%; /* Ensure it takes full width of the container */
+}
+
+/* 2. Group the Avatar and Text on the left */
+.seller-main-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* 3. Style the new inline report button */
+.report-btn-inline {
+    background: transparent;
+    border: none;
+    background: transparent;
+    border: none;
+    color: #8C8A8A; /* Gray color to match your design */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s ease;
+    padding: 5px;
+}
+
+.report-btn-inline:hover {
+    color: #B41B1B; /* Turns SLU Red on hover */
+    transform: scale(1.1);
+}
+
+/* 4. Ensure details text doesn't have extra margins */
+.seller-details h4 {
+    margin: 0;
+}
+
+.seller-details p {
+    margin: 0;
 }
 
 .seller-avatar {

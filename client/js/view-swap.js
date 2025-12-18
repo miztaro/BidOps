@@ -104,10 +104,10 @@ function setupReportButton() {
     newReportBtn.addEventListener('click', (e) => {
         e.stopPropagation(); 
         
-        const reportReason = prompt('Please enter the reason for reporting this item:');
+        const reportReason = prompt('Please enter the reason for reporting this user:');
         
         if (reportReason && reportReason.trim() !== '') {
-            fetch('../server/item/report_item.php', {
+            fetch('../server/item/report_user.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
