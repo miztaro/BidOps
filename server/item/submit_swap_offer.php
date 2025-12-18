@@ -51,7 +51,7 @@ try {
     $stmt = $db->prepare("
         INSERT INTO item 
         (seller_id, title, description, category_type, item_type, status, created_date)
-        VALUES (?, ?, ?, ?, 'swap', 'available', NOW())
+        VALUES (?, ?, ?, ?, 'swap', 'active', NOW())
     ");
     $stmt->bind_param(
         "ssss",
