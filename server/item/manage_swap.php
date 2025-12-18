@@ -88,14 +88,14 @@ try {
         $stmt->close();
 
         // 3. Mark the seller's original item as 'swapped'
-        $stmt = $db->prepare("UPDATE item SET status = 'swapped' WHERE item_id = ?");
+        $stmt = $db->prepare("UPDATE item SET status = 'sold' WHERE item_id = ?");
         $stmt->bind_param("i", $requested_item_id);
         $stmt->execute();
         $stmt->close();
         
         // 4. Mark the buyer's offered item as 'swapped' 
         // This prevents the buyer from offering the item again.
-        $stmt = $db->prepare("UPDATE item SET status = 'swapped' WHERE item_id = ?");
+        $stmt = $db->prepare("UPDATE item SET status = 'sold' WHERE item_id = ?");
         $stmt->bind_param("i", $offered_item_id);
         $stmt->execute();
         $stmt->close();
