@@ -114,13 +114,13 @@ try {
     $stmt->close();
 
     // Insert new bid
-    $bid_id = uniqid();
+    
     $stmt = $db->prepare("
-        INSERT INTO bidoffer (bid_id, item_id, bidder_id, bid_amount, bid_status, created_at)
+        INSERT INTO bidoffer ( item_id, bidder_id, bid_amount, bid_status, created_at)
         VALUES (?, ?, ?, ?, 'active', NOW())
     ");
     
-    $stmt->bind_param("sisd", $bid_id, $item_id, $user_id, $bid_amount);
+    $stmt->bind_param("sisd", $item_id, $user_id, $bid_amount);
     
     if (!$stmt->execute()) {
         throw new Exception("Execute failed: " . $stmt->error);
