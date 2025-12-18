@@ -162,6 +162,11 @@ try {
             WHERE i.seller_id = ?
                 AND i.status IS NOT NULL 
                 AND i.status <> ''
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM swapoffer so
+                    WHERE so.offered_item_id = i.item_id
+                )   
             GROUP BY i.item_id 
             ORDER BY i.created_date DESC
         "; 
