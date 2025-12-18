@@ -61,6 +61,7 @@ function disableAllButtons() {
         const newChatBtn = chatBtn.cloneNode(true);
         chatBtn.replaceWith(newChatBtn);
     }
+    setupReportButton();
 }
 
 function enableSwapOffer() {
@@ -90,40 +91,35 @@ function setupBackButton() {
 
 function setupReportButton() {
     const reportBtn = document.getElementById('reportBtn');
+    if (!reportBtn) return;
 
-    if (reportBtn) {
-        const newReportBtn = reportBtn.cloneNode(true);
-        reportBtn.replaceWith(newReportBtn);
+    // Clone to clear old listeners and ensure it's enabled
+    const newReportBtn = reportBtn.cloneNode(true);
+    reportBtn.replaceWith(newReportBtn);
+    
+    newReportBtn.disabled = false;
+    newReportBtn.style.opacity = '1';
+    newReportBtn.style.cursor = 'pointer';
+
+    newReportBtn.addEventListener('click', () => {
+        const reportReason = prompt('Please enter the reason for reporting this item:');
         
-        newReportBtn.addEventListener('click', () => {
-            const reportReason = prompt('Please enter the reason for reporting this item:');
-            
-            if (reportReason && reportReason.trim() !== '') {
-                fetch('../server/item/report_item.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        item_id: itemId,
-                        reason: reportReason
-                    })
+        if (reportReason && reportReason.trim() !== '') {
+            fetch('../server/item/report_item.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    item_id: itemId,
+                    reason: reportReason
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Thank you for your report. We will review this item shortly.');
-                    } else {
-                        alert(data.message || 'Failed to submit report');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error submitting report:', error);
-                    alert('Failed to submit report. Please try again.');
-                });
-            }
-        });
-    }
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message || (data.success ? 'Report submitted' : 'Failed to submit'));
+            })
+            .catch(err => alert('Failed to submit report. Please try again.'));
+        }
+    });
 }
 
 // --- DATA LOADING & RENDERING ---
@@ -194,6 +190,7 @@ function loadSwapItemDetails() {
             console.log('About to call populateSwapItemDetails with:', data);
             populateSwapItemDetails(data);
             setupChatButton();
+            setupReportButton();
 
             // Bind click to seller profile
             const sellerProfileLink = document.getElementById('sellerProfileLink');
