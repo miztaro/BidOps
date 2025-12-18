@@ -54,6 +54,10 @@ body {
     flex: 1;
     min-width: 200px;
 }
+.wow {
+    padding-bottom: 25px;
+    padding-top: 25px;
+}
 
 .filter-group label {
     font-weight: 600;
