@@ -503,6 +503,7 @@ function setupReportButton() {
         reportBtn.replaceWith(newReportBtn);
         
         newReportBtn.addEventListener('click', () => {
+            e.stopPropagation(); 
             const reportReason = prompt('Please enter the reason for reporting this item:');
             
             if (reportReason && reportReason.trim() !== '') {
