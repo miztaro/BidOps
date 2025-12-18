@@ -26,6 +26,8 @@ export function openBidModal(itemId) {
         countdownInterval = null;
     }
     
+    currentItemId = itemId;
+    
     // Ensure we clear the container to show "Loading Timer..."
     const timerEl = document.getElementById('bid-timer');
     if (timerEl) {
