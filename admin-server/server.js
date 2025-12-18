@@ -150,51 +150,62 @@ app.get('/api/reports', async (req, res) => {
     } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
-// D. BAN API (Updated to remove all user items upon banning)
+// D. BAN API 
 app.post('/api/ban', async (req, res) => {
     const { report_id, target_id, target_type } = req.body;
     const conn = await db.getConnection();
     
+    console.log(`Ban Request received for ${target_type}: ${target_id}`);
+
     try {
         await conn.beginTransaction();
 
         let userIdToBan = null;
 
+        // --- STEP 1: Identify the User ID to ban ---
         if (target_type === 'item') {
-            // 1. Get the seller_id from the reported item
+            // If an item was reported, find the person who owns it
             const [rows] = await conn.query("SELECT seller_id FROM item WHERE item_id = ?", [target_id]);
-            
             if (rows.length > 0) {
                 userIdToBan = rows[0].seller_id;
+                console.log(`Found seller ID ${userIdToBan} from reported item ${target_id}`);
             }
-        } else if (target_type === 'user') {
-            // target_id is already the user_id
+        } else {
+            // If a user was reported directly, target_id is the user_id
             userIdToBan = target_id;
         }
 
-        if (userIdToBan) {
-            // 2. Ban the user
-            await conn.query("UPDATE user SET is_banned = 1 WHERE user_id = ?", [userIdToBan]);
-
-            // 3. NEW: Set ALL items by this user to 'approval_rejected' 
-            // This effectively "deletes" them from the public marketplace
-            await conn.query(
-                "UPDATE item SET status = 'approval_rejected' WHERE seller_id = ?", 
-                [userIdToBan]
-            );
+        if (!userIdToBan) {
+            throw new Exception("Could not find a user to ban.");
         }
 
-        // 4. Resolve the report
+        // --- STEP 2: Ban the user ---
+        const [userResult] = await conn.query("UPDATE user SET is_banned = 1 WHERE user_id = ?", [userIdToBan]);
+        console.log(`User ${userIdToBan} banned status updated.`);
+
+        // --- STEP 3: Remove ALL items by this user ---
+        // We set status to 'approval_rejected' so they disappear from the marketplace
+        const [itemResult] = await conn.query(
+            "UPDATE item SET status = 'approval_rejected' WHERE seller_id = ?", 
+            [userIdToBan]
+        );
+        console.log(`Removed ${itemResult.affectedRows} items belonging to banned user ${userIdToBan}`);
+
+        // --- STEP 4: Resolve the report ---
         if (report_id) {
             await conn.query("UPDATE report SET status = 'resolved' WHERE report_id = ?", [report_id]);
+            console.log(`Report ${report_id} marked as resolved.`);
         }
 
         await conn.commit();
-        res.json({ success: true, message: 'User banned and all listings removed successfully' });
+        res.json({ 
+            success: true, 
+            message: `User banned and ${itemResult.affectedRows} items removed.` 
+        });
         
     } catch (err) {
         await conn.rollback();
-        console.error("Ban Error:", err);
+        console.error("Critical Ban Error:", err.message);
         res.status(500).json({ success: false, message: err.message });
     } finally {
         conn.release();
