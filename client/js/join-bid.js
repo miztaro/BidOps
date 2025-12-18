@@ -502,7 +502,7 @@ function setupReportButton() {
         const newReportBtn = reportBtn.cloneNode(true);
         reportBtn.replaceWith(newReportBtn);
         
-        newReportBtn.addEventListener('click', () => {
+        newReportBtn.addEventListener('click', (e) => {
             e.stopPropagation(); 
             const reportReason = prompt('Please enter the reason for reporting this item:');
             

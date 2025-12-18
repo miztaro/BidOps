@@ -101,7 +101,7 @@ function setupReportButton() {
     newReportBtn.style.opacity = '1';
     newReportBtn.style.cursor = 'pointer';
 
-    newReportBtn.addEventListener('click', () => {
+    newReportBtn.addEventListener('click', (e) => {
         e.stopPropagation(); 
         
         const reportReason = prompt('Please enter the reason for reporting this item:');
