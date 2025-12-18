@@ -46,17 +46,11 @@ body {
 }
 
 .filter-group {
-    padding-top: 25px;
-    padding-bottom: 25px;
     display: flex;
     flex-direction: column;
     gap: 8px;
     flex: 1;
     min-width: 200px;
-}
-.wow {
-    padding-bottom: 25px;
-    padding-top: 25px;
 }
 
 .filter-group label {
