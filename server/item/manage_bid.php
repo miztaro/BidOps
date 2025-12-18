@@ -72,7 +72,7 @@ try {
         // 2. Decline all other active bids for this item
         $stmt = $db->prepare("
             UPDATE bidoffer 
-            SET bid_status = 'declined' 
+            SET bid_status = 'lost' 
             WHERE item_id = ? AND bid_id != ? AND bid_status = 'active'
         ");
         $stmt->bind_param("ii", $item_id, $bid_id);
