@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     loadItem(itemId);
 
-    function loadItem(id) {
+function loadItem(id) {
         fetch(`/api/item/${id}`)
         .then(res => res.json())
         .then(data => {
@@ -27,22 +27,22 @@ document.addEventListener("DOMContentLoaded", function() {
             if(item.seller_name) document.getElementById('sellerName').textContent = item.seller_name;
             if(item.seller_email) document.getElementById('sellerEmail').textContent = item.seller_email;
 
-            // Images
-                        if(data.images.length > 0) {
-                // 1. POINT TO PHP SERVER (Port 80/Apache), NOT Node (Port 3000)
-                // Make sure 'BidOps' matches your actual folder name in htdocs
-                const phpServer = 'http://localhost/BidOps/server'; 
+            // --- FIXED IMAGE SECTION ---
+            if(data.images && data.images.length > 0) {
+                // 1. DYNAMIC IP DETECTION
+                // This will be 'localhost' on your PC, but '10.120.77.220' on your phone automatically
+                const currentIP = window.location.hostname; 
 
-                // 2. CLEAN THE PATH
-                // Your DB likely has "uploads/item_...png"
-                // We strip "uploads/" so we don't get the "uploads/uploads/" error
+                // 2. BUILD THE URL
+                // We use Port 80 (Apache) for the PHP server
+                const phpServer = `http://${currentIP}/BidOps/server`; 
+
                 const rawPath = data.images[0].image_path;
                 const cleanFilename = rawPath.replace('uploads/', '');
 
                 // 3. SET THE SOURCE
                 document.getElementById('mainImage').src = `${phpServer}/item/uploads/${cleanFilename}`;
                 
-                // Optional: Handle broken images
                 document.getElementById('mainImage').onerror = function() {
                     this.src = '../assets/images/placeholder.png'; 
                 };
@@ -57,7 +57,6 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
     }
-
     // Delete
     const modal = document.getElementById('deleteModal');
     document.getElementById('deleteItemBtn').onclick = () => modal.style.display = 'block';

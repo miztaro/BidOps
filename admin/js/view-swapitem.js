@@ -10,41 +10,44 @@ document.addEventListener("DOMContentLoaded", function() {
 
     loadItem(itemId);
 
-    function loadItem(id) {
-        fetch(`/api/item/${id}`)
-        .then(res => res.json())
-        .then(data => {
-            if(!data.success) { alert(data.message); return; }
-            const item = data.item;
+function loadItem(id) {
+    fetch(`/api/item/${id}`)
+    .then(res => res.json())
+    .then(data => {
+        if(!data.success) { alert(data.message); return; }
+        const item = data.item;
+        
+        document.getElementById('itemTitle').textContent = item.title;
+        document.getElementById('itemDescription').textContent = item.description;
+        document.getElementById('itemCategory').textContent = item.category_type;
+        document.getElementById('itemId').textContent = item.item_id;
+        document.getElementById('itemStatus').textContent = item.status;
+        if(item.seller_name) document.getElementById('sellerName').textContent = item.seller_name;
+
+        if(data.images && data.images.length > 0) {
+            // --- DYNAMIC IP FIX ---
+            // This gets 'localhost' on your PC, but '10.120.77.220' on your phone
+            const currentHost = window.location.hostname; 
             
-            document.getElementById('itemTitle').textContent = item.title;
-            document.getElementById('itemDescription').textContent = item.description;
-            document.getElementById('itemCategory').textContent = item.category_type;
-            document.getElementById('itemId').textContent = item.item_id;
-            document.getElementById('itemStatus').textContent = item.status;
-            if(item.seller_name) document.getElementById('sellerName').textContent = item.seller_name;
+            // We use Port 80 (standard) for the PHP/Apache server where images live
+            const phpServer = `http://${currentHost}/BidOps/server`; 
 
-            if(data.images.length > 0) {
-                // 1. POINT TO PHP SERVER (Port 80/Apache), NOT Node (Port 3000)
-                // Make sure 'BidOps' matches your actual folder name in htdocs
-                const phpServer = 'http://localhost/BidOps/server'; 
+            // Clean the path logic
+            const rawPath = data.images[0].image_path;
+            const cleanFilename = rawPath.replace('uploads/', '');
 
-                // 2. CLEAN THE PATH
-                // Your DB likely has "uploads/item_...png"
-                // We strip "uploads/" so we don't get the "uploads/uploads/" error
-                const rawPath = data.images[0].image_path;
-                const cleanFilename = rawPath.replace('uploads/', '');
-
-                // 3. SET THE SOURCE
-                document.getElementById('mainImage').src = `${phpServer}/item/uploads/${cleanFilename}`;
-                
-                // Optional: Handle broken images
-                document.getElementById('mainImage').onerror = function() {
-                    this.src = '../assets/images/placeholder.png'; 
-                };
-            }
-        });
-    }
+            // Set the Source
+            const finalImageUrl = `${phpServer}/item/uploads/${cleanFilename}`;
+            console.log("Loading Image from:", finalImageUrl); // Debug this in console
+            
+            document.getElementById('mainImage').src = finalImageUrl;
+            
+            document.getElementById('mainImage').onerror = function() {
+                this.src = '../assets/images/placeholder.png'; 
+            };
+        }
+    });
+}
 
     const modal = document.getElementById('deleteModal');
     document.getElementById('deleteItemBtn').onclick = () => modal.style.display = 'block';
