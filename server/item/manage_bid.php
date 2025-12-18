@@ -88,7 +88,7 @@ try {
         $stmt->close();
         
         // 4. CRITICAL FIX: Insert transaction receipt (No 'item_type' column)
-        $transactionId = 'tr' . uniqid(); 
+        
         
         // Removed 'item_type' field and placeholder from the query
         $stmt = $db->prepare("
