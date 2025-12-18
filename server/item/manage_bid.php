@@ -62,7 +62,7 @@ try {
         ------------------------------*/
 
         // 1. Update bid status to 'accepted'
-        $stmt = $db->prepare("UPDATE bidoffer SET bid_status = 'accepted' WHERE bid_id = ?");
+        $stmt = $db->prepare("UPDATE bidoffer SET bid_status = 'won' WHERE bid_id = ?");
         $stmt->bind_param("i", $bid_id);
         if (!$stmt->execute()) {
              throw new Exception("Failed to update accepted bid status.");
@@ -125,7 +125,7 @@ try {
             DECLINE BID LOGIC
         ------------------------------*/
         // Update bid status to 'declined'
-        $stmt = $db->prepare("UPDATE bidoffer SET bid_status = 'declined' WHERE bid_id = ?");
+        $stmt = $db->prepare("UPDATE bidoffer SET bid_status = 'lost' WHERE bid_id = ?");
         $stmt->bind_param("i", $bid_id);
         $stmt->execute();
         $stmt->close();
